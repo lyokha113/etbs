@@ -24,7 +24,6 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
         if (status != null) {
             int statusCode = Integer.parseInt(status.toString());
             Map<String, Object> error = new LinkedHashMap<>();
-            error.put("status", 0);
             error.put("errors", statusCode == HttpStatus.NOT_FOUND.value() ?
                     "API Not found" :
                     HttpStatus.valueOf(statusCode).getReasonPhrase());
