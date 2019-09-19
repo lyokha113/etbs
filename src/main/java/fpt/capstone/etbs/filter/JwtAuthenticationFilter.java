@@ -3,6 +3,8 @@ package fpt.capstone.etbs.filter;
 import fpt.capstone.etbs.component.JwtTokenProvider;
 import fpt.capstone.etbs.component.UserDetailsSecurity;
 import fpt.capstone.etbs.model.Account;
+import fpt.capstone.etbs.model.Role;
+import fpt.capstone.etbs.payload.LoginResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -36,7 +39,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwt = getJwtFromRequest(request);
 
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-                Account account = tokenProvider.getTokenValue(jwt);
+                LoginResponse json = tokenProvider.getTokenValue(jwt);
+                Role role = Role.builder().id(json.getRoleId()).build();
+                Account account = Account.builder()
+                        .id(json.getId())
+                        .fullName(json.getFullName())
+                        .email(json.getEmail())
+                        .role(role)
+                        .build();
                 UserDetails userDetails = userDetailsSecurity.loadUserFromAccount(account);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

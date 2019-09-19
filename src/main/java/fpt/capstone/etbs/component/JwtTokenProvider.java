@@ -4,6 +4,7 @@ package fpt.capstone.etbs.component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fpt.capstone.etbs.model.Account;
+import fpt.capstone.etbs.payload.LoginResponse;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,26 +27,26 @@ public class JwtTokenProvider {
     @Value("${app.jwtExpirationInMs}")
     private int jwtExpirationInMs;
 
-    public String generateToken(Account account) throws JsonProcessingException {
+    public String generateToken(LoginResponse response) throws JsonProcessingException {
 
         ObjectMapper om = new ObjectMapper();
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
         return Jwts.builder()
-                .setSubject(om.writeValueAsString(account))
+                .setSubject(om.writeValueAsString(response))
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
 
-    public Account getTokenValue(String token) throws IOException {
+    public LoginResponse getTokenValue(String token) throws IOException {
         Claims claims = Jwts.parser()
                 .setSigningKey(jwtSecret)
                 .parseClaimsJws(token)
                 .getBody();
-        return new ObjectMapper().readValue(claims.getSubject(), Account.class);
+        return new ObjectMapper().readValue(claims.getSubject(), LoginResponse.class);
     }
 
     public boolean validateToken(String authToken) {
