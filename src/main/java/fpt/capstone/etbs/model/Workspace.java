@@ -1,10 +1,13 @@
 package fpt.capstone.etbs.model;
 
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
 
@@ -14,7 +17,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Workspace  implements Serializable {
+public class Workspace implements Serializable {
 
     @Id
     @Column
@@ -24,6 +27,17 @@ public class Workspace  implements Serializable {
     @Column(nullable = false)
     @NotBlank
     private String name;
+
+    @CreatedDate
+    @Column(name = "created_date")
+    private Date createdDate;
+
+    @LastModifiedDate
+    @Column(name = "last_modified_date")
+    private Date lastModifiedDate;
+
+    @Column(columnDefinition = "TINYINT(1) default 0", nullable = false)
+    private boolean active;
 
     @ManyToOne
     @NonNull

@@ -5,10 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -19,7 +22,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MediaStorage  implements Serializable {
+public class MediaStorage implements Serializable {
 
     @Id
     @Column
@@ -37,6 +40,17 @@ public class MediaStorage  implements Serializable {
     @Column(nullable = false)
     @NotBlank
     private String link;
+
+    @CreatedDate
+    @Column(name = "created_date")
+    private Date createdDate;
+
+    @LastModifiedDate
+    @Column(name = "last_modified_date")
+    private Date lastModifiedDate;
+
+    @Column(columnDefinition = "TINYINT(1) default 0", nullable = false)
+    private boolean active;
 
     @OneToMany(mappedBy = "mediaStorage", cascade = CascadeType.ALL)
     private Set<MediaFile> files;
