@@ -10,6 +10,6 @@ import java.util.List;
 public interface CategoryService {
     List<CategoryListResponse> getAllListCategory();
     void createCategory(CategoryCreateRequest request);
-    void updateCategory(CategoryUpdateRequest request);
+    boolean updateCategory(CategoryUpdateRequest request);
     void changeCategoryStatus(CategoryStatusRequest request);
 }

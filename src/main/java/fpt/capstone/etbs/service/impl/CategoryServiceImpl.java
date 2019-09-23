@@ -8,10 +8,12 @@ import fpt.capstone.etbs.payload.CategoryUpdateRequest;
 import fpt.capstone.etbs.repository.CategoryRepository;
 import fpt.capstone.etbs.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class CategoryServiceImpl implements CategoryService {
     @Autowired
     CategoryRepository categoryRepository;
@@ -34,10 +36,14 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void updateCategory(CategoryUpdateRequest request) {
-        Category category = categoryRepository.getOne(request.getId());
-        category.setName(request.getName());
-        categoryRepository.save(category);
+    public boolean updateCategory(CategoryUpdateRequest request) {
+        Category category = categoryRepository.findById(request.getId()).orElse(null);
+        if (category != null) {
+            category.setName(request.getName());
+            categoryRepository.save(category);
+            return true;
+        }
+        return false;
     }
 
     @Override
