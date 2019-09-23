@@ -28,6 +28,9 @@ public class Category implements Serializable {
     @NotBlank
     private String name;
 
+    @Column(columnDefinition = "TINYINT(1) default 0", nullable = false)
+    private boolean active;
+
     @ManyToMany(cascade = CascadeType.ALL)
     private Set<DefaultTemplate> templates;
 
