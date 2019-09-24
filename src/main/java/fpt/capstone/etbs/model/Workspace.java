@@ -1,8 +1,11 @@
 package fpt.capstone.etbs.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import fpt.capstone.etbs.component.Auditing;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -17,7 +20,9 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Workspace implements Serializable {
+@EntityListeners(AuditingEntityListener.class)
+@JsonIgnoreProperties(value = {"createdDate", "lastModifiedDate"}, allowGetters = true)
+public class Workspace extends Auditing implements Serializable {
 
     @Id
     @Column
@@ -27,14 +32,6 @@ public class Workspace implements Serializable {
     @Column(nullable = false)
     @NotBlank
     private String name;
-
-    @CreatedDate
-    @Column(name = "created_date")
-    private Date createdDate;
-
-    @LastModifiedDate
-    @Column(name = "last_modified_date")
-    private Date lastModifiedDate;
 
     @Column(columnDefinition = "TINYINT(1) default 0", nullable = false)
     private boolean active;

@@ -29,15 +29,25 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void createCategory(CategoryCreateRequest request) {
-        Category category = new Category();
-        category.setName(request.getName());
-        categoryRepository.save(category);
+    public Category getCategory(int id) {
+        return categoryRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public boolean createCategory(CategoryCreateRequest request) {
+        Category category = categoryRepository.getByName(request.getName()).orElse(null);
+        if (category == null) {
+            category = new Category();
+            category.setName(request.getName());
+            categoryRepository.save(category);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public boolean updateCategory(CategoryUpdateRequest request) {
-        Category category = categoryRepository.findById(request.getId()).orElse(null);
+        Category category = getCategory(request.getId());
         if (category != null) {
             category.setName(request.getName());
             categoryRepository.save(category);
@@ -47,11 +57,13 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void changeCategoryStatus(CategoryStatusRequest request) {
-        Category category = categoryRepository.getOne(request.getId());
-        category.setActive(request.isActive());
-        categoryRepository.save(category);
+    public boolean changeCategoryStatus(CategoryStatusRequest request) {
+        Category category = getCategory(request.getId());
+        if (category != null) {
+            category.setActive(request.isActive());
+            categoryRepository.save(category);
+            return true;
+        }
+        return false;
     }
-
-
 }

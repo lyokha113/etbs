@@ -24,8 +24,12 @@ public class CategoryController {
     @PostMapping("/category")
     private ResponseEntity<ApiResponse> createCategory(
             @Valid @RequestBody CategoryCreateRequest request) {
-        categoryService.createCategory(request);
-        return ResponseEntity.ok(new ApiResponse<>(1, "Create Successful"));
+        if (categoryService.createCategory(request)) {
+            return ResponseEntity.ok(new ApiResponse<>(1, "Create Successful!"));
+        } else {
+            return ResponseEntity.ok(new ApiResponse<>(0, "Create Failed. Name is duplicate!"));
+        }
+
     }
 
     @PutMapping("/category/update")

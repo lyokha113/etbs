@@ -69,9 +69,9 @@ public class AuthController {
                     ResponseEntity.ok(new ApiResponse<>(0, "account create failed"));
         } catch (Exception ex) {
             if (ex.getMessage().contains("ConstraintViolationException")) {
-                return ResponseEntity.ok(new ApiResponse<>(0, "account is existed"));
+                return ResponseEntity.ok(new ApiResponse<>(0, "Account Created Failed. " + ex.getMessage()));
             }
-            return ResponseEntity.ok(new ApiResponse<>(-1, ex.getMessage()));
+            return ResponseEntity.ok(new ApiResponse<>(-1, "Account Created Failed. " + ex.getMessage()));
         }
     }
 }
