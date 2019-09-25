@@ -63,6 +63,17 @@ public class AccountServiceImpl implements AccountService {
         return null;
     }
 
+    @Override
+    public boolean changeStatusAccount(UUID uuid, boolean active) {
+        Account account = getAccount(uuid);
+        if (account != null) {
+            account.setActive(active);
+            accountRepository.save(account);
+            return true;
+        }
+        return false;
+    }
+
     private Account setAccountFromRequest(RegisterRequest request, Role role) {
         Account account = new Account();
         account.setPassword(request.getPassword());

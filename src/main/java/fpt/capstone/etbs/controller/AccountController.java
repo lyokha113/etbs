@@ -18,9 +18,6 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     @GetMapping("/account")
     public ResponseEntity<ApiResponse> getAccounts(@Valid @RequestBody String email) {
         Account accounts = accountService.getAccountByEmail(email);
@@ -37,8 +34,7 @@ public class AccountController {
                 ResponseEntity.badRequest().body(
                         new ApiResponse<>(false, "Account is existed", null));
     }
-
-    @PutMapping("/account/{id}")
+    @PutMapping("/account/status/{id}")
     public ResponseEntity<ApiResponse> updateAccount(@PathVariable("id") UUID uuid,
                                                      @Valid @RequestBody AccountUpdateRequest request) {
         Account account = accountService.updateAccount(uuid, request);
