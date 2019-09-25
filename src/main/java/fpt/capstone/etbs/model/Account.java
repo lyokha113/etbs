@@ -1,17 +1,23 @@
 package fpt.capstone.etbs.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import fpt.capstone.etbs.component.Auditing;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -22,7 +28,9 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Account implements Serializable {
+@EntityListeners(AuditingEntityListener.class)
+@JsonIgnoreProperties(value = {"createdDate", "lastModifiedDate"}, allowGetters = true)
+public class Account extends Auditing implements Serializable {
 
     @Id
     @GeneratedValue(generator = "uuid2")

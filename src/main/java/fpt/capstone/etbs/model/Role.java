@@ -1,12 +1,18 @@
 package fpt.capstone.etbs.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import fpt.capstone.etbs.component.Auditing;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
 
@@ -16,7 +22,8 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Role  implements Serializable {
+@EntityListeners(AuditingEntityListener.class)
+public class Role extends Auditing implements Serializable {
 
     @Id
     @Column
@@ -25,6 +32,9 @@ public class Role  implements Serializable {
 
     @Column
     private String name;
+
+    @Column(columnDefinition = "TINYINT(1) default 0", nullable = false)
+    private boolean active;
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Account> accounts;
