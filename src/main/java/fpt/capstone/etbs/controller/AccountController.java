@@ -3,12 +3,10 @@ package fpt.capstone.etbs.controller;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.payload.AccountUpdateRequest;
 import fpt.capstone.etbs.payload.ApiResponse;
-import fpt.capstone.etbs.payload.RegisterRequest;
+import fpt.capstone.etbs.payload.CreateAccountRequest;
 import fpt.capstone.etbs.service.AccountService;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,34 +24,28 @@ public class AccountController {
     @GetMapping("/account")
     public ResponseEntity<ApiResponse> getAccounts(@Valid @RequestBody String email) {
         Account accounts = accountService.getAccountByEmail(email);
-        return ResponseEntity.ok(new ApiResponse<>(1, accounts));
+        return ResponseEntity.ok(new ApiResponse<>(true, "", accounts));
     }
 
     @PostMapping("/account")
-    public ResponseEntity<ApiResponse> createAccount(@Valid @RequestBody RegisterRequest request) {
-        try {
-            request.setPassword(passwordEncoder.encode(request.getPassword()));
-            accountService.registerAccount(request);
-            Account account = accountService.getAccountByEmail(request.getEmail());
-            return account != null ? ResponseEntity.ok(new ApiResponse<>(1, account)) :
-                    ResponseEntity.ok(new ApiResponse<>(0, "Account Created Failed"));
-        } catch (Exception ex) {
-            return ResponseEntity.ok(new ApiResponse<>(-1, ex.getMessage()));
-        }
+    public ResponseEntity<ApiResponse> createAccount(@Valid @RequestBody CreateAccountRequest request) {
+        request.setPassword(passwordEncoder.encode(request.getPassword()));
+        Account account = accountService.createAccount(request);
+        return account != null ?
+                ResponseEntity.ok(
+                        new ApiResponse<>(true, "Account created", account)) :
+                ResponseEntity.badRequest().body(
+                        new ApiResponse<>(false, "Account is existed", null));
     }
 
     @PutMapping("/account/{id}")
     public ResponseEntity<ApiResponse> updateAccount(@PathVariable("id") UUID uuid,
                                                      @Valid @RequestBody AccountUpdateRequest request) {
-        try {
-            if (accountService.updateAccount(uuid, request)) {
-                return ResponseEntity.ok(new ApiResponse<>(1, "Update Successful"));
-            } else {
-                return ResponseEntity.ok(new ApiResponse<>(0, "Update Failed. Not found"));
-            }
-        } catch (Exception ex) {
-            return ResponseEntity.ok(new ApiResponse<>(-1, ex.getMessage()));
-        }
+        Account account = accountService.updateAccount(uuid, request);
+        return account != null ?
+                ResponseEntity.ok(
+                        new ApiResponse<>(true, "Update successful", account)) :
+                ResponseEntity.badRequest().body(
+                        new ApiResponse<>(false, "Update failed. Not found", null));
     }
-
 }

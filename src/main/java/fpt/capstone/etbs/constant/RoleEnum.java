@@ -1,5 +1,7 @@
 package fpt.capstone.etbs.constant;
 
+import java.util.Arrays;
+
 public enum RoleEnum {
 
     ADMINISTRATOR(1, "ADMINISTRATOR"), USER(2, "USER");
@@ -18,5 +20,10 @@ public enum RoleEnum {
     RoleEnum(int id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    public static RoleEnum getRole(int roleId) {
+        return Arrays.stream(RoleEnum.values()).filter(role -> role.getId() == roleId)
+                .findFirst().orElse(null);
     }
 }

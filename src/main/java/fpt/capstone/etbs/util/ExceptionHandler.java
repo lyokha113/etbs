@@ -14,7 +14,4 @@ public class ExceptionHandler {
         return result;
     }
 
-    public static boolean isDuplicateException(List<String> exceptions) {
-        return exceptions.stream().anyMatch(ex -> ex.contains("Duplicate"));
-    }
 }

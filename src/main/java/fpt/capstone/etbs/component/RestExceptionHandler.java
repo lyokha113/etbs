@@ -6,7 +6,6 @@ import java.util.List;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
-import fpt.capstone.etbs.exception.DuplicationException;
 import fpt.capstone.etbs.payload.ApiError;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
@@ -138,13 +137,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             errors.add(violation.getRootBeanClass().getName() + " " + violation.getPropertyPath() + ": " + violation.getMessage());
         }
         final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);
-        return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
-    }
-
-    @ExceptionHandler({ DuplicationException.class })
-    public ResponseEntity<Object> handleDuplicationException(final DuplicationException ex, final WebRequest request) {
-        logger.info(ex.getClass().getName());
-        final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), "Duplicate input value");
         return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
     }
 

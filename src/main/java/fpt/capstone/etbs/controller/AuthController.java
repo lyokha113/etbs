@@ -2,13 +2,11 @@ package fpt.capstone.etbs.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fpt.capstone.etbs.component.JwtTokenProvider;
-import fpt.capstone.etbs.exception.DuplicationException;
+import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.payload.*;
 import fpt.capstone.etbs.service.AccountService;
-import fpt.capstone.etbs.util.ExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 public class AuthController {
@@ -66,23 +63,15 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse> registerAccount(@Valid @RequestBody RegisterRequest request) throws Exception {
-        try {
-            request.setPassword(passwordEncoder.encode(request.getPassword()));
-            accountService.registerAccount(request);
-            Account account = accountService.getAccountByEmail(request.getEmail());
-            return account != null ?
-                    ResponseEntity.ok(
-                            new ApiResponse<>(true, "Account created", account)) :
-                    ResponseEntity.badRequest().body(
-                            new ApiResponse<>(false, "Account create failed", null));
-        } catch (Exception ex) {
-            List<String> exceptionMessageChain = ExceptionHandler.getExceptionMessageChain(ex.getCause());
-            if (ExceptionHandler.isDuplicateException(exceptionMessageChain)) {
-                throw new DuplicationException("Account is existed");
-            }
-            throw ex;
-        }
+    public ResponseEntity<ApiResponse> registerAccount(@Valid @RequestBody RegisterRequest request) {
+        request.setPassword(passwordEncoder.encode(request.getPassword()));
+        Account account = accountService.createAccount(request, RoleEnum.USER.getId());
+        return account != null ?
+                ResponseEntity.ok(
+                        new ApiResponse<>(true, "Account created", account)) :
+                ResponseEntity.badRequest().body(
+                        new ApiResponse<>(false, "Account is existed", null));
+
     }
 }
 

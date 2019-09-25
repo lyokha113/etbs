@@ -12,6 +12,7 @@ import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Data
@@ -43,6 +44,9 @@ public class RawTemplate extends Auditing implements Serializable {
     @NonNull
     private Workspace workspace;
 
+    @OneToMany(mappedBy = "template", cascade = CascadeType.ALL)
+    private Set<TemplateVersion> versions;
+
     @Column(columnDefinition = "TINYINT(1) default 0", nullable = false)
     private boolean active;
 
@@ -51,7 +55,6 @@ public class RawTemplate extends Auditing implements Serializable {
         return "RawTemplate{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", content='" + content + '\'' +
                 ", description='" + description + '\'' +
                 ", workspace=" + workspace +
                 '}';

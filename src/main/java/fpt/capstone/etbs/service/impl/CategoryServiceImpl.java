@@ -12,21 +12,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
+
     @Autowired
     CategoryRepository categoryRepository;
-
-    @Override
-    public List<CategoryListResponse> getAllListCategory() {
-        List<CategoryListResponse> resultList = new ArrayList<>();
-        List<Category> categoryList = categoryRepository.findAll();
-        for (Category category : categoryList) {
-            resultList.add(new CategoryListResponse(category.getId(), category.getName()));
-        }
-        return resultList;
-    }
 
     @Override
     public Category getCategory(int id) {
@@ -34,26 +26,34 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public boolean createCategory(CategoryCreateRequest request) {
+    public List<CategoryListResponse> getAllListCategory() {
+        return categoryRepository.findAll()
+                .stream()
+                .map(category -> new CategoryListResponse(category.getId(), category.getName()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Category createCategory(CategoryCreateRequest request) {
         Category category = categoryRepository.getByName(request.getName()).orElse(null);
         if (category == null) {
             category = new Category();
             category.setName(request.getName());
             categoryRepository.save(category);
-            return true;
+            return category;
         }
-        return false;
+        return null;
     }
 
     @Override
-    public boolean updateCategory(CategoryUpdateRequest request) {
+    public Category updateCategory(CategoryUpdateRequest request) {
         Category category = getCategory(request.getId());
         if (category != null) {
             category.setName(request.getName());
             categoryRepository.save(category);
-            return true;
+            return category;
         }
-        return false;
+        return null;
     }
 
     @Override

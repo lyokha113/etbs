@@ -18,39 +18,39 @@ public class CategoryController {
     @GetMapping("/category")
     private ResponseEntity<ApiResponse> getCategories() {
         List<CategoryListResponse> categoryListResponses = categoryService.getAllListCategory();
-        return ResponseEntity.ok(new ApiResponse<>(1, categoryListResponses));
+        return ResponseEntity.ok(new ApiResponse<>(true, "", categoryListResponses));
     }
 
     @PostMapping("/category")
     private ResponseEntity<ApiResponse> createCategory(
             @Valid @RequestBody CategoryCreateRequest request) {
-        if (categoryService.createCategory(request)) {
-            return ResponseEntity.ok(new ApiResponse<>(1, "Create Successful!"));
-        } else {
-            return ResponseEntity.ok(new ApiResponse<>(0, "Create Failed. Name is duplicate!"));
-        }
 
+        Category category = categoryService.createCategory(request);
+        return category != null ?
+                ResponseEntity.ok(
+                        new ApiResponse<>(true, "Category created", category)) :
+                ResponseEntity.badRequest().body(
+                        new ApiResponse<>(false, "Category name is duplicated", null));
     }
 
     @PutMapping("/category/update")
     private ResponseEntity<ApiResponse> updateCategory(
             @Valid @RequestBody CategoryUpdateRequest request) {
-        try {
-            if (categoryService.updateCategory(request)) {
-                return ResponseEntity.ok(new ApiResponse<>(1, "Update Successful"));
-            } else {
-                return ResponseEntity.ok(new ApiResponse<>(0, "Update Failed. Not found"));
-            }
-        } catch (Exception e) {
-            return ResponseEntity.ok(new ApiResponse<>(-1, e.getMessage()));
-        }
+        Category category = categoryService.updateCategory(request);
+        return category != null ?
+                ResponseEntity.ok(
+                        new ApiResponse<>(true, "Update successful", category)) :
+                ResponseEntity.badRequest().body(
+                        new ApiResponse<>(false, "Update failed. Not found", null));
     }
 
     @PutMapping("/category/status")
     private ResponseEntity<ApiResponse> activateCategory(
             @Valid @RequestBody CategoryStatusRequest request) {
-        categoryService.changeCategoryStatus(request);
-        return ResponseEntity.ok(new ApiResponse<>(1, "Update Status Successful"));
+        boolean result = categoryService.changeCategoryStatus(request);
+        return result ?
+                ResponseEntity.ok(new ApiResponse<>(true, "Update status successful", null)) :
+                ResponseEntity.badRequest().body(new ApiResponse<>(false, "Update failed", null));
     }
 
 }

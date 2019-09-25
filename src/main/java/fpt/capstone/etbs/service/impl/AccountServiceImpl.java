@@ -1,9 +1,9 @@
 package fpt.capstone.etbs.service.impl;
 
-import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Role;
 import fpt.capstone.etbs.payload.AccountUpdateRequest;
+import fpt.capstone.etbs.payload.CreateAccountRequest;
 import fpt.capstone.etbs.payload.RegisterRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.service.AccountService;
@@ -19,33 +19,48 @@ public class AccountServiceImpl implements AccountService {
     private AccountRepository accountRepository;
 
     @Override
-    public Account getAccountByEmail(String email) {
-        return accountRepository.getByEmail(email).orElse(null);
-    }
-
-    @Override
-    public void registerAccount(RegisterRequest request) {
-        Role role = new Role();
-        role.setId(RoleEnum.USER.getId());
-        Account account = setAccountFromRequest(request, role);
-        accountRepository.save(account);
-    }
-
-    @Override
     public Account getAccount(UUID uuid) {
         return accountRepository.findById(uuid).orElse(null);
     }
 
     @Override
-    public boolean updateAccount(UUID uuid, AccountUpdateRequest request) {
+    public Account getAccountByEmail(String email) {
+        return accountRepository.getByEmail(email).orElse(null);
+    }
+
+    @Override
+    public Account createAccount(RegisterRequest request, int roleId) {
+        Account account = getAccountByEmail(request.getEmail());
+        if (account == null) {
+            Role role = new Role();
+            role.setId(roleId);
+            account = setAccountFromRequest(request, role);
+            account = accountRepository.save(account);
+            return account;
+        }
+        return null;
+    }
+
+    @Override
+    public Account createAccount(CreateAccountRequest request) {
+        RegisterRequest registerRequest = RegisterRequest.builder()
+                .email(request.getEmail())
+                .fullName(request.getFullName())
+                .password(request.getPassword())
+                .build();
+        return createAccount(registerRequest, request.getRoleId());
+    }
+
+    @Override
+    public Account updateAccount(UUID uuid, AccountUpdateRequest request) {
         Account account = getAccount(uuid);
         if (account != null) {
-            account.setFullName(request.getFullname());
+            account.setFullName(request.getFullName());
             account.setPassword(request.getPassword());
             accountRepository.save(account);
-            return true;
+            return account;
         }
-        return false;
+        return null;
     }
 
     private Account setAccountFromRequest(RegisterRequest request, Role role) {

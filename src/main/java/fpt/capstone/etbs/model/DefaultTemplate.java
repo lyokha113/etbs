@@ -61,7 +61,6 @@ public class DefaultTemplate extends Auditing implements Serializable {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", author=" + author +
-                ", content='" + content + '\'' +
                 ", description='" + description + '\'' +
                 '}';
     }

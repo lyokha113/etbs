@@ -25,14 +25,14 @@ public class UserController {
     public ResponseEntity<ApiResponse> getUserDetail(Authentication auth) {
         UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
         Account account = accountService.getAccount(userPrincipal.getId());
-        return ResponseEntity.ok(new ApiResponse<>(1, account));
+        return ResponseEntity.ok(new ApiResponse<>(true, "", account));
     }
 
     @PutMapping("/user")
     public ResponseEntity<ApiResponse> updateUser(@Valid @RequestBody AccountUpdateRequest request, Authentication auth) {
         UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
         Account account = accountService.getAccount(userPrincipal.getId());
-        accountService.updateAccount(account.getId(), request);
-        return ResponseEntity.ok(new ApiResponse<>(1, account));
+        account = accountService.updateAccount(account.getId(), request);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Update successful", account));
     }
 }

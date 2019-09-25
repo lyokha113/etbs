@@ -11,7 +11,7 @@ import java.util.List;
 public interface CategoryService {
     List<CategoryListResponse> getAllListCategory();
     Category getCategory(int id);
-    boolean createCategory(CategoryCreateRequest request);
-    boolean updateCategory(CategoryUpdateRequest request);
+    Category createCategory(CategoryCreateRequest request);
+    Category updateCategory(CategoryUpdateRequest request);
     boolean changeCategoryStatus(CategoryStatusRequest request);
 }
