@@ -13,5 +13,5 @@ public interface CategoryService {
     Category getCategory(int id);
     Category createCategory(CategoryCreateRequest request);
     Category updateCategory(CategoryUpdateRequest request);
-    boolean changeCategoryStatus(CategoryStatusRequest request);
+    Category changeCategoryStatus(CategoryStatusRequest request);
 }

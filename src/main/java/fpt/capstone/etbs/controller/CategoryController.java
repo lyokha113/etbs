@@ -47,10 +47,12 @@ public class CategoryController {
     @PutMapping("/category/status")
     private ResponseEntity<ApiResponse> activateCategory(
             @Valid @RequestBody CategoryStatusRequest request) {
-        boolean result = categoryService.changeCategoryStatus(request);
-        return result ?
-                ResponseEntity.ok(new ApiResponse<>(true, "Update status successful", null)) :
-                ResponseEntity.badRequest().body(new ApiResponse<>(false, "Update failed", null));
+        Category category = categoryService.changeCategoryStatus(request);
+        return category != null ?
+                ResponseEntity.ok(
+                        new ApiResponse<>(true, "Change successful", category)) :
+                ResponseEntity.badRequest().body(
+                        new ApiResponse<>(false, "Change failed. Not found", null));
     }
 
 }

@@ -18,6 +18,9 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @GetMapping("/account")
     public ResponseEntity<ApiResponse> getAccounts(@Valid @RequestBody String email) {
         Account accounts = accountService.getAccountByEmail(email);

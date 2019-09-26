@@ -57,13 +57,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public boolean changeCategoryStatus(CategoryStatusRequest request) {
+    public Category changeCategoryStatus(CategoryStatusRequest request) {
         Category category = getCategory(request.getId());
         if (category != null) {
             category.setActive(request.isActive());
             categoryRepository.save(category);
-            return true;
         }
-        return false;
+        return category;
     }
 }
