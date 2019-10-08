@@ -18,7 +18,7 @@ public class UserPrincipal implements UserDetails, OAuth2User {
     private String email;
     private Boolean active;
     private String password;
-    private List<GrantedAuthority> authorities;
+    private Collection<? extends GrantedAuthority> authorities;
     private Map<String, Object> attributes;
 
     public static UserPrincipal create(Account account) {
@@ -52,8 +52,7 @@ public class UserPrincipal implements UserDetails, OAuth2User {
         this.authorities = authorities;
     }
 
-    @Override
-    public List<GrantedAuthority> getAuthorities() {
+    public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
 

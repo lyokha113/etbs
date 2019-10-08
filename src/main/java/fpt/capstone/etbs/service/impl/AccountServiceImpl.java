@@ -4,23 +4,36 @@ import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Role;
 import fpt.capstone.etbs.payload.AccountUpdateRequest;
 import fpt.capstone.etbs.payload.CreateAccountRequest;
+import fpt.capstone.etbs.payload.LoginRequest;
 import fpt.capstone.etbs.payload.RegisterRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
+import fpt.capstone.etbs.repository.RoleRepository;
 import fpt.capstone.etbs.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 
 import java.util.UUID;
 
 @Service
-public class AccountServiceImpl implements AccountService {
-
+public class AccountServiceImpl extends DefaultOAuth2UserService implements AccountService {
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Override
+
     public Account getAccount(UUID uuid) {
         return accountRepository.findById(uuid).orElse(null);
+    }
+
+    @Override
+    public Account loginByGoogle(LoginRequest loginRequest) {
+        return null;
     }
 
     @Override
@@ -32,44 +45,28 @@ public class AccountServiceImpl implements AccountService {
     public Account createAccount(RegisterRequest request, int roleId) {
         Account account = getAccountByEmail(request.getEmail());
         if (account == null) {
-            Role role = new Role();
-            role.setId(roleId);
-            account = setAccountFromRequest(request, role);
-            account = accountRepository.save(account);
-            return account;
+            account = new Account();
+            account.setEmail(request.getEmail());
+            account.setFullName(request.getFullName());
+            account.setPassword(passwordEncoder.encode(request.getPassword()));
+            if (roleRepository.findById(roleId).isPresent()) {
+                account.setRole(roleRepository.findById(roleId).get());
+            }
+            accountRepository.save(account);
         }
-        return null;
+        return account;
     }
 
-    @Override
-    public Account createAccount(CreateAccountRequest request) {
-        RegisterRequest registerRequest = RegisterRequest.builder()
-                .email(request.getEmail())
-                .fullName(request.getFullName())
-                .password(request.getPassword())
-                .build();
-        return createAccount(registerRequest, request.getRoleId());
-    }
 
     @Override
     public Account updateAccount(UUID uuid, AccountUpdateRequest request) {
         Account account = getAccount(uuid);
         if (account != null) {
             account.setFullName(request.getFullName());
-            account.setPassword(request.getPassword());
+            account.setPassword(passwordEncoder.encode(request.getPassword()));
             accountRepository.save(account);
             return account;
         }
         return null;
-    }
-
-    private Account setAccountFromRequest(RegisterRequest request, Role role) {
-        Account account = new Account();
-        account.setPassword(request.getPassword());
-        account.setFullName(request.getFullName());
-        account.setEmail(request.getEmail());
-        account.setRole(role);
-        account.setActive(true);
-        return account;
     }
 }

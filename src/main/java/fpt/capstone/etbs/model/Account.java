@@ -9,15 +9,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -47,6 +44,9 @@ public class Account extends Auditing implements Serializable {
     @JsonIgnore
     private String password;
 
+    @Column
+    private String imageUrl;
+
     @Column(columnDefinition = "TINYINT(1) default 0", nullable = false)
     private boolean active;
 
@@ -58,6 +58,10 @@ public class Account extends Auditing implements Serializable {
     @NotNull
     private Role role;
 
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider;
+
+    private String providerId;
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
     private Set<Rating> ratings;
 

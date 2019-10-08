@@ -1,12 +1,14 @@
 package fpt.capstone.etbs.controller;
 
-import fpt.capstone.etbs.component.UserPrincipal;
+import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.payload.AccountUpdateRequest;
 import fpt.capstone.etbs.payload.ApiResponse;
+import fpt.capstone.etbs.security.CurrentUser;
 import fpt.capstone.etbs.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,6 +22,17 @@ public class UserController {
 
     @Autowired
     private AccountService accountService;
+
+    @GetMapping("/user/me")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ApiResponse> getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
+        Account account = accountService.getAccount(userPrincipal.getId());
+        if (account != null) {
+            return ResponseEntity.ok(new ApiResponse<>(true, "", account));
+        }
+        return ResponseEntity.badRequest().body(
+                new ApiResponse<>(false, "Get User failed. Not found", null));
+    }
 
     @GetMapping("/user")
     public ResponseEntity<ApiResponse> getUserDetail(Authentication auth) {

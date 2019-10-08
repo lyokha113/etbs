@@ -7,13 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -35,7 +32,7 @@ public class Rating extends Auditing implements Serializable {
     private Account account;
 
     @ManyToOne
-    private DefaultTemplate template;
+    private Template template;
 
     @Column(nullable = false)
     private boolean vote;

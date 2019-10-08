@@ -21,30 +21,30 @@ public class AccountController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @GetMapping("/account")
-    public ResponseEntity<ApiResponse> getAccounts(@Valid @RequestBody String email) {
-        Account accounts = accountService.getAccountByEmail(email);
-        return ResponseEntity.ok(new ApiResponse<>(true, "", accounts));
-    }
+//    @GetMapping("/account")
+//    public ResponseEntity<ApiResponse> getAccounts(@Valid @RequestBody String email) {
+//        Account accounts = accountService.getAccountByEmail(email);
+//        return ResponseEntity.ok(new ApiResponse<>(true, "", accounts));
+//    }
 
-    @PostMapping("/account")
-    public ResponseEntity<ApiResponse> createAccount(@Valid @RequestBody CreateAccountRequest request) {
-        request.setPassword(passwordEncoder.encode(request.getPassword()));
-        Account account = accountService.createAccount(request);
-        return account != null ?
-                ResponseEntity.ok(
-                        new ApiResponse<>(true, "Account created", account)) :
-                ResponseEntity.badRequest().body(
-                        new ApiResponse<>(false, "Account is existed", null));
-    }
-    @PutMapping("/account/status/{id}")
-    public ResponseEntity<ApiResponse> updateAccount(@PathVariable("id") UUID uuid,
-                                                     @Valid @RequestBody AccountUpdateRequest request) {
-        Account account = accountService.updateAccount(uuid, request);
-        return account != null ?
-                ResponseEntity.ok(
-                        new ApiResponse<>(true, "Update successful", account)) :
-                ResponseEntity.badRequest().body(
-                        new ApiResponse<>(false, "Update failed. Not found", null));
-    }
+//    @PostMapping("/account")
+//    public ResponseEntity<ApiResponse> createAccount(@Valid @RequestBody CreateAccountRequest request) {
+//        request.setPassword(passwordEncoder.encode(request.getPassword()));
+//        Account account = accountService.createAccount(request, request.get);
+//        return account != null ?
+//                ResponseEntity.ok(
+//                        new ApiResponse<>(true, "Account created", account)) :
+//                ResponseEntity.badRequest().body(
+//                        new ApiResponse<>(false, "Account is existed", null));
+//    }
+//    @PutMapping("/account/status/{id}")
+//    public ResponseEntity<ApiResponse> updateAccount(@PathVariable("id") UUID uuid,
+//                                                     @Valid @RequestBody AccountUpdateRequest request) {
+//        Account account = accountService.updateAccount(uuid, request);
+//        return account != null ?
+//                ResponseEntity.ok(
+//                        new ApiResponse<>(true, "Update successful", account)) :
+//                ResponseEntity.badRequest().body(
+//                        new ApiResponse<>(false, "Update failed. Not found", null));
+//    }
 }

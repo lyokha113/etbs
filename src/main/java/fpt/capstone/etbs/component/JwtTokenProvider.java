@@ -3,22 +3,23 @@ package fpt.capstone.etbs.component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fpt.capstone.etbs.model.Account;
+import fpt.capstone.etbs.config.AppProperties;
+import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.payload.LoginResponse;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
 
-@Component
+@Service
 public class JwtTokenProvider {
-
+    private AppProperties appProperties;
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
     @Value("${app.jwtSecret}")
@@ -26,6 +27,10 @@ public class JwtTokenProvider {
 
     @Value("${app.jwtExpirationInMs}")
     private int jwtExpirationInMs;
+
+    public JwtTokenProvider(AppProperties appProperties) {
+        this.appProperties = appProperties;
+    }
 
     public String generateToken(LoginResponse response) throws JsonProcessingException {
 
@@ -35,6 +40,20 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .setSubject(om.writeValueAsString(response))
+                .setIssuedAt(new Date())
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .compact();
+    }
+
+    public String createToken(Authentication authentication) {
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + appProperties.getAuth().getTokenExpirationMsec());
+
+        return Jwts.builder()
+                .setSubject(userPrincipal.getId().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)

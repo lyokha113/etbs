@@ -5,6 +5,7 @@ import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.AuthProvider;
 import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.repository.AccountRepository;
+import fpt.capstone.etbs.repository.RoleRepository;
 import fpt.capstone.etbs.security.OAuth2UserInfo;
 import fpt.capstone.etbs.security.OAuth2UserInfoFactory;
 import fpt.capstone.etbs.service.OAuth2UserService;
@@ -24,8 +25,10 @@ import java.util.Optional;
 public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private RoleRepository roleRepository;
 
-    public OAuth2User loadAccount(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
+    public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
 
         try {
@@ -40,14 +43,14 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
 
     private OAuth2User processOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
         OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(oAuth2UserRequest.getClientRegistration().getRegistrationId(), oAuth2User.getAttributes());
-        if(StringUtils.isEmpty(oAuth2UserInfo.getEmail())) {
+        if (StringUtils.isEmpty(oAuth2UserInfo.getEmail())) {
             throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
         }
         Optional<Account> userOptional = accountRepository.getByEmail(oAuth2UserInfo.getEmail());
         Account account;
-        if(userOptional.isPresent()) {
+        if (userOptional.isPresent()) {
             account = userOptional.get();
-            if(!account.getProvider().equals(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))) {
+            if (!account.getProvider().equals(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))) {
                 throw new OAuth2AuthenticationProcessingException("Looks like you're signed up with " +
                         account.getProvider() + " account. Please use your " + account.getProvider() +
                         " account to login.");
@@ -61,12 +64,14 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
 
     private Account registerNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {
         Account account = new Account();
-
         account.setProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
         account.setProviderId(oAuth2UserInfo.getId());
         account.setFullName(oAuth2UserInfo.getName());
         account.setEmail(oAuth2UserInfo.getEmail());
         account.setImageUrl(oAuth2UserInfo.getImageUrl());
+        if (roleRepository.findById(1).isPresent()) {
+            account.setRole(roleRepository.findById(1).get());
+        }
         return accountRepository.save(account);
     }
 
