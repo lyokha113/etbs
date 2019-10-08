@@ -9,5 +9,4 @@ import java.util.UUID;
 
 @Repository
 public interface MediaFileRepository extends JpaRepository<MediaFile, Integer> {
-    List<MediaFile> getAllByMediaStorage_Account_Id(UUID id);
 }

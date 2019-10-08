@@ -1,14 +1,15 @@
 package fpt.capstone.etbs.service.impl;
 
+import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.exception.OAuth2AuthenticationProcessingException;
 import fpt.capstone.etbs.model.Account;
-import fpt.capstone.etbs.model.AuthProvider;
+import fpt.capstone.etbs.constant.AuthProvider;
+import fpt.capstone.etbs.model.Role;
 import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.RoleRepository;
 import fpt.capstone.etbs.security.OAuth2UserInfo;
 import fpt.capstone.etbs.security.OAuth2UserInfoFactory;
-import fpt.capstone.etbs.service.OAuth2UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
@@ -69,9 +70,7 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
         account.setFullName(oAuth2UserInfo.getName());
         account.setEmail(oAuth2UserInfo.getEmail());
         account.setImageUrl(oAuth2UserInfo.getImageUrl());
-        if (roleRepository.findById(1).isPresent()) {
-            account.setRole(roleRepository.findById(1).get());
-        }
+        account.setRole(Role.builder().id(RoleEnum.USER.getId()).build());
         return accountRepository.save(account);
     }
 

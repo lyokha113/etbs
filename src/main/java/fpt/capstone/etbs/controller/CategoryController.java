@@ -12,13 +12,14 @@ import java.util.List;
 
 @RestController
 public class CategoryController {
+
     @Autowired
     private CategoryService categoryService;
 
     @GetMapping("/category")
     private ResponseEntity<ApiResponse> getCategories() {
-        List<CategoryListResponse> categoryListResponses = categoryService.getAllListCategory();
-        return ResponseEntity.ok(new ApiResponse<>(true, "", categoryListResponses));
+        List<CategoryResponse> categoryRespons = categoryService.getAllListCategory();
+        return ResponseEntity.ok(new ApiResponse<>(true, "", categoryRespons));
     }
 
     @PostMapping("/category")
@@ -33,10 +34,11 @@ public class CategoryController {
                         new ApiResponse<>(false, "Category name is duplicated", null));
     }
 
-    @PutMapping("/category/update")
+    @PutMapping("/category/{id}")
     private ResponseEntity<ApiResponse> updateCategory(
+            @PathVariable("id") int id,
             @Valid @RequestBody CategoryUpdateRequest request) {
-        Category category = categoryService.updateCategory(request);
+        Category category = categoryService.updateCategory(id, request);
         return category != null ?
                 ResponseEntity.ok(
                         new ApiResponse<>(true, "Update successful", category)) :
@@ -44,15 +46,5 @@ public class CategoryController {
                         new ApiResponse<>(false, "Update failed. Not found", null));
     }
 
-    @PutMapping("/category/status")
-    private ResponseEntity<ApiResponse> activateCategory(
-            @Valid @RequestBody CategoryStatusRequest request) {
-        Category category = categoryService.changeCategoryStatus(request);
-        return category != null ?
-                ResponseEntity.ok(
-                        new ApiResponse<>(true, "Change successful", category)) :
-                ResponseEntity.badRequest().body(
-                        new ApiResponse<>(false, "Change failed. Not found", null));
-    }
 
 }

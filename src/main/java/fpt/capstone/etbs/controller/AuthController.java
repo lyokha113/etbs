@@ -25,7 +25,6 @@ import javax.validation.Valid;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/account")
 public class AuthController {
 
     @Autowired
@@ -43,35 +42,25 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest)
             throws Exception {
-//        try {
-//            Authentication authentication = authenticationManager.authenticate(
-//                    new UsernamePasswordAuthenticationToken(
-//                            loginRequest.getEmail(), loginRequest.getPassword())
-//            );
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//            Account account = accountService.getAccountByEmail(loginRequest.getEmail());
-//            LoginResponse response = new LoginResponse(account);
-//            String jwt = tokenProvider.generateToken(response);
-//            return ResponseEntity.ok(new ApiResponse<>(true, "Logged successfully",
-//                    new JwtAuthenticationResponse(jwt)));
-//        } catch (BadCredentialsException ex) {
-//            return ResponseEntity.ok(new ApiResponse<>(false, "Incorrect login", null));
-//        } catch (LockedException ex) {
-//            return ResponseEntity.ok(new ApiResponse<>(false, "Account was locked", null));
-//        } catch (JsonProcessingException e) {
-//            throw new Exception("Json parsing error");
-//        }
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
-                        loginRequest.getPassword()
-                )
-        );
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getEmail(), loginRequest.getPassword())
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = tokenProvider.createToken(authentication);
-        return ResponseEntity.ok(new ApiResponse<>(true, token, new JwtAuthenticationResponse(token)));
+            Account account = accountService.getAccountByEmail(loginRequest.getEmail());
+            LoginResponse response = new LoginResponse(account);
+            String jwt = tokenProvider.generateToken(response);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Logged successfully",
+                    new JwtAuthenticationResponse(jwt)));
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.ok(new ApiResponse<>(false, "Incorrect login", null));
+        } catch (LockedException ex) {
+            return ResponseEntity.ok(new ApiResponse<>(false, "Account was locked", null));
+        } catch (JsonProcessingException e) {
+            throw new Exception("Json parsing error");
+        }
     }
 
     @PostMapping("/register")

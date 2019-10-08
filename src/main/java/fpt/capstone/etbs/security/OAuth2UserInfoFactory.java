@@ -1,7 +1,7 @@
 package fpt.capstone.etbs.security;
 
 import fpt.capstone.etbs.exception.OAuth2AuthenticationProcessingException;
-import fpt.capstone.etbs.model.AuthProvider;
+import fpt.capstone.etbs.constant.AuthProvider;
 
 import java.util.Map;
 

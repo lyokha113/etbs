@@ -3,6 +3,7 @@ package fpt.capstone.etbs.config;
 import fpt.capstone.etbs.component.HttpCookieOAuth2AuthorizationRequest;
 import fpt.capstone.etbs.component.JwtAuthenticationEntryPoint;
 import fpt.capstone.etbs.component.UserDetailsSecurity;
+import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.filter.JwtAuthenticationFilter;
 import fpt.capstone.etbs.security.OAuth2AuthenticationFailureHandler;
 import fpt.capstone.etbs.security.OAuth2AuthenticationSuccessHandler;
@@ -76,78 +77,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    //    @Override
-//    protected void configure(HttpSecurity http) throws Exception {
-//        http
-//                .cors()
-//                .and()
-//                .csrf()
-//                .disable()
-//                .exceptionHandling()
-//                .authenticationEntryPoint(new RestAuthenticationEntryPoint())
-//                .and()
-//                .sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
-//                .authorizeRequests()
-//                //Swagger
-//                .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
-//                //All
-//                .antMatchers(HttpMethod.POST, "/login", "/register").permitAll()
-//                //User
-//                //Administrator
-//                .anyRequest().authenticated()
-//                .and().oauth2Login()
-//                .authorizationEndpoint()
-//                .baseUri("/oauth2/authorize")
-//                .authorizationRequestRepository(cookieAuthorizationRequestRepository())
-//                .and()
-//                .redirectionEndpoint()
-//                .baseUri("/oauth2/callback/*")
-//                .and()
-//                .userInfoEndpoint()
-//                .userService(customOAuth2UserService)
-//                .and()
-//                .successHandler(oAuth2AuthenticationSuccessHandler)
-//                .failureHandler(oAuth2AuthenticationFailureHandler);
-//        ;
-//
-//        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-//
-//    }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .cors()
                 .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
                 .csrf()
-                .disable()
-                .formLogin()
-                .disable()
-                .httpBasic()
                 .disable()
                 .exceptionHandling()
                 .authenticationEntryPoint(new RestAuthenticationEntryPoint())
                 .and()
-                .authorizeRequests()
-                .antMatchers("/",
-                        "/error",
-                        "/favicon.ico",
-                        "/**/*.png",
-                        "/**/*.gif",
-                        "/**/*.svg",
-                        "/**/*.jpg",
-                        "/**/*.html",
-                        "/**/*.css",
-                        "/**/*.js")
-                .permitAll()
-                .antMatchers("/auth/**", "/oauth2/**")
-                .permitAll()
-                .anyRequest()
-                .authenticated()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .oauth2Login()
                 .authorizationEndpoint()
@@ -161,9 +102,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .userService(customOAuth2UserService)
                 .and()
                 .successHandler(oAuth2AuthenticationSuccessHandler)
-                .failureHandler(oAuth2AuthenticationFailureHandler);
+                .failureHandler(oAuth2AuthenticationFailureHandler)
+                .and()
+                .authorizeRequests()
+                //Swagger
+                .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
+                //All
+                .antMatchers(HttpMethod.POST, "/login", "/register").permitAll()
+                //User
+                //Administrator
+                .antMatchers(HttpMethod.POST, "/category", "/category/**").hasRole(RoleEnum.ADMINISTRATOR.getName())
+                .anyRequest().authenticated()
+        ;
 
-        // Add our custom Token based authentication filter
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
     }
 }

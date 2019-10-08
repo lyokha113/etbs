@@ -26,7 +26,6 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
     private RoleRepository roleRepository;
 
     @Override
-
     public Account getAccount(UUID uuid) {
         return accountRepository.findById(uuid).orElse(null);
     }

@@ -19,7 +19,6 @@ import java.util.UUID;
 
 @Service
 public class JwtTokenProvider {
-    private AppProperties appProperties;
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
     @Value("${app.jwtSecret}")
@@ -27,10 +26,6 @@ public class JwtTokenProvider {
 
     @Value("${app.jwtExpirationInMs}")
     private int jwtExpirationInMs;
-
-    public JwtTokenProvider(AppProperties appProperties) {
-        this.appProperties = appProperties;
-    }
 
     public String generateToken(LoginResponse response) throws JsonProcessingException {
 
@@ -40,20 +35,6 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .setSubject(om.writeValueAsString(response))
-                .setIssuedAt(new Date())
-                .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
-                .compact();
-    }
-
-    public String createToken(Authentication authentication) {
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + appProperties.getAuth().getTokenExpirationMsec());
-
-        return Jwts.builder()
-                .setSubject(userPrincipal.getId().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)

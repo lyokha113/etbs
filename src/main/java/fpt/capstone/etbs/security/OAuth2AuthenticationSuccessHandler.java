@@ -1,9 +1,12 @@
 package fpt.capstone.etbs.security;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fpt.capstone.etbs.component.HttpCookieOAuth2AuthorizationRequest;
 import fpt.capstone.etbs.component.JwtTokenProvider;
 import fpt.capstone.etbs.config.AppProperties;
 import fpt.capstone.etbs.exception.BadRequestException;
+import fpt.capstone.etbs.model.UserPrincipal;
+import fpt.capstone.etbs.payload.LoginResponse;
 import fpt.capstone.etbs.util.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -53,7 +56,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
-    protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+    protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws JsonProcessingException {
         Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
 
@@ -63,7 +66,15 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
-        String token = tokenProvider.createToken(authentication);
+
+        UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
+        LoginResponse res = LoginResponse.builder()
+                .id(user.getId())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .imageUrl(user.getImageUrl())
+                .build();
+        String token = tokenProvider.generateToken(res);
 
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("token", token)

@@ -17,6 +17,7 @@ public class UserPrincipal implements UserDetails, OAuth2User {
     private String fullName;
     private String email;
     private Boolean active;
+    private String imageUrl;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
     private Map<String, Object> attributes;
@@ -30,6 +31,7 @@ public class UserPrincipal implements UserDetails, OAuth2User {
                 account.getEmail(),
                 account.isActive(),
                 account.getPassword(),
+                account.getImageUrl(),
                 grantedAuthorities
         );
     }
@@ -40,16 +42,14 @@ public class UserPrincipal implements UserDetails, OAuth2User {
         return userPrincipal;
     }
 
-    public UserPrincipal() {
-    }
-
-    public UserPrincipal(UUID id, String fullName, String email, Boolean active, String password, List<GrantedAuthority> authorities) {
+    public UserPrincipal(UUID id, String fullName, String email, Boolean active, String password, String imageUrl, List<GrantedAuthority> authorities) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.active = active;
         this.password = password;
         this.authorities = authorities;
+        this.imageUrl = imageUrl;
     }
 
     public Collection<? extends GrantedAuthority> getAuthorities() {

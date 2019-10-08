@@ -14,4 +14,5 @@ public class MediaFileUpdateRequest {
     private String link;
     private String name;
     private String type;
+    private boolean active;
 }

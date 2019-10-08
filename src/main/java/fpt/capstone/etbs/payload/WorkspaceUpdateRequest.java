@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WorkspaceUpdateRequest {
-    private int id;
     private String name;
+    private boolean active;
 }

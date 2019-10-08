@@ -1,4 +1,4 @@
-package fpt.capstone.etbs.model;
+package fpt.capstone.etbs.constant;
 
 public enum AuthProvider {
     local,

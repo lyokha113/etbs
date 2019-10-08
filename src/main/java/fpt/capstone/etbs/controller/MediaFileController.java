@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/Media")
 public class MediaFileController {
+
     @Autowired
     MediaFileService mediaFileService;
 
-    @PostMapping("/create")
+    @PostMapping("/media")
     public ResponseEntity<ApiResponse> createMediaFile(@Valid @RequestBody MediaFileCreateRequest request) {
         MediaFile mediaFile = mediaFileService.createMediaFile(request);
         return mediaFile != null ?
@@ -25,9 +25,11 @@ public class MediaFileController {
                         new ApiResponse<>(false, "File can not created!!", null));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<ApiResponse> updateMediaFile(@Valid @RequestBody MediaFileUpdateRequest request) {
-        MediaFile mediaFile = mediaFileService.updateMediaFile(request);
+    @PutMapping("/media/{id}")
+    public ResponseEntity<ApiResponse> updateMediaFile(
+            @PathVariable("id") int id,
+            @Valid @RequestBody MediaFileUpdateRequest request) {
+        MediaFile mediaFile = mediaFileService.updateMediaFile(id, request);
         return mediaFile != null ?
                 ResponseEntity.ok(
                         new ApiResponse<>(true, "The File updated", mediaFile)) :
@@ -35,13 +37,4 @@ public class MediaFileController {
                         new ApiResponse<>(false, "The File can not be updated!!", null));
     }
 
-    @PutMapping("/status")
-    public ResponseEntity<ApiResponse> changeStatusMediaFile(@Valid @RequestBody MediaFileStatusRequest request) {
-        MediaFile mediaFile = mediaFileService.changeStatusMediaFile(request);
-        return mediaFile != null ?
-                ResponseEntity.ok(
-                        new ApiResponse<>(true, "The media file updated", mediaFile)) :
-                ResponseEntity.badRequest().body(
-                        new ApiResponse<>(false, "The media file can not be updated!!", null));
-    }
 }

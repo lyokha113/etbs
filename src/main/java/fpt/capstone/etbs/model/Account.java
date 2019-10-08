@@ -3,10 +3,8 @@ package fpt.capstone.etbs.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import fpt.capstone.etbs.component.Auditing;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import fpt.capstone.etbs.constant.AuthProvider;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -58,10 +56,14 @@ public class Account extends Auditing implements Serializable {
     @NotNull
     private Role role;
 
+    private String providerId;
+
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
 
-    private String providerId;
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+    private Set<MediaFile> files;
+
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
     private Set<Rating> ratings;
 
