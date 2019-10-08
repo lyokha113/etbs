@@ -6,14 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
 
@@ -25,7 +22,7 @@ import java.util.Set;
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(value = {"createdDate", "lastModifiedDate"}, allowGetters = true)
-public class DefaultTemplate extends Auditing implements Serializable {
+public class Template extends Auditing implements Serializable {
 
     @Id
     @Column
@@ -69,7 +66,7 @@ public class DefaultTemplate extends Auditing implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DefaultTemplate that = (DefaultTemplate) o;
+        Template that = (Template) o;
         return Objects.equals(id, that.id);
     }
 

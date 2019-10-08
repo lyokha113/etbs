@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryUpdateRequest {
+public class WorkspaceUpdateRequest {
     private String name;
     private boolean active;
 }

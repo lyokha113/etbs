@@ -1,47 +1,58 @@
-package fpt.capstone.etbs.component;
+package fpt.capstone.etbs.model;
 
-import fpt.capstone.etbs.model.Account;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 
 @Data
-@AllArgsConstructor
-public class UserPrincipal implements UserDetails {
+public class UserPrincipal implements UserDetails, OAuth2User {
 
     private UUID id;
     private String fullName;
     private String email;
     private Boolean active;
-
+    private String imageUrl;
     private String password;
-
-    private List<GrantedAuthority> authorities;
+    private Collection<? extends GrantedAuthority> authorities;
+    private Map<String, Object> attributes;
 
     public static UserPrincipal create(Account account) {
-
         List<GrantedAuthority> grantedAuthorities = AuthorityUtils
                 .commaSeparatedStringToAuthorityList("ROLE_" + account.getRole().getName());
-
         return new UserPrincipal(
                 account.getId(),
                 account.getFullName(),
                 account.getEmail(),
                 account.isActive(),
                 account.getPassword(),
+                account.getImageUrl(),
                 grantedAuthorities
         );
     }
 
-    @Override
-    public List<GrantedAuthority>  getAuthorities() {
+    public static UserPrincipal create(Account account, Map<String, Object> attributes) {
+        UserPrincipal userPrincipal = UserPrincipal.create(account);
+        userPrincipal.setAttributes(attributes);
+        return userPrincipal;
+    }
+
+    public UserPrincipal(UUID id, String fullName, String email, Boolean active, String password, String imageUrl, List<GrantedAuthority> authorities) {
+        this.id = id;
+        this.fullName = fullName;
+        this.email = email;
+        this.active = active;
+        this.password = password;
+        this.authorities = authorities;
+        this.imageUrl = imageUrl;
+    }
+
+    public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
 
@@ -87,5 +98,10 @@ public class UserPrincipal implements UserDetails {
     public int hashCode() {
 
         return Objects.hash(id);
+    }
+
+    @Override
+    public String getName() {
+        return String.valueOf(id);
     }
 }

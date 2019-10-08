@@ -3,22 +3,22 @@ package fpt.capstone.etbs.component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fpt.capstone.etbs.model.Account;
+import fpt.capstone.etbs.config.AppProperties;
+import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.payload.LoginResponse;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
 
-@Component
+@Service
 public class JwtTokenProvider {
-
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
     @Value("${app.jwtSecret}")

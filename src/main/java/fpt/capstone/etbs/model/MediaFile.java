@@ -29,10 +29,6 @@ public class MediaFile extends Auditing {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @NonNull
-    private MediaStorage mediaStorage;
-
     @Column(nullable = false)
     @NotBlank
     private String name;
@@ -44,6 +40,10 @@ public class MediaFile extends Auditing {
     @Column(nullable = false)
     @NonNull
     private String type;
+
+    @ManyToOne
+    @NonNull
+    private Account account;
 
     @Column(columnDefinition = "TINYINT(1) default 0", nullable = false)
     private boolean active;

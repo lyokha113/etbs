@@ -5,11 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryUpdateRequest {
+public class MediaFileCreateRequest {
     private String name;
-    private boolean active;
+    private String link;
+    private String type;
+    private UUID storageId;
 }

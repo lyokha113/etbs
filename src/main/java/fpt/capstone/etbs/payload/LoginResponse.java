@@ -23,12 +23,14 @@ public class LoginResponse {
     private UUID id;
     private String email;
     private String fullName;
+    private String imageUrl;
     private int roleId;
 
     public LoginResponse(Account account) {
         this.id = account.getId();
         this.email = account.getEmail();
         this.fullName = account.getFullName();
+        this.imageUrl = account.getImageUrl();
         this.roleId = account.getRole().getId();
     }
 
