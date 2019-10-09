@@ -110,6 +110,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //All
                 .antMatchers(HttpMethod.POST, "/login", "/register").permitAll()
                 //User
+                .antMatchers(HttpMethod.POST, "/email/**").permitAll()
                 //Administrator
                 .antMatchers(HttpMethod.POST, "/category", "/category/**").hasRole(RoleEnum.ADMINISTRATOR.getName())
                 .anyRequest().authenticated()
