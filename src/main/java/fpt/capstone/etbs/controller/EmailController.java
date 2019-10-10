@@ -2,23 +2,34 @@ package fpt.capstone.etbs.controller;
 
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.SendEmailRequest;
+import fpt.capstone.etbs.service.EmailDraftService;
 import fpt.capstone.etbs.service.EmailSenderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 @RestController
-public class SendEmailController {
+public class EmailController {
 
     @Autowired
     private EmailSenderService emailSenderService;
 
-    @PostMapping("/email/gmail")
+    @Autowired
+    EmailDraftService emailDraftService;
+
+    @PostMapping("/email/draft/gmail")
+    public ResponseEntity<ApiResponse> draftGmail() throws Exception {
+        emailDraftService.draftGmail();
+        return ResponseEntity.ok(new ApiResponse<>(true, "Email Draft", null));
+    }
+    @PostMapping("/email/draft/outlook")
+    public ResponseEntity<ApiResponse> draftOutlook() throws Exception {
+        emailDraftService.draftOutlook();
+        return ResponseEntity.ok(new ApiResponse<>(true, "Email Draft", null));
+    }
+    @PostMapping("/email/send/gmail")
     public ResponseEntity<ApiResponse> sendEmailByJava(
             @Valid @RequestBody SendEmailRequest request) throws Exception {
         emailSenderService.sendEmailByJava(
@@ -28,7 +39,7 @@ public class SendEmailController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Email sent", null));
     }
 
-    @PostMapping("/email/sendgrid")
+    @PostMapping("/email/send/sendgrid")
     public ResponseEntity<ApiResponse> sendEmailBySendGrid(
             @Valid @RequestBody SendEmailRequest request) throws Exception {
         emailSenderService.sendEmailBySendGrid(
