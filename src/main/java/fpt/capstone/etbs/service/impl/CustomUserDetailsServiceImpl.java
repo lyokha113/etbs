@@ -1,6 +1,5 @@
 package fpt.capstone.etbs.service.impl;
 
-import fpt.capstone.etbs.exception.ResourceNotFoundException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.repository.AccountRepository;
@@ -16,6 +15,7 @@ import java.util.UUID;
 
 @Service
 public class CustomUserDetailsServiceImpl implements CustomUserDetailsService, UserDetailsService {
+
     @Autowired
     AccountRepository accountRepository;
 
@@ -28,11 +28,10 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService, U
     }
 
     @Override
-    public UserDetails loadUserById(UUID id) {
-        Account account = accountRepository
-                .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Account", "id", id)
-                );
+    public UserDetails loadUserFromAccount(Account account) {
+        if (account == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
         return UserPrincipal.create(account);
     }
 

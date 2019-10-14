@@ -1,7 +1,6 @@
 package fpt.capstone.etbs.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import fpt.capstone.etbs.component.Auditing;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +15,7 @@ import java.util.Set;
 
 @Entity
 @Data
-@Table(name = "default_template")
+@Table(name = "template")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -43,8 +42,7 @@ public class Template extends Auditing implements Serializable {
     @Column(columnDefinition = "text")
     private String description;
 
-    @Column(columnDefinition = "TINYINT(1) default 0", nullable = false)
-    private boolean active;
+    @Column(columnDefinition = "TINYINT(1) default 1")private Boolean active;
 
     @ManyToMany(mappedBy = "templates", cascade = CascadeType.ALL)
     private Set<Category> categories;

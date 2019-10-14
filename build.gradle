@@ -34,6 +34,7 @@ dependencies {
     implementation 'com.sendgrid:sendgrid-java:4.4.1'
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.1.6.RELEASE'
     implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.1.6.RELEASE'
+    compile 'com.google.firebase:firebase-admin:6.8.1'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     developmentOnly 'org.springframework.boot:spring-boot-devtools'

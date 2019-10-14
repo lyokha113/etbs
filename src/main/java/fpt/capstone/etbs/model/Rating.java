@@ -2,7 +2,6 @@ package fpt.capstone.etbs.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import fpt.capstone.etbs.component.Auditing;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,8 +36,7 @@ public class Rating extends Auditing implements Serializable {
     @Column(nullable = false)
     private boolean vote;
 
-    @Column(columnDefinition = "TINYINT(1) default 0", nullable = false)
-    private boolean active;
+    @Column(columnDefinition = "TINYINT(1) default 1")private Boolean active;
 
     @Override
     public String toString() {

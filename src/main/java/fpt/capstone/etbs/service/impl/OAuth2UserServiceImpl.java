@@ -7,9 +7,7 @@ import fpt.capstone.etbs.constant.AuthProvider;
 import fpt.capstone.etbs.model.Role;
 import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.repository.AccountRepository;
-import fpt.capstone.etbs.repository.RoleRepository;
-import fpt.capstone.etbs.security.OAuth2UserInfo;
-import fpt.capstone.etbs.security.OAuth2UserInfoFactory;
+import fpt.capstone.etbs.component.GoogleOAuth2UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
@@ -24,10 +22,9 @@ import java.util.Optional;
 
 @Service
 public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
+
     @Autowired
     private AccountRepository accountRepository;
-    @Autowired
-    private RoleRepository roleRepository;
 
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
@@ -43,7 +40,7 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
     }
 
     private OAuth2User processOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
-        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(oAuth2UserRequest.getClientRegistration().getRegistrationId(), oAuth2User.getAttributes());
+        GoogleOAuth2UserInfo oAuth2UserInfo = new GoogleOAuth2UserInfo(oAuth2User.getAttributes());
         if (StringUtils.isEmpty(oAuth2UserInfo.getEmail())) {
             throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
         }
@@ -63,7 +60,7 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
         return UserPrincipal.create(account, oAuth2User.getAttributes());
     }
 
-    private Account registerNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {
+    private Account registerNewUser(OAuth2UserRequest oAuth2UserRequest, GoogleOAuth2UserInfo oAuth2UserInfo) {
         Account account = new Account();
         account.setProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
         account.setProviderId(oAuth2UserInfo.getId());
@@ -74,7 +71,7 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
         return accountRepository.save(account);
     }
 
-    private Account updateExistingUser(Account existingUser, OAuth2UserInfo oAuth2UserInfo) {
+    private Account updateExistingUser(Account existingUser, GoogleOAuth2UserInfo oAuth2UserInfo) {
         existingUser.setFullName(oAuth2UserInfo.getName());
         existingUser.setImageUrl(oAuth2UserInfo.getImageUrl());
         return accountRepository.save(existingUser);

@@ -1,19 +1,15 @@
 package fpt.capstone.etbs.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import fpt.capstone.etbs.component.Auditing;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -38,8 +34,7 @@ public class EmailProvider extends Auditing implements Serializable {
     @Column
     private String setting;
 
-    @Column(columnDefinition = "TINYINT(1) default 0", nullable = false)
-    private boolean active;
+    @Column(columnDefinition = "TINYINT(1) default 1")private Boolean active;
 
     @Override
     public String toString() {

@@ -1,4 +1,4 @@
-package fpt.capstone.etbs.component;
+package fpt.capstone.etbs.model;
 
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

@@ -29,7 +29,7 @@ public class UserPrincipal implements UserDetails, OAuth2User {
                 account.getId(),
                 account.getFullName(),
                 account.getEmail(),
-                account.isActive(),
+                account.getActive(),
                 account.getPassword(),
                 account.getImageUrl(),
                 grantedAuthorities

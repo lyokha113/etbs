@@ -2,7 +2,6 @@ package fpt.capstone.etbs.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import fpt.capstone.etbs.component.Auditing;
 import fpt.capstone.etbs.constant.AuthProvider;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -45,8 +44,8 @@ public class Account extends Auditing implements Serializable {
     @Column
     private String imageUrl;
 
-    @Column(columnDefinition = "TINYINT(1) default 0", nullable = false)
-    private boolean active;
+    @Column(columnDefinition = "TINYINT(1) default 1")
+    private Boolean active;
 
     @Column(nullable = false)
     @NotBlank

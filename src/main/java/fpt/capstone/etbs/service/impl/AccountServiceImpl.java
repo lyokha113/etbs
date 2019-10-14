@@ -18,10 +18,13 @@ import java.util.UUID;
 
 @Service
 public class AccountServiceImpl extends DefaultOAuth2UserService implements AccountService {
+
     @Autowired
     private AccountRepository accountRepository;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     @Autowired
     private RoleRepository roleRepository;
 

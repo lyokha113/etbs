@@ -1,7 +1,6 @@
 package fpt.capstone.etbs.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import fpt.capstone.etbs.component.Auditing;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,8 +32,7 @@ public class Category extends Auditing implements Serializable {
     @NotBlank
     private String name;
 
-    @Column(columnDefinition = "TINYINT(1) default 0", nullable = false)
-    private boolean active;
+    @Column(columnDefinition = "TINYINT(1) default 1")private Boolean active;
 
     @ManyToMany(cascade = CascadeType.ALL)
     private Set<Template> templates;

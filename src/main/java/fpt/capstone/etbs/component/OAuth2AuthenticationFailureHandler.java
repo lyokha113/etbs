@@ -1,4 +1,4 @@
-package fpt.capstone.etbs.security;
+package fpt.capstone.etbs.component;
 
 import fpt.capstone.etbs.component.HttpCookieOAuth2AuthorizationRequest;
 import fpt.capstone.etbs.util.CookieUtils;
@@ -19,7 +19,7 @@ import static fpt.capstone.etbs.component.HttpCookieOAuth2AuthorizationRequest.R
 @Component
 public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-    HttpCookieOAuth2AuthorizationRequest httpCookieOAuth2AuthorizationRequestRepository = new HttpCookieOAuth2AuthorizationRequest();
+    private HttpCookieOAuth2AuthorizationRequest httpCookieOAuth2AuthorizationRequestRepository = new HttpCookieOAuth2AuthorizationRequest();
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {

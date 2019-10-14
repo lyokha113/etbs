@@ -1,7 +1,6 @@
 package fpt.capstone.etbs.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import fpt.capstone.etbs.component.Auditing;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -13,13 +12,13 @@ import java.util.Objects;
 
 @Entity
 @Data
-@Table(name = "template_version")
+@Table(name = "raw_template_version")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(value = {"createdDate", "lastModifiedDate"}, allowGetters = true)
-public class TemplateVersion extends Auditing implements Serializable {
+public class RawTemplateVersion extends Auditing implements Serializable {
 
     @Id
     @Column
@@ -38,8 +37,7 @@ public class TemplateVersion extends Auditing implements Serializable {
     @NonNull
     private RawTemplate template;
 
-    @Column(columnDefinition = "TINYINT(1) default 1", nullable = false)
-    private boolean active;
+    @Column(columnDefinition = "TINYINT(1) default 1")private Boolean active;
 
     @Override
     public String toString() {
@@ -54,7 +52,7 @@ public class TemplateVersion extends Auditing implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TemplateVersion that = (TemplateVersion) o;
+        RawTemplateVersion that = (RawTemplateVersion) o;
         return Objects.equals(id, that.id);
     }
 

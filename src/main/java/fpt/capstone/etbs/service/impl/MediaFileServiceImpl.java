@@ -1,7 +1,6 @@
 package fpt.capstone.etbs.service.impl;
 
 import fpt.capstone.etbs.model.MediaFile;
-import fpt.capstone.etbs.payload.MediaFileCreateRequest;
 import fpt.capstone.etbs.payload.MediaFileUpdateRequest;
 import fpt.capstone.etbs.repository.MediaFileRepository;
 import fpt.capstone.etbs.service.MediaFileService;
@@ -29,14 +28,8 @@ public class MediaFileServiceImpl implements MediaFileService {
     }
 
     @Override
-    public MediaFile createMediaFile(MediaFileCreateRequest request) {
-        MediaFile mediaFile = new MediaFile();
-        mediaFile.setActive(true);
-        mediaFile.setLink(request.getLink());
-        mediaFile.setName(request.getName());
-        mediaFile.setType(request.getType());
+    public void createMediaFile(MediaFile mediaFile) {
         mediaFileRepository.save(mediaFile);
-        return mediaFile;
     }
 
     @Override
@@ -44,7 +37,6 @@ public class MediaFileServiceImpl implements MediaFileService {
         MediaFile mediaFile = getMediaFile(id);
         if (mediaFile != null) {
             mediaFile.setName(request.getName());
-            mediaFile.setType(request.getType());
             mediaFile.setLink(request.getLink());
             mediaFile.setActive(request.isActive());
         }

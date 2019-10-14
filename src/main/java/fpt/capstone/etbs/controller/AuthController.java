@@ -65,11 +65,10 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse> registerAccount(@Valid @RequestBody RegisterRequest request) {
-        request.setPassword(passwordEncoder.encode(request.getPassword()));
         Account account = accountService.createAccount(request, RoleEnum.USER.getId());
         return account != null ?
                 ResponseEntity.ok(
-                        new ApiResponse<>(true, "Account created", account)) :
+                        new ApiResponse<>(true, "Account created", new LoginResponse(account))) :
                 ResponseEntity.badRequest().body(
                         new ApiResponse<>(false, "Account is existed", null));
 

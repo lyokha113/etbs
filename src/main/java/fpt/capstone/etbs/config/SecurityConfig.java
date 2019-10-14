@@ -1,15 +1,10 @@
 package fpt.capstone.etbs.config;
 
 import fpt.capstone.etbs.component.HttpCookieOAuth2AuthorizationRequest;
-import fpt.capstone.etbs.component.JwtAuthenticationEntryPoint;
-import fpt.capstone.etbs.component.UserDetailsSecurity;
+import fpt.capstone.etbs.component.OAuth2AuthenticationFailureHandler;
+import fpt.capstone.etbs.component.OAuth2AuthenticationSuccessHandler;
 import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.filter.JwtAuthenticationFilter;
-import fpt.capstone.etbs.security.OAuth2AuthenticationFailureHandler;
-import fpt.capstone.etbs.security.OAuth2AuthenticationSuccessHandler;
-import fpt.capstone.etbs.security.RestAuthenticationEntryPoint;
-import fpt.capstone.etbs.service.CustomUserDetailsService;
-import fpt.capstone.etbs.service.OAuth2UserService;
 import fpt.capstone.etbs.service.impl.CustomUserDetailsServiceImpl;
 import fpt.capstone.etbs.service.impl.OAuth2UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +21,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -36,6 +32,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
         prePostEnabled = true
 )
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
     @Autowired
     private CustomUserDetailsServiceImpl customUserDetailsService;
 
@@ -84,11 +81,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf()
                 .disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(new RestAuthenticationEntryPoint())
-                .and()
+                .formLogin()
+                .disable()
+                .httpBasic()
+                .disable()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(new Http403ForbiddenEntryPoint())
                 .and()
                 .oauth2Login()
                 .authorizationEndpoint()
@@ -108,12 +109,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //Swagger
                 .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
                 //All
-                .antMatchers(HttpMethod.POST, "/login", "/register").permitAll()
+                .antMatchers(HttpMethod.POST, "/login", "/register").anonymous()
+                .antMatchers(HttpMethod.GET, "/category").permitAll()
+                // Logged
+                .antMatchers("/user").hasAnyRole(RoleEnum.ADMINISTRATOR.getName(), RoleEnum.USER.getName())
                 //User
-                .antMatchers(HttpMethod.POST, "/email/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/media/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/email/**", "/media").permitAll()
+                .antMatchers(HttpMethod.PUT, "/media/**").permitAll()
                 //Administrator
-                .antMatchers(HttpMethod.POST, "/category", "/category/**").hasRole(RoleEnum.ADMINISTRATOR.getName())
-                .anyRequest().authenticated()
+                .antMatchers(HttpMethod.POST, "/category").hasRole(RoleEnum.ADMINISTRATOR.getName())
+                .antMatchers(HttpMethod.PUT, "/category/**").hasRole(RoleEnum.ADMINISTRATOR.getName())
+                .anyRequest()
+                .authenticated()
         ;
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
