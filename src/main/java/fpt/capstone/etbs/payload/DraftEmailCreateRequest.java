@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DraftEmailCreateRequest {
-    private String gmail;
+    private String email;
     private String password;
     private String subject;
     private String body;

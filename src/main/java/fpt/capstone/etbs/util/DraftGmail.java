@@ -15,7 +15,6 @@ import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.Draft;
 import com.google.api.services.gmail.model.Message;
-import com.google.api.services.people.v1.PeopleServiceScopes;
 import fpt.capstone.etbs.payload.DraftEmailCreateRequest;
 import fpt.capstone.etbs.service.impl.EmailDraftServiceImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -39,7 +38,7 @@ public class DraftGmail {
         Gmail service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                 .setApplicationName(APPLICATION_NAME)
                 .build();
-        String userID = request.getGmail();
+        String userID = request.getEmail();
         createDraftGmail(service, userID, mm);
     }
 

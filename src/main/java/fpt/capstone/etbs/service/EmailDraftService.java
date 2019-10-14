@@ -9,4 +9,5 @@ import java.security.GeneralSecurityException;
 public interface EmailDraftService {
     void draftGmail(DraftEmailCreateRequest request) throws IOException, MessagingException, GeneralSecurityException;
     void draftOutlook(DraftEmailCreateRequest request) throws MessagingException;
+    void draftYahoo(DraftEmailCreateRequest request) throws MessagingException;
 }

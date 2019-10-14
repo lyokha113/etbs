@@ -26,6 +26,12 @@ public class EmailController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Email Draft", null));
     }
 
+    @PostMapping("/email/draft/yahoo")
+    public ResponseEntity<ApiResponse> draftYahoo(@Valid @RequestBody DraftEmailCreateRequest request) throws Exception {
+        emailDraftService.draftYahoo(request);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Email Draft", null));
+    }
+
     @PostMapping("/email/draft/outlook")
     public ResponseEntity<ApiResponse> draftOutlook(@Valid @RequestBody DraftEmailCreateRequest request) throws Exception {
         emailDraftService.draftOutlook(request);
