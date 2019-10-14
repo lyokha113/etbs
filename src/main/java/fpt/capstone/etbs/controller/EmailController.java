@@ -1,6 +1,7 @@
 package fpt.capstone.etbs.controller;
 
 import fpt.capstone.etbs.payload.ApiResponse;
+import fpt.capstone.etbs.payload.DraftEmailCreateRequest;
 import fpt.capstone.etbs.payload.SendEmailRequest;
 import fpt.capstone.etbs.service.EmailDraftService;
 import fpt.capstone.etbs.service.EmailSenderService;
@@ -20,15 +21,17 @@ public class EmailController {
     EmailDraftService emailDraftService;
 
     @PostMapping("/email/draft/gmail")
-    public ResponseEntity<ApiResponse> draftGmail() throws Exception {
-        emailDraftService.draftGmail();
+    public ResponseEntity<ApiResponse> draftGmail(@Valid @RequestBody DraftEmailCreateRequest request) throws Exception {
+        emailDraftService.draftGmail(request);
         return ResponseEntity.ok(new ApiResponse<>(true, "Email Draft", null));
     }
+
     @PostMapping("/email/draft/outlook")
-    public ResponseEntity<ApiResponse> draftOutlook() throws Exception {
-        emailDraftService.draftOutlook();
+    public ResponseEntity<ApiResponse> draftOutlook(@Valid @RequestBody DraftEmailCreateRequest request) throws Exception {
+        emailDraftService.draftOutlook(request);
         return ResponseEntity.ok(new ApiResponse<>(true, "Email Draft", null));
     }
+
     @PostMapping("/email/send/gmail")
     public ResponseEntity<ApiResponse> sendEmailByJava(
             @Valid @RequestBody SendEmailRequest request) throws Exception {
