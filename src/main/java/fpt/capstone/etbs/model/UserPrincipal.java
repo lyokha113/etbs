@@ -16,7 +16,7 @@ public class UserPrincipal implements UserDetails, OAuth2User {
     private UUID id;
     private String fullName;
     private String email;
-    private Boolean active;
+    private boolean active;
     private String imageUrl;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
@@ -29,7 +29,7 @@ public class UserPrincipal implements UserDetails, OAuth2User {
                 account.getId(),
                 account.getFullName(),
                 account.getEmail(),
-                account.getActive(),
+                account.isActive(),
                 account.getPassword(),
                 account.getImageUrl(),
                 grantedAuthorities

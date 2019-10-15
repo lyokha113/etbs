@@ -36,7 +36,7 @@ public class MediaFile extends Auditing {
     private Account account;
 
     @Column(columnDefinition = "TINYINT(1) default 1")
-    private Boolean active;
+    private boolean active;
 
     @Override
     public String toString() {

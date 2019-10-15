@@ -37,6 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (category == null) {
             category = new Category();
             category.setName(request.getName());
+            category.setActive(true);
             categoryRepository.save(category);
             return category;
         }

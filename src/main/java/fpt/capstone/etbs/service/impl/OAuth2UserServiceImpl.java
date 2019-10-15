@@ -68,6 +68,7 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
         account.setEmail(oAuth2UserInfo.getEmail());
         account.setImageUrl(oAuth2UserInfo.getImageUrl());
         account.setRole(Role.builder().id(RoleEnum.USER.getId()).build());
+        account.setActive(true);
         return accountRepository.save(account);
     }
 

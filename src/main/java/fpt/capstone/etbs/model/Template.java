@@ -42,7 +42,7 @@ public class Template extends Auditing implements Serializable {
     @Column(columnDefinition = "text")
     private String description;
 
-    @Column(columnDefinition = "TINYINT(1) default 1")private Boolean active;
+    @Column(columnDefinition = "TINYINT(1) default 1")private boolean active;
 
     @ManyToMany(mappedBy = "templates", cascade = CascadeType.ALL)
     private Set<Category> categories;

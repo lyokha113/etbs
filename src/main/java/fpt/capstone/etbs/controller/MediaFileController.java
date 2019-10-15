@@ -43,6 +43,7 @@ public class MediaFileController {
                 .name(filename)
                 .link(url)
                 .account(accountService.getAccount(userPrincipal.getId()))
+                .active(true)
                 .build();
         mediaFileService.createMediaFile(mediaFile);
 

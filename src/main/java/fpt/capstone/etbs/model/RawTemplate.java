@@ -43,7 +43,8 @@ public class RawTemplate extends Auditing implements Serializable {
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL)
     private Set<RawTemplateVersion> versions;
 
-    @Column(columnDefinition = "TINYINT(1) default 1")private Boolean active;
+    @Column(columnDefinition = "TINYINT(1) default 1")
+    private boolean active;
 
     @Override
     public String toString() {

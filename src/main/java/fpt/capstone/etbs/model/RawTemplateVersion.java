@@ -37,7 +37,8 @@ public class RawTemplateVersion extends Auditing implements Serializable {
     @NonNull
     private RawTemplate template;
 
-    @Column(columnDefinition = "TINYINT(1) default 1")private Boolean active;
+    @Column(columnDefinition = "TINYINT(1) default 1")
+    private boolean active;
 
     @Override
     public String toString() {

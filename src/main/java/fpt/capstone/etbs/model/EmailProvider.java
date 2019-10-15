@@ -34,7 +34,8 @@ public class EmailProvider extends Auditing implements Serializable {
     @Column
     private String setting;
 
-    @Column(columnDefinition = "TINYINT(1) default 1")private Boolean active;
+    @Column(columnDefinition = "TINYINT(1) default 1")
+    private boolean active;
 
     @Override
     public String toString() {

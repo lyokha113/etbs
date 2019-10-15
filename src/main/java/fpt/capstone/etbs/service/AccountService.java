@@ -12,5 +12,4 @@ public interface AccountService {
     Account createAccount(RegisterRequest request, int roleId);
     Account updateAccount(UUID uuid, AccountUpdateRequest request);
     Account getAccount(UUID uuid);
-    Account loginByGoogle(LoginRequest loginRequest);
 }

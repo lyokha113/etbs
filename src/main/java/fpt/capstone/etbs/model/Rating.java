@@ -36,7 +36,8 @@ public class Rating extends Auditing implements Serializable {
     @Column(nullable = false)
     private boolean vote;
 
-    @Column(columnDefinition = "TINYINT(1) default 1")private Boolean active;
+    @Column(columnDefinition = "TINYINT(1) default 1")
+    private boolean active;
 
     @Override
     public String toString() {

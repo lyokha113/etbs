@@ -45,7 +45,7 @@ public class Account extends Auditing implements Serializable {
     private String imageUrl;
 
     @Column(columnDefinition = "TINYINT(1) default 1")
-    private Boolean active;
+    private boolean active;
 
     @Column(nullable = false)
     @NotBlank

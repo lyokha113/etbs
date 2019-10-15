@@ -29,7 +29,8 @@ public class Workspace extends Auditing implements Serializable {
     @NotBlank
     private String name;
 
-    @Column(columnDefinition = "TINYINT(1) default 1")private Boolean active;
+    @Column(columnDefinition = "TINYINT(1) default 1")
+    private boolean active;
 
     @ManyToOne
     @NonNull

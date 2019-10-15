@@ -34,11 +34,6 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
     }
 
     @Override
-    public Account loginByGoogle(LoginRequest loginRequest) {
-        return null;
-    }
-
-    @Override
     public Account getAccountByEmail(String email) {
         return accountRepository.getByEmail(email).orElse(null);
     }
@@ -51,6 +46,7 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
             account.setEmail(request.getEmail());
             account.setFullName(request.getFullName());
             account.setPassword(passwordEncoder.encode(request.getPassword()));
+            account.setActive(true);
             if (roleRepository.findById(roleId).isPresent()) {
                 account.setRole(roleRepository.findById(roleId).get());
             }
