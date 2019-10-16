@@ -18,8 +18,8 @@ public class CategoryController {
 
     @GetMapping("/category")
     private ResponseEntity<ApiResponse> getCategories() {
-        List<CategoryResponse> categoryRespons = categoryService.getAllListCategory();
-        return ResponseEntity.ok(new ApiResponse<>(true, "", categoryRespons));
+        List<CategoryResponse> categoryResponse = categoryService.getAllListCategory();
+        return ResponseEntity.ok(new ApiResponse<>(true, "", categoryResponse));
     }
 
     @PostMapping("/category")

@@ -63,7 +63,7 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
     private Account registerNewUser(OAuth2UserRequest oAuth2UserRequest, GoogleOAuth2UserInfo oAuth2UserInfo) {
         Account account = new Account();
         account.setProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
-        account.setProviderId(oAuth2UserInfo.getId());
+//        account.setProviderId(oAuth2UserInfo.getId());
         account.setFullName(oAuth2UserInfo.getName());
         account.setEmail(oAuth2UserInfo.getEmail());
         account.setImageUrl(oAuth2UserInfo.getImageUrl());

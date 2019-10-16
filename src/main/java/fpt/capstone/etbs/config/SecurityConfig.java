@@ -118,8 +118,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/email/**", "/media").permitAll()
                 .antMatchers(HttpMethod.PUT, "/media/**").permitAll()
                 //Administrator
-                .antMatchers(HttpMethod.POST, "/category").hasRole(RoleEnum.ADMINISTRATOR.getName())
-                .antMatchers(HttpMethod.PUT, "/category/**").hasRole(RoleEnum.ADMINISTRATOR.getName())
+                .antMatchers(HttpMethod.POST, "/category").permitAll()
+                .antMatchers(HttpMethod.PUT, "/category/**").permitAll()
                 .anyRequest()
                 .authenticated()
         ;

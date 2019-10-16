@@ -23,6 +23,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(value = {"createdDate", "lastModifiedDate"}, allowGetters = true)
 public class Account extends Auditing implements Serializable {
 
@@ -55,7 +56,7 @@ public class Account extends Auditing implements Serializable {
     @NotNull
     private Role role;
 
-    private String providerId;
+//    private String providerId;
 
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
@@ -79,16 +80,4 @@ public class Account extends Auditing implements Serializable {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Account account = (Account) o;
-        return Objects.equals(id, account.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }
