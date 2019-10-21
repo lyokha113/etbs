@@ -8,19 +8,18 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.firebase.cloud.StorageClient;
+import fpt.capstone.etbs.EtbsApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 
 @Configuration
 public class FirebaseConfig {
 
     private static final String BUCKET_URL = "etbs-441a1.appspot.com";
-    private static final String SDK_FILE = "firebasesdk.json";
+    private static final String SDK_FILE = "/firebasesdk.json";
 
     @Bean
     public Firestore firestore() {
@@ -34,9 +33,8 @@ public class FirebaseConfig {
 
     @PostConstruct
     public void init() throws IOException {
-        File file = new ClassPathResource(SDK_FILE).getFile();
-        FileInputStream serviceAccount =
-                new FileInputStream(file);
+
+        InputStream serviceAccount = EtbsApplication.class.getResourceAsStream(SDK_FILE);
         GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccount);
         FirestoreOptions firestoreOptions = FirestoreOptions.newBuilder()
                 .setCredentials(credentials)

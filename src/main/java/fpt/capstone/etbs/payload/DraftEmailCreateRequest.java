@@ -14,4 +14,5 @@ public class DraftEmailCreateRequest {
     private String password;
     private String subject;
     private String body;
+    private String provider;
 }
