@@ -16,7 +16,7 @@ public class EmailController {
     @Autowired
     private EmailService emailSenderService;
 
-    @PostMapping("/email/draft/")
+    @PostMapping("/email/draft")
     public ResponseEntity<ApiResponse> makeDraftEmail(@Valid @RequestBody DraftEmailCreateRequest request) throws Exception {
         emailSenderService.makeDraftEmail(request);
         return ResponseEntity.ok(new ApiResponse<>(true, "Draft was made", null));
