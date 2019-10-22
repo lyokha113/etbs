@@ -3,6 +3,7 @@ package fpt.capstone.etbs.controller;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.TemplateCreateRequest;
+import fpt.capstone.etbs.payload.TemplateCreateResponse;
 import fpt.capstone.etbs.payload.TemplateUpdateRequest;
 import fpt.capstone.etbs.service.TemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,10 +64,10 @@ public class TemplateController {
     @PostMapping("/template")
     private ResponseEntity<ApiResponse> createTemplate(
             @Valid @RequestBody TemplateCreateRequest request) {
-        Template template = templateService.createTemplate(request);
-        return template != null ?
+        TemplateCreateResponse response = templateService.createTemplate(request);
+        return response != null ?
                 ResponseEntity.ok(
-                        new ApiResponse<>(true, "Template created", template)) :
+                        new ApiResponse<>(true, "Template created", response)) :
                 ResponseEntity.badRequest().body(
                         new ApiResponse<>(false, "Template name is duplicated", null));
     }

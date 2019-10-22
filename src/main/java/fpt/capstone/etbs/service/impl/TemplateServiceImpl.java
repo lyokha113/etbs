@@ -3,6 +3,7 @@ package fpt.capstone.etbs.service.impl;
 import fpt.capstone.etbs.model.Category;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.TemplateCreateRequest;
+import fpt.capstone.etbs.payload.TemplateCreateResponse;
 import fpt.capstone.etbs.payload.TemplateUpdateRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.CategoryRepository;
@@ -24,10 +25,11 @@ public class TemplateServiceImpl implements TemplateService {
     CategoryRepository categoryRepository;
 
     @Override
-    public Template createTemplate(TemplateCreateRequest request) {
+    public TemplateCreateResponse createTemplate(TemplateCreateRequest request) {
         if (accountRepository.findById(request.getAuthor()).isPresent()) {
             Template template = new Template();
             template.setActive(true);
+            template.setName(request.getName());
             template.setAuthor(accountRepository.findById(request.getAuthor()).get());
             template.setContent(request.getContent());
             template.setDescription(request.getDescription());
@@ -38,7 +40,14 @@ public class TemplateServiceImpl implements TemplateService {
                 }
             }
             template.setCategories(categoryList);
-            return template;
+            //TODO: add link for thumpnail
+            template.setThumpnail("");
+            templateRepository.save(template);
+            TemplateCreateResponse response = new TemplateCreateResponse();
+            response.setId(template.getId());
+            response.setCategories(request.getCategories());
+            response.setThumpnail(template.getThumpnail());
+            return response;
         }
         return null;
     }
