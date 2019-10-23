@@ -1,10 +1,7 @@
 package fpt.capstone.etbs.controller;
 
 import fpt.capstone.etbs.model.Template;
-import fpt.capstone.etbs.payload.ApiResponse;
-import fpt.capstone.etbs.payload.TemplateCreateRequest;
-import fpt.capstone.etbs.payload.TemplateCreateResponse;
-import fpt.capstone.etbs.payload.TemplateUpdateRequest;
+import fpt.capstone.etbs.payload.*;
 import fpt.capstone.etbs.service.TemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +18,7 @@ public class TemplateController {
 
     @GetMapping("/template")
     private ResponseEntity<ApiResponse> getAllTemplate() {
-        List<Template> template = templateService.getAllTemplate();
+        List<TemplateResponse> template = templateService.getAllTemplate();
         return template != null ?
                 ResponseEntity.ok(
                         new ApiResponse<>(true, "Get template successful", template)) :
@@ -31,7 +28,7 @@ public class TemplateController {
 
     @GetMapping("/template/{id}")
     private ResponseEntity<ApiResponse> getTemplate(@PathVariable("id") int id) {
-        Template template = templateService.getTemplate(id);
+        TemplateResponse template = templateService.getTemplate(id);
         return template != null ?
                 ResponseEntity.ok(
                         new ApiResponse<>(true, "Get template successful", template)) :
@@ -39,9 +36,9 @@ public class TemplateController {
                         new ApiResponse<>(false, "Get template failed. Not found", null));
     }
 
-    @GetMapping("/template/{uuid}")
+    @GetMapping("/template/author/{uuid}")
     private ResponseEntity<ApiResponse> getTemplateList(@PathVariable("uuid") UUID id) {
-        List<Template> templateList = templateService.getListTemplate(id);
+        List<TemplateResponse> templateList = templateService.getListTemplate(id);
         return templateList != null ?
                 ResponseEntity.ok(
                         new ApiResponse<>(true, "Get template successful", templateList)) :
@@ -53,10 +50,10 @@ public class TemplateController {
     private ResponseEntity<ApiResponse> updateTemplate(
             @PathVariable("id") int id,
             @Valid @RequestBody TemplateUpdateRequest request) {
-        Template template = templateService.updateTemplate(id, request);
-        return template != null ?
+        boolean check = templateService.updateTemplate(id, request);
+        return !check ?
                 ResponseEntity.ok(
-                        new ApiResponse<>(true, "Update template successful", template)) :
+                        new ApiResponse<>(true, "Update template successful", check)) :
                 ResponseEntity.badRequest().body(
                         new ApiResponse<>(false, "Update template failed. Not found", null));
     }

@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -7,6 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -33,8 +35,9 @@ public class Category extends Auditing implements Serializable {
     @Column(columnDefinition = "TINYINT(1) default 1")
     private boolean active;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    private Set<Template> templates;
+    @JsonIgnore
+    @ManyToMany(cascade = CascadeType.MERGE, mappedBy = "categories")
+    private Set<Template> templates = new HashSet<>();
 
     @Override
     public String toString() {
