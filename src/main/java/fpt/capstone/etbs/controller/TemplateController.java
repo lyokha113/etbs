@@ -18,7 +18,7 @@ public class TemplateController {
 
     @GetMapping("/template")
     private ResponseEntity<ApiResponse> getAllTemplate() {
-        List<TemplateResponse> template = templateService.getAllTemplate();
+        List<TemplateResponse> template = templateService.getAllListTemplate();
         return template != null ?
                 ResponseEntity.ok(
                         new ApiResponse<>(true, "Get template successful", template)) :
@@ -28,7 +28,7 @@ public class TemplateController {
 
     @GetMapping("/template/{id}")
     private ResponseEntity<ApiResponse> getTemplate(@PathVariable("id") int id) {
-        TemplateResponse template = templateService.getTemplate(id);
+        Template template = templateService.getTemplate(id);
         return template != null ?
                 ResponseEntity.ok(
                         new ApiResponse<>(true, "Get template successful", template)) :

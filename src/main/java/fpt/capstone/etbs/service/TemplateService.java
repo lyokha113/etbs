@@ -11,8 +11,8 @@ import java.util.UUID;
 
 public interface TemplateService {
     TemplateCreateResponse createTemplate(TemplateCreateRequest request);
-    TemplateResponse getTemplate(int id);
+    Template getTemplate(int id);
     boolean updateTemplate(int id, TemplateUpdateRequest request);
     List<TemplateResponse> getListTemplate(UUID id);
-    List<TemplateResponse> getAllTemplate();
+    List<TemplateResponse> getAllListTemplate();
 }

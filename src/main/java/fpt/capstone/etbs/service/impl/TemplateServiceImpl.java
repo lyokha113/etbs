@@ -14,7 +14,9 @@ import fpt.capstone.etbs.service.TemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class TemplateServiceImpl implements TemplateService {
@@ -27,8 +29,7 @@ public class TemplateServiceImpl implements TemplateService {
     CategoryRepository categoryRepository;
 
     @Override
-    public TemplateCreateResponse
-    createTemplate(TemplateCreateRequest request) {
+    public TemplateCreateResponse createTemplate(TemplateCreateRequest request) {
         if (accountRepository.findById(request.getAuthor()).isPresent()) {
             Template template = new Template();
             template.setActive(true);
@@ -54,21 +55,9 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public TemplateResponse getTemplate(int id) {
-        if (templateRepository.findById(id).isPresent()) {
-            Template template = templateRepository.findById(id).get();
-            TemplateResponse response = new TemplateResponse();
-            response.setThumpnail(template.getThumpnail());
-            List<Category> categoryList = categoryRepository.getAllByTemplates(template);
-            List<String> categoryNameList = new ArrayList<>();
-            for (Category category : categoryList) {
-                categoryNameList.add(category.getName());
-            }
-            response.setCategories(categoryNameList);
-            response.setName(template.getName());
-            return response;
-        }
-        return null;
+    public Template getTemplate(int id) {
+        return templateRepository
+                .findById(id).orElse(null);
     }
 
     @Override
@@ -94,41 +83,19 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     public List<TemplateResponse> getListTemplate(UUID id) {
-        //TODO: get only high rating template
-        List<TemplateResponse> responses = new ArrayList<>();
-        List<Template> templateList = templateRepository.findAllByAuthor_Id(id);
-        for (int i = 0; i < templateList.size(); i++) {
-            TemplateResponse temp = new TemplateResponse();
-            temp.setThumpnail(templateList.get(i).getThumpnail());
-            List<Category> categoryList = categoryRepository.getAllByTemplates(templateList.get(i));
-            List<String> categoryNameList = new ArrayList<>();
-            for (int j = 0; j < categoryList.size(); j++) {
-                categoryNameList.add(categoryList.get(j).getName());
-            }
-            temp.setCategories(categoryNameList);
-            temp.setName(templateList.get(i).getName());
-            responses.add(temp);
-        }
-        return responses;
+        return templateRepository
+                .findAllByAuthor_Id(id)
+                .stream()
+                .map(TemplateResponse::setResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<TemplateResponse> getAllTemplate() {
-        //TODO: get only high rating template
-        List<TemplateResponse> responses = new ArrayList<>();
-        List<Template> templateList = templateRepository.findAll();
-        for (int i = 0; i < templateList.size(); i++) {
-            TemplateResponse temp = new TemplateResponse();
-            temp.setThumpnail(templateList.get(i).getThumpnail());
-            List<Category> categoryList = categoryRepository.getAllByTemplates(templateList.get(i));
-            List<String> categoryNameList = new ArrayList<>();
-            for (int j = 0; j < categoryList.size(); j++) {
-                categoryNameList.add(categoryList.get(j).getName());
-            }
-            temp.setCategories(categoryNameList);
-            temp.setName(templateList.get(i).getName());
-            responses.add(temp);
-        }
-        return responses;
+    public List<TemplateResponse> getAllListTemplate() {
+        return templateRepository
+                .findAll()
+                .stream()
+                .map(TemplateResponse::setResponse)
+                .collect(Collectors.toList());
     }
 }
