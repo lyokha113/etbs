@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -7,7 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
-import java.util.Objects;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -26,11 +27,11 @@ public class Template extends Auditing implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     @NotBlank
     private String name;
 
-    @Column
+    @ManyToOne
     private Account author;
 
     @Column(columnDefinition = "longtext", nullable = false)
@@ -46,8 +47,12 @@ public class Template extends Auditing implements Serializable {
     @Column
     private String thumpnail;
 
-    @ManyToMany(mappedBy = "templates", cascade = CascadeType.ALL)
-    private Set<Category> categories;
+    @JsonIgnore
+    @ManyToMany(cascade = CascadeType.MERGE)
+    @JoinTable(name = "category_templates",
+            joinColumns = {@JoinColumn(name = "categories_id")},
+            inverseJoinColumns = {@JoinColumn(name = "templates_id")})
+    private Set<Category> categories = new HashSet<>();
 
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL)
     private Set<Rating> ratings;

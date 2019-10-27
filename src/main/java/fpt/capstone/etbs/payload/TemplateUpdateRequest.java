@@ -17,6 +17,7 @@ public class TemplateUpdateRequest {
     private String name;
     private String content;
     private String description;
+    private String thumpnail;
     private UUID author;
     private List<Integer> categories;
     private boolean active;

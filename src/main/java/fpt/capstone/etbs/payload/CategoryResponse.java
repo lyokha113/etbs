@@ -25,12 +25,8 @@ public class CategoryResponse {
                 .stream()
                 .map(t -> Template.builder().id(t.getId()).name(t.getName()).build())
                 .collect(Collectors.toList());
-
         return CategoryResponse.builder().id(category.getId()).name(category.getName()).templates(templates).build();
     }
-
-
-
 }
 
 @Data
