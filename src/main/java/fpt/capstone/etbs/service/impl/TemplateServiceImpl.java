@@ -3,10 +3,7 @@ package fpt.capstone.etbs.service.impl;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Category;
 import fpt.capstone.etbs.model.Template;
-import fpt.capstone.etbs.payload.TemplateCreateRequest;
-import fpt.capstone.etbs.payload.TemplateCreateResponse;
-import fpt.capstone.etbs.payload.TemplateResponse;
-import fpt.capstone.etbs.payload.TemplateUpdateRequest;
+import fpt.capstone.etbs.payload.*;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.CategoryRepository;
 import fpt.capstone.etbs.repository.TemplateRepository;
@@ -14,9 +11,9 @@ import fpt.capstone.etbs.service.TemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class TemplateServiceImpl implements TemplateService {
@@ -29,7 +26,8 @@ public class TemplateServiceImpl implements TemplateService {
     CategoryRepository categoryRepository;
 
     @Override
-    public TemplateCreateResponse createTemplate(TemplateCreateRequest request) {
+    public TemplateCreateResponse
+    createTemplate(TemplateCreateRequest request) {
         if (accountRepository.findById(request.getAuthor()).isPresent()) {
             Template template = new Template();
             template.setActive(true);
@@ -55,9 +53,23 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public Template getTemplate(int id) {
-        return templateRepository
-                .findById(id).orElse(null);
+    public TemplateResponse getTemplate(int id) {
+        if (templateRepository.findById(id).isPresent()) {
+            Template template = templateRepository.findById(id).get();
+            TemplateResponse temp = new TemplateResponse();
+            temp.setThumpnail(template.getThumpnail());
+            List<Category> categoryList = categoryRepository.getAllByTemplates(template);
+            List<CategoriesOfTemplate> list = new ArrayList<>();
+            for (Category category : categoryList) {
+                list.add(new CategoriesOfTemplate(category.getId(),
+                        category.getName()));
+            }
+            temp.setContent(template.getContent());
+            temp.setDescription(template.getDescription());
+            temp.setCategories(list);
+            temp.setName(template.getName());
+        }
+        return null;
     }
 
     @Override
@@ -83,19 +95,35 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     public List<TemplateResponse> getListTemplate(UUID id) {
-        return templateRepository
-                .findAllByAuthor_Id(id)
-                .stream()
-                .map(TemplateResponse::setResponse)
-                .collect(Collectors.toList());
+        List<TemplateResponse> responses = new ArrayList<>();
+        List<Template> templateList = templateRepository.findAllByAuthor_Id(id);
+        return setValueToResponse(responses, templateList);
     }
 
     @Override
     public List<TemplateResponse> getAllListTemplate() {
-        return templateRepository
-                .findAll()
-                .stream()
-                .map(TemplateResponse::setResponse)
-                .collect(Collectors.toList());
+        //TODO: get only high rating template
+        List<TemplateResponse> responses = new ArrayList<>();
+        List<Template> templateList = templateRepository.findAll();
+        return setValueToResponse(responses, templateList);
+    }
+
+    private List<TemplateResponse> setValueToResponse(List<TemplateResponse> responses, List<Template> templateList) {
+        for (Template template : templateList) {
+            TemplateResponse temp = new TemplateResponse();
+            List<Category> categoryList = categoryRepository.getAllByTemplates(template);
+            List<CategoriesOfTemplate> list = new ArrayList<>();
+            for (Category category : categoryList) {
+                list.add(new CategoriesOfTemplate(category.getId(),
+                        category.getName()));
+            }
+            temp.setContent(template.getContent());
+            temp.setDescription(template.getDescription());
+            temp.setCategories(list);
+            temp.setThumpnail(template.getThumpnail());
+            temp.setName(template.getName());
+            responses.add(temp);
+        }
+        return responses;
     }
 }
