@@ -1,12 +1,14 @@
 package fpt.capstone.etbs.service;
 
 import fpt.capstone.etbs.model.Workspace;
-import fpt.capstone.etbs.payload.WorkspaceCreateRequest;
-import fpt.capstone.etbs.payload.WorkspaceUpdateRequest;
+import fpt.capstone.etbs.payload.WorkspaceRequest;
+
+import java.util.List;
+import java.util.UUID;
 
 public interface WorkspaceService {
-    Workspace createWorkspace(WorkspaceCreateRequest request);
-    Workspace getWorkspace(int id);
-    Workspace updateWorkspace(int id, WorkspaceUpdateRequest request);
-
+    List<Workspace> getWorkspacesOfAccount(UUID accountId);
+    Workspace createWorkspace(UUID accountId, WorkspaceRequest request);
+    Workspace updateWorkspace(UUID accountId, int workspaceId, WorkspaceRequest request);
+    void deleteWorkspace(UUID accountId, int workspaceId);
 }

@@ -50,7 +50,7 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             Account account = accountService.getAccountByEmail(loginRequest.getEmail());
-            LoginResponse response = new LoginResponse(account);
+            AccountResponse response = AccountResponse.setResponse(account);
             String jwt = tokenProvider.generateToken(response);
             return ResponseEntity.ok(new ApiResponse<>(true, "Logged successfully",
                     new JwtAuthenticationResponse(jwt)));
@@ -68,7 +68,7 @@ public class AuthController {
         Account account = accountService.createAccount(request, RoleEnum.USER.getId());
         return account != null ?
                 ResponseEntity.ok(
-                        new ApiResponse<>(true, "Account created", new LoginResponse(account))) :
+                        new ApiResponse<>(true, "Account created", AccountResponse.setResponse(account))) :
                 ResponseEntity.badRequest().body(
                         new ApiResponse<>(false, "Account is existed", null));
 

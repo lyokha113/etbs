@@ -35,7 +35,7 @@ public class TemplateServiceImpl implements TemplateService {
             template.setAuthor(Account.builder().id(request.getAuthor()).build());
             template.setContent(request.getContent());
             //TODO: add link for thumpnail
-            template.setThumpnail("");
+            template.setThumbnail("");
             template.setDescription(request.getDescription());
             for (int i = 0; i < request.getCategories().size(); i++) {
                 if (categoryRepository.findById(request.getCategories().get(i)).isPresent()) {
@@ -46,7 +46,7 @@ public class TemplateServiceImpl implements TemplateService {
             TemplateCreateResponse response = new TemplateCreateResponse();
             response.setId(template.getId());
             response.setCategories(request.getCategories());
-            response.setThumpnail(template.getThumpnail());
+            response.setThumpnail(template.getThumbnail());
             return response;
         }
         return null;
@@ -57,7 +57,7 @@ public class TemplateServiceImpl implements TemplateService {
         if (templateRepository.findById(id).isPresent()) {
             Template template = templateRepository.findById(id).get();
             TemplateResponse temp = new TemplateResponse();
-            temp.setThumpnail(template.getThumpnail());
+            temp.setThumbnail(template.getThumbnail());
             List<Category> categoryList = categoryRepository.getAllByTemplates(template);
             List<CategoriesOfTemplate> list = new ArrayList<>();
             for (Category category : categoryList) {
@@ -80,7 +80,7 @@ public class TemplateServiceImpl implements TemplateService {
             template.setName(request.getName());
             template.setAuthor(Account.builder().id(request.getAuthor()).build());
             template.setContent(request.getContent());
-            template.setThumpnail(request.getThumpnail());
+            template.setThumbnail(request.getThumpnail());
             template.setDescription(request.getDescription());
             for (int i = 0; i < request.getCategories().size(); i++) {
                 if (categoryRepository.findById(request.getCategories().get(i)).isPresent()) {
@@ -96,7 +96,7 @@ public class TemplateServiceImpl implements TemplateService {
     @Override
     public List<TemplateResponse> getListTemplate(UUID id) {
         List<TemplateResponse> responses = new ArrayList<>();
-        List<Template> templateList = templateRepository.findAllByAuthor_Id(id);
+        List<Template> templateList = templateRepository.getAllByAuthor_Id(id);
         return setValueToResponse(responses, templateList);
     }
 
@@ -120,7 +120,7 @@ public class TemplateServiceImpl implements TemplateService {
             temp.setContent(template.getContent());
             temp.setDescription(template.getDescription());
             temp.setCategories(list);
-            temp.setThumpnail(template.getThumpnail());
+            temp.setThumbnail(template.getThumbnail());
             temp.setName(template.getName());
             responses.add(temp);
         }

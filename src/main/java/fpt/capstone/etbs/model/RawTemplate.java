@@ -37,6 +37,9 @@ public class RawTemplate extends Auditing implements Serializable {
     @Column(columnDefinition = "text")
     private String description;
 
+    @Column(columnDefinition = "text")
+    private String thumbnail;
+
     @ManyToOne
     @NonNull
     private Workspace workspace;
@@ -53,7 +56,7 @@ public class RawTemplate extends Auditing implements Serializable {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", workspace=" + workspace +
+                ", thumbnail='" + thumbnail + '\'' +
                 '}';
     }
 

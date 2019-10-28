@@ -10,6 +10,8 @@ import java.util.Optional;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
+
     Optional<Category> getByName(String name);
+    Optional<Category> getByNameAndIdNot(String name, Integer id);
     List<Category> getAllByTemplates(Template template);
 }

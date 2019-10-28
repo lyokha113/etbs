@@ -7,8 +7,13 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MediaFileService {
-    void createMediaFile(MediaFile mediaFile);
-    MediaFile getMediaFile(int id);
-    MediaFile updateMediaFile(int id, MediaFileUpdateRequest request);
-    List<MediaFile> getListMediaFile(UUID id);
+
+    List<MediaFile> getMediaFilesOfAccount(UUID accountId);
+    List<MediaFile> getInactiveMediaFiles();
+    MediaFile createMediaFile(UUID accountId, UUID id, String name, String link);
+    MediaFile updateMediaFile(UUID accountId, UUID id, MediaFileUpdateRequest request);
+    MediaFile deactivateMediaFile(UUID accountId, UUID id);
+    void deleteMediaFile(List<MediaFile> files);
+
+
 }

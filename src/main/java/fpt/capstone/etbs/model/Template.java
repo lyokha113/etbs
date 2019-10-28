@@ -45,7 +45,7 @@ public class Template extends Auditing implements Serializable {
     private boolean active;
 
     @Column
-    private String thumpnail;
+    private String thumbnail;
 
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.MERGE)

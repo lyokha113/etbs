@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.controller;
 
+import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.MediaFile;
 import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.payload.ApiResponse;
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 public class MediaFileController {
@@ -26,45 +29,60 @@ public class MediaFileController {
     @Autowired
     private FirebaseService firebaseService;
 
-    @Autowired
-    private AccountService accountService;
-
-    @PostMapping("/media")
-    public ResponseEntity<ApiResponse> createMediaFile(@RequestParam("file") MultipartFile file,
-                                                       @RequestParam("filename") String filename,
-                                                       Authentication auth) throws Exception {
-
+    @GetMapping("/file")
+    public ResponseEntity<ApiResponse> getMediaFileOfAccount(Authentication auth) {
         UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-        UUID uuid = UUID.randomUUID();
-        String url = firebaseService.createImage("/" + userPrincipal.getId(), file, uuid.toString());
-        MediaFile mediaFile = MediaFile
-                .builder()
-                .id(uuid)
-                .name(filename)
-                .link(url)
-                .account(accountService.getAccount(userPrincipal.getId()))
-                .active(true)
-                .build();
-        mediaFileService.createMediaFile(mediaFile);
-
-        return mediaFile != null ?
-                ResponseEntity.ok(
-                        new ApiResponse<>(true, "File created", new MediaFileResponse(mediaFile))) :
-                ResponseEntity.badRequest().body(
-                        new ApiResponse<>(false, "File can not created!!", null));
-
+        List<MediaFile> files = mediaFileService.getMediaFilesOfAccount(userPrincipal.getId());
+        List<MediaFileResponse> response = files.stream()
+                .map(MediaFileResponse::setResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(new ApiResponse<>(true, "", response));
     }
 
-    @PutMapping("/media/{id}")
+    @PostMapping("/file")
+    public ResponseEntity<ApiResponse> createMediaFile(
+            Authentication auth,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("filename") String filename) throws Exception {
+        UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+        UUID id = UUID.randomUUID();
+        String link = firebaseService.createImage(userPrincipal.getId().toString(), file, id.toString());
+        try {
+            MediaFile mediaFile = mediaFileService.createMediaFile(userPrincipal.getId(), id, filename, link);
+            MediaFileResponse response = MediaFileResponse.setResponse(mediaFile);
+            return ResponseEntity.ok(new ApiResponse<>(true, "File created", response));
+        } catch (BadRequestException ex) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+        }
+    }
+
+    @PutMapping("/file/{id}")
     public ResponseEntity<ApiResponse> updateMediaFile(
-            @PathVariable("id") int id,
+            Authentication auth,
+            @PathVariable("id") UUID id,
             @Valid @RequestBody MediaFileUpdateRequest request) {
-        MediaFile mediaFile = mediaFileService.updateMediaFile(id, request);
-        return mediaFile != null ?
-                ResponseEntity.ok(
-                        new ApiResponse<>(true, "The File updated", mediaFile)) :
-                ResponseEntity.badRequest().body(
-                        new ApiResponse<>(false, "The File can not be updated!!", null));
+        UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+        try {
+            MediaFile mediaFile = mediaFileService.updateMediaFile(userPrincipal.getId(), id, request);
+            MediaFileResponse response = MediaFileResponse.setResponse(mediaFile);
+            return ResponseEntity.ok(new ApiResponse<>(true, "File updated", response));
+        } catch (BadRequestException ex) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+        }
+    }
+
+    @DeleteMapping("/workspace/{id}")
+    public ResponseEntity<ApiResponse> deleteMediaFile(
+            Authentication auth,
+            @PathVariable("id") UUID id) {
+        UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+        try {
+            mediaFileService.deactivateMediaFile(userPrincipal.getId(), id);
+            return ResponseEntity.ok(new ApiResponse<>(true, "File deleted", null));
+        } catch (BadRequestException ex) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+        }
+
     }
 
 }
