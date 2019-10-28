@@ -3,17 +3,15 @@ package fpt.capstone.etbs.component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fpt.capstone.etbs.payload.LoginResponse;
+import fpt.capstone.etbs.payload.AccountResponse;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Set;
 
 @Component
 public class JwtTokenProvider {
@@ -25,7 +23,7 @@ public class JwtTokenProvider {
     @Value("${app.jwtExpirationInMs}")
     private int jwtExpirationInMs;
 
-    public String generateToken(LoginResponse response) throws JsonProcessingException {
+    public String generateToken(AccountResponse response) throws JsonProcessingException {
 
         ObjectMapper om = new ObjectMapper();
         Date now = new Date();
@@ -39,12 +37,12 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public LoginResponse getTokenValue(String token) throws IOException {
+    public AccountResponse getTokenValue(String token) throws IOException {
         Claims claims = Jwts.parser()
                 .setSigningKey(jwtSecret)
                 .parseClaimsJws(token)
                 .getBody();
-        return new ObjectMapper().readValue(claims.getSubject(), LoginResponse.class);
+        return new ObjectMapper().readValue(claims.getSubject(), AccountResponse.class);
     }
 
     public boolean validateToken(String authToken) {

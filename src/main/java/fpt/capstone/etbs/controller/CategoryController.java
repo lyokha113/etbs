@@ -1,6 +1,8 @@
 package fpt.capstone.etbs.controller;
 
+import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Category;
+import fpt.capstone.etbs.model.Workspace;
 import fpt.capstone.etbs.payload.*;
 import fpt.capstone.etbs.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class CategoryController {
@@ -18,32 +21,36 @@ public class CategoryController {
 
     @GetMapping("/category")
     private ResponseEntity<ApiResponse> getCategories() {
-        List<CategoryResponse> categoryResponse = categoryService.getAllListCategory();
-        return ResponseEntity.ok(new ApiResponse<>(true, "", categoryResponse));
+        List<Category> categories = categoryService.getCategories();
+        List<CategoryResponse> response = categories.stream()
+                .map(CategoryResponse::setResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(new ApiResponse<>(true, "", response));
     }
 
     @PostMapping("/category")
     private ResponseEntity<ApiResponse> createCategory(
             @Valid @RequestBody CategoryCreateRequest request) {
-
-        Category category = categoryService.createCategory(request);
-        return category != null ?
-                ResponseEntity.ok(
-                        new ApiResponse<>(true, "Category created", category)) :
-                ResponseEntity.badRequest().body(
-                        new ApiResponse<>(false, "Category name is duplicated", null));
+        try {
+            Category category = categoryService.createCategory(request);
+            CategoryResponse response = CategoryResponse.setResponse(category);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Category created", response));
+        } catch (BadRequestException ex) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+        }
     }
 
     @PutMapping("/category/{id}")
     private ResponseEntity<ApiResponse> updateCategory(
             @PathVariable("id") int id,
             @Valid @RequestBody CategoryUpdateRequest request) {
-        Category category = categoryService.updateCategory(id, request);
-        return category != null ?
-                ResponseEntity.ok(
-                        new ApiResponse<>(true, "Update successful", category)) :
-                ResponseEntity.badRequest().body(
-                        new ApiResponse<>(false, "Update failed. Not found", null));
+        try {
+            Category category = categoryService.updateCategory(id, request);
+            CategoryResponse response = CategoryResponse.setResponse(category);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Category updated", response));
+        } catch (BadRequestException ex) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+        }
     }
 
 

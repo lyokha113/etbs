@@ -1,9 +1,10 @@
 package fpt.capstone.etbs.component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.UserPrincipal;
-import fpt.capstone.etbs.payload.LoginResponse;
+import fpt.capstone.etbs.payload.AccountResponse;
 import fpt.capstone.etbs.util.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,13 +61,16 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
 
         UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
-        LoginResponse res = LoginResponse.builder()
+        AccountResponse account = AccountResponse.builder()
                 .id(user.getId())
                 .fullName(user.getFullName())
                 .email(user.getEmail())
                 .imageUrl(user.getImageUrl())
+                .active(true)
+                .roleName(RoleEnum.USER.getName())
+                .roleId(RoleEnum.USER.getId())
                 .build();
-        String token = tokenProvider.generateToken(res);
+        String token = tokenProvider.generateToken(account);
 
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("token", token)

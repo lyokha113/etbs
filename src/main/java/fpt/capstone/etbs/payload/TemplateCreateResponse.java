@@ -12,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TemplateCreateResponse {
+
     private int id;
     private String name;
     private String thumpnail;

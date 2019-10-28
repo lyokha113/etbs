@@ -8,7 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 @RestController
 public class EmailController {
@@ -18,7 +21,11 @@ public class EmailController {
 
     @PostMapping("/email/draft")
     public ResponseEntity<ApiResponse> makeDraftEmail(@Valid @RequestBody DraftEmailCreateRequest request) throws Exception {
-        emailSenderService.makeDraftEmail(request);
+        try {
+            emailSenderService.makeDraftEmail(request);
+        } catch (GeneralSecurityException e) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(false, "Invalid security information", null));
+        }
         return ResponseEntity.ok(new ApiResponse<>(true, "Draft was made", null));
     }
 

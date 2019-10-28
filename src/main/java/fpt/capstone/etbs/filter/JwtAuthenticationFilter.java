@@ -3,7 +3,7 @@ package fpt.capstone.etbs.filter;
 import fpt.capstone.etbs.component.JwtTokenProvider;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Role;
-import fpt.capstone.etbs.payload.LoginResponse;
+import fpt.capstone.etbs.payload.AccountResponse;
 import fpt.capstone.etbs.service.CustomUserDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwt = getJwtFromRequest(request);
 
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-                LoginResponse json = tokenProvider.getTokenValue(jwt);
+                AccountResponse json = tokenProvider.getTokenValue(jwt);
                 Role role = Role.builder().id(json.getRoleId()).build();
                 Account account = Account.builder()
                         .id(json.getId())

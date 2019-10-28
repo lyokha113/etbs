@@ -30,15 +30,12 @@ public class Workspace extends Auditing implements Serializable {
     @NotBlank
     private String name;
 
-    @Column(columnDefinition = "TINYINT(1) default 1")
-    private boolean active;
-
     @ManyToOne
     @NonNull
     private Account account;
 
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL)
-    private Set<RawTemplate> templates;
+    private Set<RawTemplate> rawTemplates;
 
     @Override
     public String toString() {

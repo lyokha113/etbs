@@ -2,6 +2,7 @@ package fpt.capstone.etbs.controller;
 
 import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.model.Account;
+import fpt.capstone.etbs.payload.AccountResponse;
 import fpt.capstone.etbs.payload.AccountUpdateRequest;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.service.AccountService;
@@ -25,7 +26,8 @@ public class UserController {
     public ResponseEntity<ApiResponse> getUserDetail(Authentication auth) {
         UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
         Account account = accountService.getAccount(userPrincipal.getId());
-        return ResponseEntity.ok(new ApiResponse<>(true, "", account));
+        AccountResponse response = AccountResponse.setResponse(account);
+        return ResponseEntity.ok(new ApiResponse<>(true, "", response));
     }
 
     @PutMapping("/user")
@@ -33,6 +35,7 @@ public class UserController {
         UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
         Account account = accountService.getAccount(userPrincipal.getId());
         account = accountService.updateAccount(account.getId(), request);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Update successful", account));
+        AccountResponse response = AccountResponse.setResponse(account);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Update successful", response));
     }
 }

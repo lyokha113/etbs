@@ -14,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TemplateCreateRequest {
-    //TODO: add link thumpnail
+
     private String name;
     private String content;
     private String description;

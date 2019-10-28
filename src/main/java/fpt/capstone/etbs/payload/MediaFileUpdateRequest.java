@@ -10,9 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MediaFileUpdateRequest {
-    private int id;
-    private String link;
     private String name;
-    private String type;
     private boolean active;
 }

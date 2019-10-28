@@ -39,7 +39,6 @@ public class Account extends Auditing implements Serializable {
     private String email;
 
     @Column
-    @JsonIgnore
     private String password;
 
     @Column
@@ -55,8 +54,6 @@ public class Account extends Auditing implements Serializable {
     @ManyToOne
     @NotNull
     private Role role;
-
-//    private String providerId;
 
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;

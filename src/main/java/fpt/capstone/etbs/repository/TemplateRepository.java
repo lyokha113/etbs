@@ -10,6 +10,6 @@ import java.util.UUID;
 
 @Repository
 public interface TemplateRepository extends JpaRepository<Template, Integer> {
-    List<Template> findAllByAuthor_Id(UUID id);
+    List<Template> getAllByAuthor_Id(UUID id);
     List<Template> getAllByCategories(Category category);
 }

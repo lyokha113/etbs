@@ -17,7 +17,7 @@ import java.util.UUID;
 public class CustomUserDetailsServiceImpl implements CustomUserDetailsService, UserDetailsService {
 
     @Autowired
-    AccountRepository accountRepository;
+    private AccountRepository accountRepository;
 
     @Override
     @Transactional
