@@ -115,7 +115,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user").hasAnyRole(RoleEnum.ADMINISTRATOR.getName(), RoleEnum.USER.getName())
                 //User
                 .antMatchers(HttpMethod.GET, "/media/**","/template").permitAll()
-                .antMatchers(HttpMethod.POST, "/email/**", "/media", "/template").permitAll()
+                .antMatchers(HttpMethod.POST, "/email/**", "/media", "/template","/rawtemplate").permitAll()
                 .antMatchers(HttpMethod.PUT, "/media/**","/template").permitAll()
                 //Administrator
                 .antMatchers(HttpMethod.POST, "/category").permitAll()
