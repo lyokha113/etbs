@@ -71,7 +71,7 @@ public class MediaFileController {
         }
     }
 
-    @DeleteMapping("/workspace/{id}")
+    @DeleteMapping("/file/{id}")
     public ResponseEntity<ApiResponse> deleteMediaFile(
             Authentication auth,
             @PathVariable("id") UUID id) {
