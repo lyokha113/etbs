@@ -10,7 +10,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
@@ -24,14 +26,16 @@ public class CategoryResponse {
     private List<TemplateOfCategory> templates;
 
     public static CategoryResponse setResponse(Category category) {
-        List<TemplateOfCategory> templates = category.getTemplates().stream()
+        Set<Template> templates = category.getTemplates();
+        List<TemplateOfCategory> templatesOfCategory = templates == null ? new ArrayList<>() :
+                templates.stream()
                 .map(TemplateOfCategory::setTemplateOfCategory)
                 .collect(Collectors.toList());
         return CategoryResponse
                 .builder()
                 .id(category.getId())
                 .name(category.getName())
-                .templates(templates)
+                .templates(templatesOfCategory)
                 .build();
     }
 }
