@@ -1,6 +1,5 @@
 package fpt.capstone.etbs.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -8,7 +7,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -47,12 +45,14 @@ public class Template extends Auditing implements Serializable {
     @Column
     private String thumbnail;
 
-    @JsonIgnore
+    @Column
+    private int vote;
+
     @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(name = "category_templates",
             joinColumns = {@JoinColumn(name = "categories_id")},
             inverseJoinColumns = {@JoinColumn(name = "templates_id")})
-    private Set<Category> categories = new HashSet<>();
+    private Set<Category> categories;
 
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL)
     private Set<Rating> ratings;

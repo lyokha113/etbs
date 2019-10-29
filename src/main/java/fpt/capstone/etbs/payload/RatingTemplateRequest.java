@@ -5,16 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TemplateCreateResponse {
-
-    private int id;
-    private String name;
-    private String thumbnail;
-    private List<Integer> categories;
+public class RatingTemplateRequest {
+    private UUID accountId;
+    private int templateId;
+    private boolean vote;
 }

@@ -13,11 +13,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TemplateUpdateRequest {
-    //TODO: add link thumpnail
     private String name;
     private String content;
     private String description;
-    private String thumpnail;
+    private String thumbnail;
     private UUID author;
     private List<Integer> categories;
     private boolean active;

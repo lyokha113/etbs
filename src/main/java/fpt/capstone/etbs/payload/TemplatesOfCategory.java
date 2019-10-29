@@ -12,7 +12,4 @@ import lombok.NoArgsConstructor;
 public class TemplatesOfCategory {
     private int id;
     private String name;
-    private String thumpnail;
-    private String content;
-    private String description;
 }

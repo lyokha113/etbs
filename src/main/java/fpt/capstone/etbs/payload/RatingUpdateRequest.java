@@ -5,16 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TemplateCreateResponse {
-
+public class RatingUpdateRequest {
     private int id;
-    private String name;
-    private String thumbnail;
-    private List<Integer> categories;
+    private boolean vote;
+    private boolean active;
 }

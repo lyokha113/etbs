@@ -6,47 +6,48 @@ import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.*;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.CategoryRepository;
+import fpt.capstone.etbs.repository.RatingRepository;
 import fpt.capstone.etbs.repository.TemplateRepository;
 import fpt.capstone.etbs.service.TemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class TemplateServiceImpl implements TemplateService {
-    //TODO: add link thumpnail
     @Autowired
     TemplateRepository templateRepository;
     @Autowired
     AccountRepository accountRepository;
     @Autowired
     CategoryRepository categoryRepository;
+    @Autowired
+    RatingRepository ratingRepository;
 
     @Override
-    public TemplateCreateResponse
-    createTemplate(TemplateCreateRequest request) {
+    public TemplateCreateResponse createTemplate(TemplateCreateRequest request) {
         if (accountRepository.findById(request.getAuthor()).isPresent()) {
             Template template = new Template();
             template.setActive(true);
+            template.setVote(0);
             template.setName(request.getName());
             template.setAuthor(Account.builder().id(request.getAuthor()).build());
             template.setContent(request.getContent());
-            //TODO: add link for thumpnail
             template.setThumbnail("");
             template.setDescription(request.getDescription());
+            Set<Category> categories = new HashSet<>();
             for (int i = 0; i < request.getCategories().size(); i++) {
                 if (categoryRepository.findById(request.getCategories().get(i)).isPresent()) {
-                    template.getCategories().add(Category.builder().id(request.getCategories().get(i)).build());
+                    categories.add(Category.builder().id(request.getCategories().get(i)).build());
                 }
             }
+            template.setCategories(categories);
             templateRepository.save(template);
             TemplateCreateResponse response = new TemplateCreateResponse();
             response.setId(template.getId());
             response.setCategories(request.getCategories());
-            response.setThumpnail(template.getThumbnail());
+            response.setThumbnail(template.getThumbnail());
             return response;
         }
         return null;
@@ -80,7 +81,7 @@ public class TemplateServiceImpl implements TemplateService {
             template.setName(request.getName());
             template.setAuthor(Account.builder().id(request.getAuthor()).build());
             template.setContent(request.getContent());
-            template.setThumbnail(request.getThumpnail());
+            template.setThumbnail(request.getThumbnail());
             template.setDescription(request.getDescription());
             for (int i = 0; i < request.getCategories().size(); i++) {
                 if (categoryRepository.findById(request.getCategories().get(i)).isPresent()) {
@@ -102,10 +103,15 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     public List<TemplateResponse> getAllListTemplate() {
-        //TODO: get only high rating template
         List<TemplateResponse> responses = new ArrayList<>();
         List<Template> templateList = templateRepository.findAll();
         return setValueToResponse(responses, templateList);
+    }
+
+    @Override
+    public List<TemplateResponse> getHighRatingTemplate(int quantity) {
+
+        return null;
     }
 
     private List<TemplateResponse> setValueToResponse(List<TemplateResponse> responses, List<Template> templateList) {

@@ -14,4 +14,5 @@ public interface TemplateService {
     boolean updateTemplate(int id, TemplateUpdateRequest request);
     List<TemplateResponse> getListTemplate(UUID id);
     List<TemplateResponse> getAllListTemplate();
+    List<TemplateResponse> getHighRatingTemplate(int quantity);
 }
