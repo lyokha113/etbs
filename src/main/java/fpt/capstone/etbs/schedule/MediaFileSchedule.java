@@ -11,7 +11,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Configuration
@@ -26,18 +30,28 @@ public class MediaFileSchedule {
     @Autowired
     private MediaFileService mediaFileService;
 
-    @Scheduled(fixedDelay = 1000 * 60 * 10, initialDelay = 1000 * 30 * 1000)
-    public void sendEmail() {
+    @Scheduled(fixedDelay = 1000 * 60 * 30, initialDelay = 1000 * 60 * 30)
+    public void deleteInactiveFile() {
         logger.info("Start to delete inactive file");
-        List<MediaFile> files = mediaFileService.getInactiveMediaFiles();
-        files.forEach(f -> {
+        List<MediaFile> deleteFiles = mediaFileService.getInactiveMediaFiles();
+        deleteFiles = deleteFiles.stream().filter(f -> {
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime deleteTime = LocalDateTime.ofInstant(
+                    f.getLastModifiedDate().toInstant(), ZoneId.systemDefault());
+            return deleteTime.plusDays(1).isAfter(now);
+        }).collect(Collectors.toList());
+
+        List<MediaFile> deletedFiles = new ArrayList<>();
+
+        deleteFiles.forEach(f -> {
             try {
                 firebaseService.deleteImage(f.getAccount().getId().toString(), f.getId().toString());
+                deletedFiles.add(f);
             } catch (Exception e) {
                 logger.error(e.getMessage());
             }
         });
-        mediaFileService.deleteMediaFile(files);
+        mediaFileService.deleteMediaFile(deletedFiles);
         logger.info("Finished delete inactive file");
     }
 }

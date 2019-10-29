@@ -1,11 +1,13 @@
 package fpt.capstone.etbs.service.impl;
 
+import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.exception.OAuth2AuthenticationProcessingException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.constant.AuthProvider;
 import fpt.capstone.etbs.model.Role;
 import fpt.capstone.etbs.model.UserPrincipal;
+import fpt.capstone.etbs.model.Workspace;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.component.GoogleOAuth2UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
@@ -48,10 +52,12 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
         Account account;
         if (userOptional.isPresent()) {
             account = userOptional.get();
-            if (!account.getProvider().equals(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))) {
+            if (!account.getProvider().equals(AuthProvider.google)) {
                 throw new OAuth2AuthenticationProcessingException("Looks like you're signed up with " +
                         account.getProvider() + " account. Please use your " + account.getProvider() +
                         " account to login.");
+            } else if (!account.isActive()) {
+                throw new OAuth2AuthenticationProcessingException("Your account was locked");
             }
             account = updateExistingUser(account, oAuth2UserInfo);
         } else {
@@ -63,12 +69,13 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
     private Account registerNewUser(OAuth2UserRequest oAuth2UserRequest, GoogleOAuth2UserInfo oAuth2UserInfo) {
         Account account = new Account();
         account.setProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
-//        account.setProviderId(oAuth2UserInfo.getId());
         account.setFullName(oAuth2UserInfo.getName());
         account.setEmail(oAuth2UserInfo.getEmail());
         account.setImageUrl(oAuth2UserInfo.getImageUrl());
         account.setRole(Role.builder().id(RoleEnum.USER.getId()).build());
         account.setActive(true);
+        account.setProvider(AuthProvider.google);
+        account.setWorkspaces(Stream.of(Workspace.builder().name(AppConstant.DEFAULT_WORKSPACE_NAME).build()).collect(Collectors.toSet()));
         return accountRepository.save(account);
     }
 

@@ -18,6 +18,7 @@ public class AccountResponse {
     private String email;
     private String imageUrl;
     private boolean active;
+    private String provider;
     private int roleId;
     private String roleName;
 
@@ -27,6 +28,7 @@ public class AccountResponse {
                 .fullName(account.getFullName())
                 .email(account.getEmail())
                 .imageUrl(account.getImageUrl())
+                .provider(account.getProvider().name())
                 .active(account.isActive())
                 .roleId(account.getRole().getId())
                 .roleName(account.getRole().getName())

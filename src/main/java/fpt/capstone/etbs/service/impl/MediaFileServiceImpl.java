@@ -68,12 +68,12 @@ public class MediaFileServiceImpl implements MediaFileService {
     }
 
     @Override
-    public MediaFile deactivateMediaFile(UUID accountId, UUID id) {
+    public void deactivateMediaFile(UUID accountId, UUID id) {
         MediaFile mediaFile = mediaFileRepository.getByIdAndAccount_Id(accountId, id).orElse(null);
         if (mediaFile == null) throw new BadRequestException("File doesn't exist");
 
         mediaFile.setActive(false);
-        return mediaFileRepository.save(mediaFile);
+        mediaFileRepository.save(mediaFile);
     }
 
 
