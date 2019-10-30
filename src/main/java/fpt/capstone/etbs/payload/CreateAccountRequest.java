@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CreateAccountRequest {
 
-    private String fullName;
-    private String email;
-    private String password;
-    private int roleId;
+  private String fullName;
+  private String email;
+  private String password;
+  private int roleId;
 
 }

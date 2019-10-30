@@ -4,26 +4,26 @@ import java.util.Arrays;
 
 public enum RoleEnum {
 
-    ADMINISTRATOR(1, "ADMINISTRATOR"), USER(2, "USER");
+  ADMINISTRATOR(1, "ADMINISTRATOR"), USER(2, "USER");
 
-    private int id;
-    private String name;
+  private int id;
+  private String name;
 
-    public int getId() {
-        return id;
-    }
+  RoleEnum(int id, String name) {
+    this.id = id;
+    this.name = name;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public static RoleEnum getRole(int roleId) {
+    return Arrays.stream(RoleEnum.values()).filter(role -> role.getId() == roleId)
+        .findFirst().orElse(null);
+  }
 
-    RoleEnum(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+  public int getId() {
+    return id;
+  }
 
-    public static RoleEnum getRole(int roleId) {
-        return Arrays.stream(RoleEnum.values()).filter(role -> role.getId() == roleId)
-                .findFirst().orElse(null);
-    }
+  public String getName() {
+    return name;
+  }
 }

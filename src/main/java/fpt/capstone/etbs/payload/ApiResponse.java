@@ -11,14 +11,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ApiResponse <T> {
+public class ApiResponse<T> {
 
-    private boolean success;
+  private boolean success;
 
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private String message;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String message;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private T data;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private T data;
 
 }

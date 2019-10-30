@@ -7,10 +7,10 @@ import lombok.Data;
 @Builder
 public class JwtAuthenticationResponse {
 
-    private String accessToken;
+  private String accessToken;
 
-    public JwtAuthenticationResponse(String accessToken) {
-        this.accessToken = "Bearer " + accessToken;
-    }
+  public JwtAuthenticationResponse(String accessToken) {
+    this.accessToken = "Bearer " + accessToken;
+  }
 
 }

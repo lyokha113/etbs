@@ -1,15 +1,30 @@
 package fpt.capstone.etbs.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
-import java.util.HashSet;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.util.Set;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Data
@@ -18,53 +33,44 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(of = "id", callSuper = false)
+@ToString(of = {"id"})
 @JsonIgnoreProperties(value = {"createdDate", "lastModifiedDate"}, allowGetters = true)
-public class Template extends Auditing implements Serializable {
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id")
+public class Template extends Auditing {
 
-    @Id
-    @Column
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+  @Id
+  @Column
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Integer id;
 
-    @Column(nullable = false)
-    @NotBlank
-    private String name;
+  @Column(nullable = false)
+  @NotBlank
+  private String name;
 
-    @ManyToOne
-    private Account author;
+  @ManyToOne
+  private Account author;
 
-    @Column(columnDefinition = "longtext", nullable = false)
-    @NotBlank
-    private String content;
+  @Column(columnDefinition = "longtext", nullable = false)
+  @NotBlank
+  private String content;
 
-    @Column(columnDefinition = "text")
-    private String description;
+  @Column(columnDefinition = "text")
+  private String description;
 
-    @Column(columnDefinition = "TINYINT(1) default 1")
-    private boolean active;
+  @Column(columnDefinition = "TINYINT(1) default 1")
+  private boolean active;
 
-    @Column
-    private String thumbnail;
+  @Column(columnDefinition = "text")
+  private String thumbnail;
 
-    @JsonIgnore
-    @ManyToMany(cascade = CascadeType.MERGE)
-    @JoinTable(name = "category_templates",
-            joinColumns = {@JoinColumn(name = "categories_id")},
-            inverseJoinColumns = {@JoinColumn(name = "templates_id")})
-    private Set<Category> categories = new HashSet<>();
+  @ManyToMany(cascade = CascadeType.ALL)
+  @JoinTable(name = "category_templates",
+      joinColumns = {@JoinColumn(name = "categories_id")},
+      inverseJoinColumns = {@JoinColumn(name = "templates_id")})
+  private Set<Category> categories;
 
-    @OneToMany(mappedBy = "template", cascade = CascadeType.ALL)
-    private Set<Rating> ratings;
-
-    @Override
-    public String toString() {
-        return "DefaultTemplate{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", author=" + author +
-                ", description='" + description + '\'' +
-                '}';
-    }
+  @OneToMany(mappedBy = "template", cascade = CascadeType.ALL)
+  private Set<Rating> ratings;
 
 }

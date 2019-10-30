@@ -9,87 +9,99 @@ import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.RawTemplateRepository;
 import fpt.capstone.etbs.repository.WorkspaceRepository;
 import fpt.capstone.etbs.service.WorkspaceService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class WorkspaceServiceImpl implements WorkspaceService {
 
-    @Autowired
-    private WorkspaceRepository workspaceRepository;
+  private final static String DEFAULT_WORKSPACE_NAME = "Default";
+  @Autowired
+  private WorkspaceRepository workspaceRepository;
+  @Autowired
+  private AccountRepository accountRepository;
+  @Autowired
+  private RawTemplateRepository rawTemplateRepository;
 
-    @Autowired
-    private AccountRepository accountRepository;
+  @Override
+  public List<Workspace> getWorkspacesOfAccount(UUID accountId) {
+    return workspaceRepository.getByAccount_Id(accountId);
+  }
 
-    @Autowired
-    private RawTemplateRepository rawTemplateRepository;
+  @Override
+  public Workspace getWorkspaceOfAccount(Integer workspaceId, UUID accountId) {
+    return workspaceRepository.getByIdAndAccount_Id(workspaceId, accountId).orElse(null);
+  }
 
-    private final static String DEFAULT_WORKSPACE_NAME = "Default";
+  @Override
+  public Workspace createWorkspace(UUID accountId, WorkspaceRequest request) {
 
-    @Override
-    public List<Workspace> getWorkspacesOfAccount(UUID accountId) {
-        return workspaceRepository.getByAccount_Id(accountId);
+    Account account = accountRepository.findById(accountId).orElse(null);
+    if (account == null) {
+      throw new BadRequestException("Account doesn't exist");
+    }
+    if (isDuplicateNameEachAccount(request.getName(), accountId)) {
+      throw new BadRequestException("Workspace name is existed");
     }
 
-    @Override
-    public Workspace createWorkspace(UUID accountId, WorkspaceRequest request) {
+    Workspace workspace = Workspace.builder()
+        .account(account)
+        .name(request.getName())
+        .build();
 
-        Account account = accountRepository.findById(accountId).orElse(null);
-        if (account == null) throw new BadRequestException("Account doesn't exist");
-        if (isDuplicateNameEachAccount(request.getName(), accountId))
-            throw new BadRequestException("Workspace name is existed");
+    return workspaceRepository.save(workspace);
+  }
 
-        Workspace workspace = Workspace.builder()
-                .account(account)
-                .name(request.getName())
-                .build();
+  @Override
+  public Workspace updateWorkspace(UUID accountId, Integer workspaceId, WorkspaceRequest request) {
 
-        return workspaceRepository.save(workspace);
+    Workspace workspace = workspaceRepository.getByIdAndAccount_Id(workspaceId, accountId)
+        .orElse(null);
+
+    if (workspace == null) {
+      throw new BadRequestException("Workspace doesn't exist");
+    }
+    if (isDuplicateNameEachAccount(request.getName(), accountId, workspaceId)) {
+      throw new BadRequestException("Workspace name is existed");
     }
 
-    @Override
-    public Workspace updateWorkspace(UUID accountId, int workspaceId, WorkspaceRequest request) {
+    workspace.setName(request.getName());
+    return workspaceRepository.save(workspace);
 
-        Workspace workspace = workspaceRepository.getByIdAndAccount_Id(workspaceId, accountId).orElse(null);
+  }
 
-        if (workspace == null) throw new BadRequestException("Workspace doesn't exist");
-        if (isDuplicateNameEachAccount(request.getName(), accountId, workspaceId))
-            throw new BadRequestException("Workspace name is existed");
+  @Override
+  public void deleteWorkspace(UUID accountId, Integer workspaceId) {
 
-        workspace.setName(request.getName());
-        return workspaceRepository.save(workspace);
-
+    Workspace workspace = workspaceRepository.getByIdAndAccount_Id(workspaceId, accountId)
+        .orElse(null);
+    if (workspace == null) {
+      throw new BadRequestException("Workspace doesn't exist");
     }
 
-    @Override
-    public void deleteWorkspace(UUID accountId, int workspaceId) {
+    Set<RawTemplate> templates = workspace.getRawTemplates();
+    if (templates.size() > 0) {
+      Workspace defaultWorkspace = workspaceRepository
+          .getByNameAndAccount_Id(DEFAULT_WORKSPACE_NAME, accountId)
+          .orElseThrow(() -> new BadRequestException("Default workspace doesn't exist"));
 
-        Workspace workspace = workspaceRepository.getByIdAndAccount_Id(workspaceId, accountId).orElse(null);
-        if (workspace == null) throw new BadRequestException("Workspace doesn't exist");
-
-        Set<RawTemplate> templates = workspace.getRawTemplates();
-        if (templates.size() > 0) {
-            Workspace defaultWorkspace = workspaceRepository.getByNameAndAccount_Id(DEFAULT_WORKSPACE_NAME, accountId)
-                    .orElseThrow(() -> new BadRequestException("Default workspace doesn't exist"));
-
-            templates.forEach(t -> t.setWorkspace(defaultWorkspace));
-            rawTemplateRepository.saveAll(templates);
-        }
-
-        workspaceRepository.delete(workspace);
+      templates.forEach(t -> t.setWorkspace(defaultWorkspace));
+      rawTemplateRepository.saveAll(templates);
     }
 
-    private boolean isDuplicateNameEachAccount(String name, UUID accountId) {
-        return workspaceRepository.getByNameAndAccount_Id(name, accountId).isPresent();
-    }
+    workspaceRepository.delete(workspace);
+  }
 
-    private boolean isDuplicateNameEachAccount(String name, UUID accountId, int workspaceId) {
-        return workspaceRepository.getByNameAndAccount_IdAndIdNot(name, accountId, workspaceId).isPresent();
-    }
+  private boolean isDuplicateNameEachAccount(String name, UUID accountId) {
+    return workspaceRepository.getByNameAndAccount_Id(name, accountId).isPresent();
+  }
+
+  private boolean isDuplicateNameEachAccount(String name, UUID accountId, Integer workspaceId) {
+    return workspaceRepository.getByNameAndAccount_IdAndIdNot(name, accountId, workspaceId)
+        .isPresent();
+  }
 
 }

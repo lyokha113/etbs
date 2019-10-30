@@ -1,13 +1,25 @@
 package fpt.capstone.etbs.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import javax.persistence.*;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
-import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.ToString;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 
 @Entity
@@ -17,37 +29,31 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(of = "id", callSuper = false)
+@ToString(of = {"id"})
 @JsonIgnoreProperties(value = {"createdDate", "lastModifiedDate"}, allowGetters = true)
-public class RawTemplateVersion extends Auditing implements Serializable {
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id")
+public class RawTemplateVersion extends Auditing {
 
-    @Id
-    @Column
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+  @Id
+  @Column
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Integer id;
 
-    @Column(nullable = false)
-    @NotBlank
-    private String name;
+  @Column(nullable = false)
+  @NotBlank
+  private String name;
 
-    @Column(columnDefinition = "longtext")
-    @NotBlank
-    private String content;
+  @Column(columnDefinition = "longtext")
+  @NotBlank
+  private String content;
 
-    @ManyToOne
-    @NonNull
-    private RawTemplate template;
+  @ManyToOne
+  @NonNull
+  private RawTemplate template;
 
-    @Column(columnDefinition = "TINYINT(1) default 1")
-    private boolean active;
+  @Column(columnDefinition = "TINYINT(1) default 1")
+  private boolean active;
 
-    @Override
-    public String toString() {
-        return "TemplateVersion{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", active=" + active +
-                '}';
-    }
 
 }

@@ -27,104 +27,105 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
-        securedEnabled = true,
-        jsr250Enabled = true,
-        prePostEnabled = true
+    securedEnabled = true,
+    jsr250Enabled = true,
+    prePostEnabled = true
 )
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private CustomUserDetailsServiceImpl customUserDetailsService;
+  @Autowired
+  private CustomUserDetailsServiceImpl customUserDetailsService;
 
-    @Autowired
-    private OAuth2UserServiceImpl customOAuth2UserService;
+  @Autowired
+  private OAuth2UserServiceImpl customOAuth2UserService;
 
-    @Autowired
-    private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+  @Autowired
+  private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
-    @Autowired
-    private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+  @Autowired
+  private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
 
-    @Bean
-    public HttpCookieOAuth2AuthorizationRequest cookieAuthorizationRequestRepository() {
-        return new HttpCookieOAuth2AuthorizationRequest();
-    }
+  @Bean
+  public HttpCookieOAuth2AuthorizationRequest cookieAuthorizationRequestRepository() {
+    return new HttpCookieOAuth2AuthorizationRequest();
+  }
 
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter();
-    }
+  @Bean
+  public JwtAuthenticationFilter jwtAuthenticationFilter() {
+    return new JwtAuthenticationFilter();
+  }
 
-    @Override
-    public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        authenticationManagerBuilder
-                .userDetailsService(customUserDetailsService)
-                .passwordEncoder(passwordEncoder());
-    }
+  @Override
+  public void configure(AuthenticationManagerBuilder authenticationManagerBuilder)
+      throws Exception {
+    authenticationManagerBuilder
+        .userDetailsService(customUserDetailsService)
+        .passwordEncoder(passwordEncoder());
+  }
 
-    @Bean(BeanIds.AUTHENTICATION_MANAGER)
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+  @Bean(BeanIds.AUTHENTICATION_MANAGER)
+  @Override
+  public AuthenticationManager authenticationManagerBean() throws Exception {
+    return super.authenticationManagerBean();
+  }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .cors()
-                .and()
-                .csrf()
-                .disable()
-                .formLogin()
-                .disable()
-                .httpBasic()
-                .disable()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .exceptionHandling()
-                .authenticationEntryPoint(new Http403ForbiddenEntryPoint())
-                .and()
-                .oauth2Login()
-                .authorizationEndpoint()
-                .baseUri("/oauth2/authorize")
-                .authorizationRequestRepository(cookieAuthorizationRequestRepository())
-                .and()
-                .redirectionEndpoint()
-                .baseUri("/oauth2/callback/*")
-                .and()
-                .userInfoEndpoint()
-                .userService(customOAuth2UserService)
-                .and()
-                .successHandler(oAuth2AuthenticationSuccessHandler)
-                .failureHandler(oAuth2AuthenticationFailureHandler)
-                .and()
-                .authorizeRequests()
-                //Swagger
-                .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
-                //All
-                .antMatchers(HttpMethod.POST, "/login", "/register").anonymous()
-                .antMatchers(HttpMethod.GET, "/category").permitAll()
-                // Logged
-                .antMatchers("/user").hasAnyRole(RoleEnum.ADMINISTRATOR.getName(), RoleEnum.USER.getName())
-                //User
-                .antMatchers(HttpMethod.GET, "/file","/workspace","/template").permitAll()
-                .antMatchers(HttpMethod.POST, "/file", "/workspace", "/template", "/email/**").permitAll()
-                .antMatchers(HttpMethod.PUT, "/file/**", "/workspace/**", "/template").permitAll()
-                //Administrator
-                .antMatchers(HttpMethod.POST, "/category").permitAll()
-                .antMatchers(HttpMethod.PUT, "/category/**").permitAll()
-                .anyRequest()
-                .authenticated()
-        ;
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    http
+        .cors()
+        .and()
+        .csrf()
+        .disable()
+        .formLogin()
+        .disable()
+        .httpBasic()
+        .disable()
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        .and()
+        .exceptionHandling()
+        .authenticationEntryPoint(new Http403ForbiddenEntryPoint())
+        .and()
+        .oauth2Login()
+        .authorizationEndpoint()
+        .baseUri("/oauth2/authorize")
+        .authorizationRequestRepository(cookieAuthorizationRequestRepository())
+        .and()
+        .redirectionEndpoint()
+        .baseUri("/oauth2/callback/*")
+        .and()
+        .userInfoEndpoint()
+        .userService(customOAuth2UserService)
+        .and()
+        .successHandler(oAuth2AuthenticationSuccessHandler)
+        .failureHandler(oAuth2AuthenticationFailureHandler)
+        .and()
+        .authorizeRequests()
+        //Swagger
+        .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
+        //All
+        .antMatchers(HttpMethod.POST, "/login", "/register").anonymous()
+        .antMatchers(HttpMethod.GET, "/category").permitAll()
+        // Logged
+        .antMatchers("/user").hasAnyRole(RoleEnum.ADMINISTRATOR.getName(), RoleEnum.USER.getName())
+        //User
+        .antMatchers(HttpMethod.GET, "/file", "file/*", "/workspace", "/workspace/*", "/template").permitAll()
+        .antMatchers(HttpMethod.POST, "/file", "/workspace", "/template", "/email/**").permitAll()
+        .antMatchers(HttpMethod.PUT, "/file/*", "/workspace/*", "/template").permitAll()
+        //Administrator
+        .antMatchers(HttpMethod.POST, "/category").permitAll()
+        .antMatchers(HttpMethod.PUT, "/category/*").permitAll()
+        .anyRequest()
+        .authenticated()
+    ;
 
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
-    }
+  }
 }

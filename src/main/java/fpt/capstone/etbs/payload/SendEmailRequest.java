@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SendEmailRequest {
 
-    private String to;
-    private String subject;
-    private String content;
-    private String provider;
+  private String to;
+  private String subject;
+  private String content;
+  private String provider;
 
 }

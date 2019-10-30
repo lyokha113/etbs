@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoriesOfTemplate {
-    private int id;
-    private String name;
+
+  private int id;
+  private String name;
 }

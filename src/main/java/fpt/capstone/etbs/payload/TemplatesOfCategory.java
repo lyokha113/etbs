@@ -10,9 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TemplatesOfCategory {
-    private int id;
-    private String name;
-    private String thumpnail;
-    private String content;
-    private String description;
+
+  private int id;
+  private String name;
+  private String thumpnail;
+  private String content;
+  private String description;
 }

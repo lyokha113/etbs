@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthResponse {
-    private String accessToken;
-    private final static String tokenType = "Bearer";
+
+  private final static String tokenType = "Bearer";
+  private String accessToken;
 
 }

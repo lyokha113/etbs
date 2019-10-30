@@ -11,28 +11,26 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 public class CustomUserDetailsServiceImpl implements CustomUserDetailsService, UserDetailsService {
 
-    @Autowired
-    private AccountRepository accountRepository;
+  @Autowired
+  private AccountRepository accountRepository;
 
-    @Override
-    @Transactional
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Account account = accountRepository.getByEmail(email).orElseThrow(() ->
-                new UsernameNotFoundException("User not found with email : " + email));
-        return UserPrincipal.create(account);
-    }
+  @Override
+  @Transactional
+  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    Account account = accountRepository.getByEmail(email).orElseThrow(() ->
+        new UsernameNotFoundException("User not found with email : " + email));
+    return UserPrincipal.create(account);
+  }
 
-    @Override
-    public UserDetails loadUserFromAccount(Account account) {
-        if (account == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
-        return UserPrincipal.create(account);
+  @Override
+  public UserDetails loadUserFromAccount(Account account) {
+    if (account == null) {
+      throw new UsernameNotFoundException("User not found");
     }
+    return UserPrincipal.create(account);
+  }
 
 }
