@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TemplateCreateResponse {
 
-  private int id;
-  private String name;
-  private String thumpnail;
-  private List<Integer> categories;
+    private int id;
+    private String name;
+    private String thumbnail;
+    private List<Integer> categories;
 }

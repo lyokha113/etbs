@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TemplatesOfCategory {
+public class RatingUpdateRequest {
     private int id;
-    private String name;
+    private boolean vote;
+    private boolean active;
 }

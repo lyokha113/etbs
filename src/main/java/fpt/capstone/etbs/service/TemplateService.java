@@ -8,14 +8,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TemplateService {
-
   TemplateCreateResponse createTemplate(TemplateCreateRequest request);
-
   TemplateResponse getTemplate(int id);
-
   boolean updateTemplate(int id, TemplateUpdateRequest request);
-
   List<TemplateResponse> getListTemplate(UUID id);
-
-  List<TemplateResponse> getAllListTemplate();
+    List<TemplateResponse> getHighRatingTemplate(int quantity);
 }

@@ -12,13 +12,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TemplateUpdateRequest {
-
-  //TODO: add link thumpnail
-  private String name;
-  private String content;
-  private String description;
-  private String thumpnail;
-  private UUID author;
-  private List<Integer> categories;
-  private boolean active;
+    private String name;
+    private String content;
+    private String description;
+    private String thumbnail;
+    private UUID author;
+    private List<Integer> categories;
+    private boolean active;
 }
