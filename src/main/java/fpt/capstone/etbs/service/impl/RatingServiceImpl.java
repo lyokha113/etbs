@@ -50,9 +50,14 @@ public class RatingServiceImpl implements RatingService {
       if (!rating.getAccount().getId().equals(accountId)) {
         throw new BadRequestException("Invalid permission rating");
       }
-      rating.setLike(request.isLike());
-    }
 
-    return ratingRepository.save(rating);
+      if (rating.isLike() == request.isLike()) {
+        ratingRepository.delete(rating);
+        return null;
+      } else {
+        rating.setLike(request.isLike());
+        return ratingRepository.save(rating);
+      }
+    }
   }
 }
