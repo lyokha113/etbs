@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RatingRequest {
   private int templateId;
-  private boolean like;
+  private boolean vote;
 }

@@ -33,7 +33,7 @@ public class Rating extends Auditing {
   @ManyToOne private Template template;
 
   @Column(nullable = false)
-  private boolean like;
+  private boolean vote;
 
   @Column(columnDefinition = "TINYINT(1) default 1")
   private boolean active;

@@ -44,18 +44,19 @@ public class RatingServiceImpl implements RatingService {
             .orElse(null);
 
     if (rating == null) {
-      rating = Rating.builder().account(account).template(template).like(request.isLike()).build();
+      rating = Rating.builder().account(account).template(template).vote(request.isVote()).build();
+      return ratingRepository.save(rating);
     } else {
 
       if (!rating.getAccount().getId().equals(accountId)) {
         throw new BadRequestException("Invalid permission rating");
       }
 
-      if (rating.isLike() == request.isLike()) {
+      if (rating.isVote() == request.isVote()) {
         ratingRepository.delete(rating);
         return null;
       } else {
-        rating.setLike(request.isLike());
+        rating.setVote(request.isVote());
         return ratingRepository.save(rating);
       }
     }

@@ -46,9 +46,9 @@ public class RawTemplate extends Auditing {
 
   @ManyToOne @NonNull private Workspace workspace;
 
-  //  @OneToOne(cascade = CascadeType.ALL)
-  //  @JoinColumn(name = "current_version_id", referencedColumnName = "id")
-  //  private RawTemplateVersion currentVersion;
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "current_version_id", referencedColumnName = "id")
+  private RawTemplateVersion currentVersion;
 
   @OneToMany(mappedBy = "template", cascade = CascadeType.ALL)
   private Set<RawTemplateVersion> versions;

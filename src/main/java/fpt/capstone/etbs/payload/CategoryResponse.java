@@ -47,22 +47,22 @@ class TemplateOfCategory {
   private String authorName;
   private String authorId;
   private String thumbnail;
-  private int like;
-  private int dislike;
+  private int vote;
+  private int downVote;
   private boolean active;
 
   static TemplateOfCategory setResponse(Template template) {
-    int like = (int) template.getRatings().stream().filter(r -> r.isActive() && r.isLike()).count();
-    int dislike =
-        (int) template.getRatings().stream().filter(r -> r.isActive() && !r.isLike()).count();
+    int vote = (int) template.getRatings().stream().filter(r -> r.isActive() && r.isVote()).count();
+    int downVote =
+        (int) template.getRatings().stream().filter(r -> r.isActive() && !r.isVote()).count();
     return TemplateOfCategory.builder()
         .id(template.getId())
         .name(template.getName())
         .authorName(template.getAuthor().getFullName())
         .authorId(template.getAuthor().getId().toString())
         .thumbnail(template.getThumbnail())
-        .like(like)
-        .dislike(dislike)
+        .vote(vote)
+        .downVote(downVote)
         .build();
   }
 }

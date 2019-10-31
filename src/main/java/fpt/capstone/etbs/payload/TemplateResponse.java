@@ -24,8 +24,8 @@ public class TemplateResponse {
   private String authorId;
   private String content;
   private String thumbnail;
-  private int like;
-  private int dislike;
+  private int vote;
+  private int downVote;
   private boolean active;
   private String description;
   private List<CategoryOfTemplate> categories;
@@ -37,17 +37,17 @@ public class TemplateResponse {
             ? new ArrayList<>()
             : categories.stream().map(CategoryOfTemplate::setResponse).collect(Collectors.toList());
 
-    int like = (int) template.getRatings().stream().filter(r -> r.isActive() && r.isLike()).count();
-    int dislike =
-        (int) template.getRatings().stream().filter(r -> r.isActive() && !r.isLike()).count();
+    int vote = (int) template.getRatings().stream().filter(r -> r.isActive() && r.isVote()).count();
+    int downVote =
+        (int) template.getRatings().stream().filter(r -> r.isActive() && !r.isVote()).count();
     return TemplateResponse.builder()
         .id(template.getId())
         .name(template.getName())
         .authorName(template.getAuthor().getFullName())
         .authorId(template.getAuthor().getId().toString())
         .thumbnail(template.getThumbnail())
-        .like(like)
-        .dislike(dislike)
+        .vote(vote)
+        .downVote(downVote)
         .active(template.isActive())
         .description(template.getDescription())
         .categories(categoryOfTemplates)
