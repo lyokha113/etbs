@@ -111,16 +111,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
         //All
         .antMatchers(HttpMethod.POST, "/login", "/register").anonymous()
-        .antMatchers(HttpMethod.GET, "/category").permitAll()
+        .antMatchers(HttpMethod.GET, "/category", "/template", "/template/*").permitAll()
         // Logged
         .antMatchers("/user").hasAnyRole(RoleEnum.ADMINISTRATOR.getName(), RoleEnum.USER.getName())
         //User
-        .antMatchers(HttpMethod.GET, "/file", "file/*", "/workspace", "/workspace/*", "/template").permitAll()
-        .antMatchers(HttpMethod.POST, "/file", "/workspace", "/template", "/email/**").permitAll()
-        .antMatchers(HttpMethod.PUT, "/file/*", "/workspace/*", "/template").permitAll()
+        .antMatchers(HttpMethod.GET, "/file", "file/*", "/workspace", "/workspace/*", "/raw/**").permitAll()
+        .antMatchers(HttpMethod.POST, "/file", "/workspace", "/email/*", "/rate", "/raw").permitAll()
+        .antMatchers(HttpMethod.PUT, "/file/*", "/workspace/*", "/raw/*").permitAll()
         //Administrator
-        .antMatchers(HttpMethod.POST, "/category").permitAll()
-        .antMatchers(HttpMethod.PUT, "/category/*").permitAll()
+        .antMatchers(HttpMethod.POST, "/category", "/template").permitAll()
+        .antMatchers(HttpMethod.PUT, "/category/*", "/template/*").permitAll()
         .anyRequest()
         .authenticated()
     ;

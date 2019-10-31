@@ -12,11 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TemplateUpdateRequest {
+
     private String name;
-    private String content;
     private String description;
-    private String thumbnail;
-    private UUID author;
-    private List<Integer> categories;
+    private List<Integer> categoryIds;
     private boolean active;
 }

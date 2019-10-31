@@ -2,9 +2,11 @@ package fpt.capstone.etbs.controller;
 
 import fpt.capstone.etbs.model.Tutorial;
 import fpt.capstone.etbs.payload.ApiResponse;
+import fpt.capstone.etbs.payload.TutorialResponse;
 import fpt.capstone.etbs.service.TutorialService;
 import fpt.capstone.etbs.util.RoleUtils;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +26,12 @@ public class TutorialController {
 
   @GetMapping("/tutorial")
   public ResponseEntity<ApiResponse> getActiveTutorials(Authentication auth) {
-    List<Tutorial> response = RoleUtils.hasAdminRole(auth)
+    List<Tutorial> tutorials = RoleUtils.hasAdminRole(auth)
         ? tutorialService.getTutorials()
         : tutorialService.getActiveTutorials();
+    List<TutorialResponse> response = tutorials.stream()
+        .map(TutorialResponse::setResponse)
+        .collect(Collectors.toList());
     return ResponseEntity.ok(new ApiResponse<>(true, "", response));
   }
 
@@ -38,7 +43,7 @@ public class TutorialController {
         ? tutorialService.getTutorial(id)
         : tutorialService.getActiveTutorial(id);
     return response != null ?
-        ResponseEntity.ok(new ApiResponse<>(true, "", response)) :
+        ResponseEntity.ok(new ApiResponse<>(true, "", TutorialResponse.setResponseWithContent(response))) :
         ResponseEntity.badRequest().body(new ApiResponse<>(true, "Not found", null));
   }
 
@@ -46,7 +51,7 @@ public class TutorialController {
   public ResponseEntity<ApiResponse> createTutorial(@Valid @RequestBody Tutorial tutorial) {
     Tutorial response = tutorialService.createTutorial(tutorial);
     return response != null ?
-        ResponseEntity.ok(new ApiResponse<>(true, "Tutorial created", response)) :
+        ResponseEntity.ok(new ApiResponse<>(true, "Tutorial created", TutorialResponse.setResponse(response))) :
         ResponseEntity.badRequest().body(new ApiResponse<>(true, "Tutorial create failed", null));
   }
 
@@ -56,7 +61,7 @@ public class TutorialController {
       @Valid @RequestBody Tutorial tutorial) {
     Tutorial response = tutorialService.updateTutorial(id, tutorial);
     return response != null ?
-        ResponseEntity.ok(new ApiResponse<>(true, "Tutorial updated", response)) :
+        ResponseEntity.ok(new ApiResponse<>(true, "Tutorial updated", TutorialResponse.setResponse(response))) :
         ResponseEntity.badRequest().body(new ApiResponse<>(true, "Tutorial update failed", null));
   }
 }

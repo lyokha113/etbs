@@ -9,7 +9,6 @@ import fpt.capstone.etbs.payload.WorkspaceResponse;
 import fpt.capstone.etbs.service.WorkspaceService;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.validation.Path;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WorkspaceController {
 
   @Autowired
-  WorkspaceService workspaceService;
+  private WorkspaceService workspaceService;
 
   @GetMapping("/workspace")
   public ResponseEntity<ApiResponse> getWorkspacesOfAccount(Authentication auth) {
@@ -61,7 +60,6 @@ public class WorkspaceController {
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
-
   }
 
   @PutMapping("/workspace/{id}")
@@ -77,7 +75,6 @@ public class WorkspaceController {
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
-
   }
 
   @DeleteMapping("/workspace/{id}")
@@ -91,6 +88,5 @@ public class WorkspaceController {
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
-
   }
 }

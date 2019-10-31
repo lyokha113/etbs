@@ -26,8 +26,10 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
 
   @Autowired
   private AccountRepository accountRepository;
+
   @Autowired
   private RoleRepository roleRepository;
+
   @Autowired
   private PasswordEncoder passwordEncoder;
 

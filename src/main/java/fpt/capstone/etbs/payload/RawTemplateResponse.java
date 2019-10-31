@@ -25,8 +25,13 @@ public class RawTemplateResponse {
                 .name(rawTemplate.getName())
                 .thumbnail(rawTemplate.getThumbnail())
                 .workspaceId(rawTemplate.getWorkspace().getId())
-                .content(rawTemplate.getContent())
                 .description(rawTemplate.getDescription())
                 .build();
+    }
+
+    public static RawTemplateResponse setResponseWithContent(RawTemplate rawTemplate) {
+        RawTemplateResponse response = RawTemplateResponse.setResponse(rawTemplate);
+        response.setContent(rawTemplate.getContent());
+        return response;
     }
 }

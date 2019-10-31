@@ -1,9 +1,10 @@
 package fpt.capstone.etbs.service;
 
-import fpt.capstone.etbs.payload.RatingTemplateRequest;
-import fpt.capstone.etbs.payload.RatingUpdateRequest;
+import fpt.capstone.etbs.model.Rating;
+import fpt.capstone.etbs.payload.RatingRequest;
+import java.util.UUID;
 
 public interface RatingService {
-    int templateRating(RatingTemplateRequest request);
-    int templateRatingUpdate(RatingUpdateRequest request);
+
+    Rating rate(UUID accountId, RatingRequest request);
 }

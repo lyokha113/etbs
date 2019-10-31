@@ -4,6 +4,7 @@ import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.MediaFile;
 import fpt.capstone.etbs.payload.MediaFileUpdateRequest;
+import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.MediaFileRepository;
 import fpt.capstone.etbs.service.AccountService;
 import fpt.capstone.etbs.service.MediaFileService;
@@ -19,7 +20,7 @@ public class MediaFileServiceImpl implements MediaFileService {
   private MediaFileRepository mediaFileRepository;
 
   @Autowired
-  private AccountService accountService;
+  private AccountRepository accountRepository;
 
   @Override
   public List<MediaFile> getMediaFilesOfAccount(UUID accountId) {
@@ -39,7 +40,7 @@ public class MediaFileServiceImpl implements MediaFileService {
   @Override
   public MediaFile createMediaFile(UUID accountId, UUID id, String name, String link) {
 
-    Account account = accountService.getAccount(accountId);
+    Account account = accountRepository.findById(accountId).orElse(null);
     if (account == null) {
       throw new BadRequestException("Account doesn't exist");
     }

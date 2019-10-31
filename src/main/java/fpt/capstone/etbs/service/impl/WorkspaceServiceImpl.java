@@ -43,6 +43,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     if (account == null) {
       throw new BadRequestException("Account doesn't exist");
     }
+
     if (isDuplicateNameEachAccount(request.getName(), accountId)) {
       throw new BadRequestException("Workspace name is existed");
     }

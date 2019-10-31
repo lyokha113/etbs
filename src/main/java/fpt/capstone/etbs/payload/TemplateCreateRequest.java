@@ -13,10 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TemplateCreateRequest {
 
+  private UUID rawTemplateId;
   private String name;
-  private String content;
   private String description;
-  private UUID author;
-  private List<Integer> categories;
-
+  private List<Integer> categoryIds;
 }
