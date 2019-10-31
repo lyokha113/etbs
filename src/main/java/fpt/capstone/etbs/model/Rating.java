@@ -23,14 +23,17 @@ import javax.persistence.*;
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id")
 public class Rating extends Auditing {
 
-  @Id
-  @Column
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
+  @EmbeddedId RatingIdentity id;
 
-  @ManyToOne private Account account;
+  @ManyToOne
+  @MapsId("account_id")
+  @JoinColumn(name = "account_id")
+  private Account account;
 
-  @ManyToOne private Template template;
+  @ManyToOne
+  @MapsId("template_id")
+  @JoinColumn(name = "template_id")
+  private Template template;
 
   @Column(nullable = false)
   private boolean vote;
