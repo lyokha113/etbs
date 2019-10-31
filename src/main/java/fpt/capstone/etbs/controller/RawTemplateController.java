@@ -43,40 +43,4 @@ public class RawTemplateController {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
   }
-  //
-  //    @GetMapping("/raw/workspace/{wId}")
-  //    private ResponseEntity<ApiResponse> getRawTemplateByWorkspaceId(
-  //            Authentication auth,
-  //            @Valid @PathVariable int wId) {
-  //
-  //        List<RawTemplateResponse> rawTemplateResponse =
-  // rawTemplateService.getTemplateByWorkspaceId(wId);
-  //        return rawTemplateResponse != null ?
-  //                ResponseEntity.ok(
-  //                        new ApiResponse<>(true, "Templates", rawTemplateResponse)) :
-  //                ResponseEntity.badRequest().body(
-  //                        new ApiResponse<>(false, "Do not contain any templates", null));
-  //    }
-  //
-  //    @GetMapping("/raw/{id}")
-  //    private ResponseEntity<ApiResponse> getRawTemplateById(
-  //            Authentication auth,
-  //            @Valid @PathVariable int id
-  //    ) {
-  //        RawTemplate rawTemplate = rawTemplateService.getRawTemplateById(id);
-  //        RawTemplateResponse response = new RawTemplateResponse();
-  //        if (rawTemplate != null) {
-  //            response.setId(id);
-  //            response.setContent(rawTemplate.getContent());
-  //            response.setDescription(rawTemplate.getDescription());
-  //            response.setName(rawTemplate.getName());
-  //            response.setWorkspaceId(rawTemplate.getWorkspace().getId());
-  //            response.setThumbnail(rawTemplate.getThumbnail());
-  //        }
-  //        return response != null ?
-  //                ResponseEntity.ok(
-  //                        new ApiResponse<>(true, "Templates", response)) :
-  //                ResponseEntity.badRequest().body(
-  //                        new ApiResponse<>(false, "Do not contain any templates", null));
-  //    }
 }

@@ -1,16 +1,17 @@
 package fpt.capstone.etbs.service;
 
-import fpt.capstone.etbs.payload.DraftEmailCreateRequest;
+import fpt.capstone.etbs.payload.DraftEmailRequest;
 import fpt.capstone.etbs.payload.SendEmailRequest;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.UUID;
 
 public interface EmailService {
 
-  boolean sendEmail(SendEmailRequest request) throws MessagingException, IOException;
+  boolean sendEmail(UUID accountId, SendEmailRequest request) throws MessagingException, IOException;
 
-  boolean makeDraftEmail(DraftEmailCreateRequest request)
+  boolean makeDraftEmail(UUID accountId, DraftEmailRequest request)
       throws MessagingException, IOException, GeneralSecurityException;
 }

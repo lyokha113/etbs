@@ -21,9 +21,14 @@ import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import fpt.capstone.etbs.component.SendGridMail;
 import fpt.capstone.etbs.constant.MailProvider;
-import fpt.capstone.etbs.payload.DraftEmailCreateRequest;
+import fpt.capstone.etbs.exception.BadRequestException;
+import fpt.capstone.etbs.model.RawTemplate;
+import fpt.capstone.etbs.model.Template;
+import fpt.capstone.etbs.payload.DraftEmailRequest;
 import fpt.capstone.etbs.payload.SendEmailRequest;
 import fpt.capstone.etbs.service.EmailService;
+import fpt.capstone.etbs.service.RawTemplateService;
+import fpt.capstone.etbs.service.TemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -37,6 +42,7 @@ import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -48,14 +54,22 @@ public class EmailServiceImpl implements EmailService {
   @Autowired private JavaMailSender javaMailSender;
   @Autowired private SendGrid sendGrid;
   @Autowired private GoogleClientSecrets googleClientSecrets;
+  @Autowired private RawTemplateService rawTemplateService;
 
   @Override
-  public boolean sendEmail(SendEmailRequest request) throws MessagingException, IOException {
+  public boolean sendEmail(UUID accountId, SendEmailRequest request) throws MessagingException, IOException {
     String provider = request.getProvider();
+    RawTemplate template = rawTemplateService.getRawTemplate(request.getRawTemplateId(), accountId);
+    if (template == null) {
+      throw new BadRequestException("Template doesn't existed");
+    }
+    String subject = template.getName().toUpperCase();
+    String content = template.getContent();
+
     if (provider.equalsIgnoreCase(MailProvider.GMAIL.name())) {
-      javaMailSender.send(createMessage(request));
+      javaMailSender.send(createMessage(request, subject, content));
     } else if (provider.equalsIgnoreCase(MailProvider.SENDGRID.name())) {
-      sendEmailBySendGrid(request);
+      sendEmailBySendGrid(request, subject, content);
     } else {
       return false;
     }
@@ -63,49 +77,56 @@ public class EmailServiceImpl implements EmailService {
   }
 
   @Override
-  public boolean makeDraftEmail(DraftEmailCreateRequest request)
+  public boolean makeDraftEmail(UUID accountId, DraftEmailRequest request)
       throws MessagingException, IOException, GeneralSecurityException {
     String provider = request.getProvider();
+    RawTemplate template = rawTemplateService.getRawTemplate(request.getRawTemplateId(), accountId);
+    if (template == null) {
+      throw new BadRequestException("Template doesn't existed");
+    }
+    String subject = template.getName().toUpperCase();
+    String content = template.getContent();
+
     if (provider.equalsIgnoreCase(MailProvider.GMAIL.name())) {
       createDraftGMail(
-          createMessage(request, Session.getInstance(System.getProperties())), request.getEmail());
+          createMessage(request, subject, content, Session.getInstance(System.getProperties())), request.getEmail());
     } else if (provider.equalsIgnoreCase(MailProvider.YAHOO.name())) {
-      createDraft(request);
+      createDraft(request, subject, content);
     } else if (provider.equalsIgnoreCase(MailProvider.OUTLOOK.name())) {
-      createDraft(request);
+      createDraft(request, subject, content);
     } else {
       return false;
     }
     return true;
   }
 
-  private MimeMessage createMessage(SendEmailRequest request) throws MessagingException {
+  private MimeMessage createMessage(SendEmailRequest request, String subject, String content) throws MessagingException {
     MimeMessage message = javaMailSender.createMimeMessage();
     MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
     helper.setTo(request.getTo());
-    helper.setSubject(request.getSubject());
-    helper.setText(request.getContent(), true);
+    helper.setSubject(subject);
+    helper.setText(content, true);
     return message;
   }
 
-  private MimeMessage createMessage(DraftEmailCreateRequest request, Session session)
+  private MimeMessage createMessage(DraftEmailRequest request, String subject, String content, Session session)
       throws MessagingException {
     MimeMessage message = new MimeMessage(session);
     message.setFlag(Flags.Flag.DRAFT, true);
     MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-    helper.setSubject(request.getSubject());
-    helper.setText(request.getBody(), true);
+    helper.setSubject(subject);
+    helper.setText(content, true);
     return message;
   }
 
-  private void createDraft(DraftEmailCreateRequest request) throws MessagingException {
+  private void createDraft(DraftEmailRequest request, String subject, String content) throws MessagingException {
     Properties props = MailProvider.getMailConfig(request.getProvider());
     Session session = Session.getInstance(props);
     Store mailStore = session.getStore("imap");
     mailStore.connect(props.getProperty("host"), request.getEmail(), request.getPassword());
     Folder draftsMailBoxFolder = mailStore.getFolder(props.getProperty("draft"));
     draftsMailBoxFolder.open(Folder.READ_WRITE);
-    javax.mail.Message[] draftMessages = {createMessage(request, session)};
+    javax.mail.Message[] draftMessages = {createMessage(request, subject, content, session)};
     draftsMailBoxFolder.appendMessages(draftMessages);
   }
 
@@ -121,11 +142,11 @@ public class EmailServiceImpl implements EmailService {
     this.getGMailInstance().users().drafts().create(email, draft).execute();
   }
 
-  private void sendEmailBySendGrid(SendEmailRequest request) throws IOException {
+  private void sendEmailBySendGrid(SendEmailRequest request, String subject, String content) throws IOException {
     Email sender = new Email("etbsonline@gmail.com");
     Email receiver = new Email(request.getTo());
-    Content body = new Content("text/html", request.getContent());
-    SendGridMail mail = new SendGridMail(sender, request.getSubject(), receiver, body);
+    Content body = new Content("text/html", content);
+    SendGridMail mail = new SendGridMail(sender, subject, receiver, body);
 
     Request re = new Request();
     re.setMethod(Method.POST);

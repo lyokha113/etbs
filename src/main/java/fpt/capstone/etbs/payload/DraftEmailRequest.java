@@ -9,11 +9,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DraftEmailCreateRequest {
+public class DraftEmailRequest {
 
+  private int rawTemplateId;
   private String email;
   private String password;
-  private String subject;
-  private String body;
   private String provider;
 }

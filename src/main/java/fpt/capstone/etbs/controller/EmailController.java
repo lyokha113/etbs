@@ -1,11 +1,14 @@
 package fpt.capstone.etbs.controller;
 
+import fpt.capstone.etbs.exception.BadRequestException;
+import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.payload.ApiResponse;
-import fpt.capstone.etbs.payload.DraftEmailCreateRequest;
+import fpt.capstone.etbs.payload.DraftEmailRequest;
 import fpt.capstone.etbs.payload.SendEmailRequest;
 import fpt.capstone.etbs.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,20 +23,28 @@ public class EmailController {
 
   @PostMapping("/email/draft")
   public ResponseEntity<ApiResponse> makeDraftEmail(
-      @Valid @RequestBody DraftEmailCreateRequest request) throws Exception {
+      Authentication auth, @Valid @RequestBody DraftEmailRequest request) throws Exception {
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      emailSenderService.makeDraftEmail(request);
+      emailSenderService.makeDraftEmail(userPrincipal.getId(), request);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Draft was made", null));
     } catch (GeneralSecurityException e) {
       return ResponseEntity.badRequest()
           .body(new ApiResponse<>(false, "Invalid security information", null));
+    } catch (BadRequestException ex) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
-    return ResponseEntity.ok(new ApiResponse<>(true, "Draft was made", null));
   }
 
   @PostMapping("/email/send/")
-  public ResponseEntity<ApiResponse> sendEmail(@Valid @RequestBody SendEmailRequest request)
-      throws Exception {
-    emailSenderService.sendEmail(request);
-    return ResponseEntity.ok(new ApiResponse<>(true, "Email was sent", null));
+  public ResponseEntity<ApiResponse> sendEmail(
+      Authentication auth, @Valid @RequestBody SendEmailRequest request) throws Exception {
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+    try {
+      emailSenderService.sendEmail(userPrincipal.getId(), request);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Email was sent", null));
+    } catch (BadRequestException ex) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
   }
 }
