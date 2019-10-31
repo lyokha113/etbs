@@ -26,25 +26,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(
-    securedEnabled = true,
-    jsr250Enabled = true,
-    prePostEnabled = true
-)
+@EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-  @Autowired
-  private CustomUserDetailsServiceImpl customUserDetailsService;
+  @Autowired private CustomUserDetailsServiceImpl customUserDetailsService;
 
-  @Autowired
-  private OAuth2UserServiceImpl customOAuth2UserService;
+  @Autowired private OAuth2UserServiceImpl customOAuth2UserService;
 
-  @Autowired
-  private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+  @Autowired private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
-  @Autowired
-  private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-
+  @Autowired private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
   @Bean
   public HttpCookieOAuth2AuthorizationRequest cookieAuthorizationRequestRepository() {
@@ -77,8 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http
-        .cors()
+    http.cors()
         .and()
         .csrf()
         .disable()
@@ -107,25 +97,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .failureHandler(oAuth2AuthenticationFailureHandler)
         .and()
         .authorizeRequests()
-        //Swagger
-        .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
-        //All
-        .antMatchers(HttpMethod.POST, "/login", "/register").anonymous()
-        .antMatchers(HttpMethod.GET, "/category", "/template", "/template/*").permitAll()
+        // Swagger
+        .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**")
+        .permitAll()
+        // All
+        .antMatchers(HttpMethod.POST, "/login", "/register")
+        .anonymous()
+        .antMatchers(HttpMethod.GET, "/category", "/template", "/template/*")
+        .permitAll()
         // Logged
-        .antMatchers("/user").hasAnyRole(RoleEnum.ADMINISTRATOR.getName(), RoleEnum.USER.getName())
-        //User
-        .antMatchers(HttpMethod.GET, "/file", "file/*", "/workspace", "/workspace/*", "/raw/**").permitAll()
-        .antMatchers(HttpMethod.POST, "/file", "/workspace", "/email/*", "/rate", "/raw").permitAll()
-        .antMatchers(HttpMethod.PUT, "/file/*", "/workspace/*", "/raw/*").permitAll()
-        //Administrator
-        .antMatchers(HttpMethod.POST, "/category", "/template").permitAll()
-        .antMatchers(HttpMethod.PUT, "/category/*", "/template/*").permitAll()
+        .antMatchers("/user")
+        .hasAnyRole(RoleEnum.ADMINISTRATOR.getName(), RoleEnum.USER.getName())
+        // User
+        .antMatchers(HttpMethod.GET, "/file", "file/*", "/workspace", "/workspace/*", "/raw/**")
+        .permitAll()
+        .antMatchers(HttpMethod.POST, "/file", "/workspace", "/email/*", "/rate", "/raw")
+        .permitAll()
+        .antMatchers(HttpMethod.PUT, "/file/*", "/workspace/*", "/raw/*")
+        .permitAll()
+        // Administrator
+        .antMatchers(HttpMethod.POST, "/category", "/template")
+        .permitAll()
+        .antMatchers(HttpMethod.PUT, "/category/*", "/template/*")
+        .permitAll()
         .anyRequest()
-        .authenticated()
-    ;
+        .authenticated();
 
     http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
   }
 }

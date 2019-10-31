@@ -12,5 +12,4 @@ public class JwtAuthenticationResponse {
   public JwtAuthenticationResponse(String accessToken) {
     this.accessToken = "Bearer " + accessToken;
   }
-
 }

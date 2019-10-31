@@ -14,14 +14,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class CustomUserDetailsServiceImpl implements CustomUserDetailsService, UserDetailsService {
 
-  @Autowired
-  private AccountRepository accountRepository;
+  @Autowired private AccountRepository accountRepository;
 
   @Override
   @Transactional
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-    Account account = accountRepository.getByEmail(email).orElseThrow(() ->
-        new UsernameNotFoundException("User not found with email : " + email));
+    Account account =
+        accountRepository
+            .getByEmail(email)
+            .orElseThrow(
+                () -> new UsernameNotFoundException("User not found with email : " + email));
     return UserPrincipal.create(account);
   }
 
@@ -32,5 +34,4 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService, U
     }
     return UserPrincipal.create(account);
   }
-
 }

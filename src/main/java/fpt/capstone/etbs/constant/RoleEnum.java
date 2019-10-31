@@ -3,8 +3,8 @@ package fpt.capstone.etbs.constant;
 import java.util.Arrays;
 
 public enum RoleEnum {
-
-  ADMINISTRATOR(1, "ADMINISTRATOR"), USER(2, "USER");
+  ADMINISTRATOR(1, "ADMINISTRATOR"),
+  USER(2, "USER");
 
   private int id;
   private String name;
@@ -15,8 +15,10 @@ public enum RoleEnum {
   }
 
   public static RoleEnum getRole(int roleId) {
-    return Arrays.stream(RoleEnum.values()).filter(role -> role.getId() == roleId)
-        .findFirst().orElse(null);
+    return Arrays.stream(RoleEnum.values())
+        .filter(role -> role.getId() == roleId)
+        .findFirst()
+        .orElse(null);
   }
 
   public int getId() {

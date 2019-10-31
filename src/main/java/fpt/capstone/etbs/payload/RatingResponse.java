@@ -20,7 +20,8 @@ public class RatingResponse {
   public static RatingResponse setResponse(Rating rating) {
     Template template = rating.getTemplate();
     int like = (int) template.getRatings().stream().filter(r -> r.isActive() && r.isLike()).count();
-    int dislike = (int) template.getRatings().stream().filter(r -> r.isActive() && !r.isLike()).count();
+    int dislike =
+        (int) template.getRatings().stream().filter(r -> r.isActive() && !r.isLike()).count();
     return RatingResponse.builder()
         .templateId(rating.getTemplate().getId())
         .like(like)

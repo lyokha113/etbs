@@ -1,16 +1,16 @@
 package fpt.capstone.etbs.payload;
 
 import fpt.capstone.etbs.model.Category;
-import fpt.capstone.etbs.model.Rating;
 import fpt.capstone.etbs.model.Template;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -32,15 +32,15 @@ public class TemplateResponse {
 
   public static TemplateResponse setResponse(Template template) {
     Set<Category> categories = template.getCategories();
-    List<CategoryOfTemplate> categoryOfTemplates = categories == null ? new ArrayList<>() :
-        categories.stream()
-            .map(CategoryOfTemplate::setResponse)
-            .collect(Collectors.toList());
+    List<CategoryOfTemplate> categoryOfTemplates =
+        categories == null
+            ? new ArrayList<>()
+            : categories.stream().map(CategoryOfTemplate::setResponse).collect(Collectors.toList());
 
     int like = (int) template.getRatings().stream().filter(r -> r.isActive() && r.isLike()).count();
-    int dislike = (int) template.getRatings().stream().filter(r -> r.isActive() && !r.isLike()).count();
-    return TemplateResponse
-        .builder()
+    int dislike =
+        (int) template.getRatings().stream().filter(r -> r.isActive() && !r.isLike()).count();
+    return TemplateResponse.builder()
         .id(template.getId())
         .name(template.getName())
         .authorName(template.getAuthor().getFullName())
@@ -61,7 +61,6 @@ public class TemplateResponse {
   }
 }
 
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -71,9 +70,6 @@ class CategoryOfTemplate {
   private String name;
 
   public static CategoryOfTemplate setResponse(Category category) {
-    return CategoryOfTemplate.builder()
-        .id(category.getId())
-        .name(category.getName())
-        .build();
+    return CategoryOfTemplate.builder().id(category.getId()).name(category.getName()).build();
   }
 }

@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RawTemplateCreateRequest {
-    private String name;
-    private String content;
-    private String description;
-    private String thumbnail;
-    private int workspaceId;
+  private String name;
+  private String content;
+  private String description;
+  private String thumbnail;
+  private int workspaceId;
 }

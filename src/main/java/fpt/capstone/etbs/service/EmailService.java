@@ -2,9 +2,10 @@ package fpt.capstone.etbs.service;
 
 import fpt.capstone.etbs.payload.DraftEmailCreateRequest;
 import fpt.capstone.etbs.payload.SendEmailRequest;
+
+import javax.mail.MessagingException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import javax.mail.MessagingException;
 
 public interface EmailService {
 

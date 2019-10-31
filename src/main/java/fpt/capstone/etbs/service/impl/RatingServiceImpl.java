@@ -9,21 +9,19 @@ import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.RatingRepository;
 import fpt.capstone.etbs.repository.TemplateRepository;
 import fpt.capstone.etbs.service.RatingService;
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class RatingServiceImpl implements RatingService {
 
-  @Autowired
-  RatingRepository ratingRepository;
+  @Autowired RatingRepository ratingRepository;
 
-  @Autowired
-  AccountRepository accountRepository;
+  @Autowired AccountRepository accountRepository;
 
-  @Autowired
-  TemplateRepository templateRepository;
+  @Autowired TemplateRepository templateRepository;
 
   @Override
   public Rating rate(UUID accountId, RatingRequest request) {
@@ -33,23 +31,20 @@ public class RatingServiceImpl implements RatingService {
       throw new BadRequestException("Account doesn't exist");
     }
 
-    Template template = templateRepository.getByIdAndActiveTrue(request.getTemplateId())
-        .orElse(null);
+    Template template =
+        templateRepository.getByIdAndActiveTrue(request.getTemplateId()).orElse(null);
     if (template == null) {
       throw new BadRequestException("Template doesn't exist");
     }
 
-    Rating rating = template.getRatings().stream()
-        .filter(r -> r.getAccount().getId().equals(accountId))
-        .findFirst()
-        .orElse(null);
+    Rating rating =
+        template.getRatings().stream()
+            .filter(r -> r.getAccount().getId().equals(accountId))
+            .findFirst()
+            .orElse(null);
 
     if (rating == null) {
-      rating = Rating.builder()
-          .account(account)
-          .template(template)
-          .like(request.isLike())
-          .build();
+      rating = Rating.builder().account(account).template(template).like(request.isLike()).build();
     } else {
 
       if (!rating.getAccount().getId().equals(accountId)) {
@@ -60,5 +55,4 @@ public class RatingServiceImpl implements RatingService {
 
     return ratingRepository.save(rating);
   }
-
 }

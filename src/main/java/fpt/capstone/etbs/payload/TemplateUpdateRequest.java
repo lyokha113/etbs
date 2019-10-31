@@ -1,11 +1,11 @@
 package fpt.capstone.etbs.payload;
 
-import java.util.List;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TemplateUpdateRequest {
 
-    private String name;
-    private String description;
-    private List<Integer> categoryIds;
-    private boolean active;
+  private String name;
+  private String description;
+  private List<Integer> categoryIds;
+  private boolean active;
 }

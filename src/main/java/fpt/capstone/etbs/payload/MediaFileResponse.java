@@ -1,11 +1,12 @@
 package fpt.capstone.etbs.payload;
 
 import fpt.capstone.etbs.model.MediaFile;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.UUID;
 
 @Data
 @Builder
@@ -20,8 +21,7 @@ public class MediaFileResponse {
   private UUID accountId;
 
   public static MediaFileResponse setResponse(MediaFile mediaFile) {
-    return MediaFileResponse
-        .builder()
+    return MediaFileResponse.builder()
         .id(mediaFile.getId())
         .name(mediaFile.getName())
         .link(mediaFile.getLink())
@@ -29,5 +29,4 @@ public class MediaFileResponse {
         .active(mediaFile.isActive())
         .build();
   }
-
 }

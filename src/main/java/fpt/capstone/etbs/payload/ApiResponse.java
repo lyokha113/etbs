@@ -1,6 +1,5 @@
 package fpt.capstone.etbs.payload;
 
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,5 +19,4 @@ public class ApiResponse<T> {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private T data;
-
 }

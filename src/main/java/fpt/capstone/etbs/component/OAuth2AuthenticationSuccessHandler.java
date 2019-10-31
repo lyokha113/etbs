@@ -1,20 +1,11 @@
 package fpt.capstone.etbs.component;
 
-import static fpt.capstone.etbs.component.HttpCookieOAuth2AuthorizationRequest.REDIRECT_URI_PARAM_COOKIE_NAME;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.payload.AccountResponse;
 import fpt.capstone.etbs.util.CookieUtils;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Optional;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -22,6 +13,15 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Optional;
+
+import static fpt.capstone.etbs.component.HttpCookieOAuth2AuthorizationRequest.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Component
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -29,15 +29,14 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
   @Value("${app.oauth2.authorizedRedirectUris}")
   private String authorizedRedirectUri;
 
-  @Autowired
-  private JwtTokenProvider tokenProvider;
+  @Autowired private JwtTokenProvider tokenProvider;
 
-  @Autowired
-  private HttpCookieOAuth2AuthorizationRequest httpCookieOAuth2AuthorizationRequest;
+  @Autowired private HttpCookieOAuth2AuthorizationRequest httpCookieOAuth2AuthorizationRequest;
 
   @Override
-  public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-      Authentication authentication) throws IOException, ServletException {
+  public void onAuthenticationSuccess(
+      HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+      throws IOException, ServletException {
     String targetUrl = determineTargetUrl(request, response, authentication);
 
     if (response.isCommitted()) {
@@ -49,10 +48,11 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     getRedirectStrategy().sendRedirect(request, response, targetUrl);
   }
 
-  private String determineTargetUrl(HttpServletRequest request, HttpServletResponse response,
-      Authentication authentication) throws JsonProcessingException {
-    Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
-        .map(Cookie::getValue);
+  private String determineTargetUrl(
+      HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+      throws JsonProcessingException {
+    Optional<String> redirectUri =
+        CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME).map(Cookie::getValue);
 
     if (redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) {
       throw new BadRequestException(
@@ -62,24 +62,26 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
     UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
-    AccountResponse account = AccountResponse.builder()
-        .id(user.getId())
-        .fullName(user.getFullName())
-        .email(user.getEmail())
-        .imageUrl(user.getImageUrl())
-        .active(true)
-        .roleName(RoleEnum.USER.getName())
-        .roleId(RoleEnum.USER.getId())
-        .build();
+    AccountResponse account =
+        AccountResponse.builder()
+            .id(user.getId())
+            .fullName(user.getFullName())
+            .email(user.getEmail())
+            .imageUrl(user.getImageUrl())
+            .active(true)
+            .roleName(RoleEnum.USER.getName())
+            .roleId(RoleEnum.USER.getId())
+            .build();
     String token = tokenProvider.generateToken(account);
 
     return UriComponentsBuilder.fromUriString(targetUrl)
         .queryParam("token", token)
-        .build().toUriString();
+        .build()
+        .toUriString();
   }
 
-  private void clearAuthenticationAttributes(HttpServletRequest request,
-      HttpServletResponse response) {
+  private void clearAuthenticationAttributes(
+      HttpServletRequest request, HttpServletResponse response) {
     super.clearAuthenticationAttributes(request);
     httpCookieOAuth2AuthorizationRequest.removeAuthorizationRequestCookies(request, response);
   }

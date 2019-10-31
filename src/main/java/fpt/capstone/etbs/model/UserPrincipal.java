@@ -1,16 +1,12 @@
 package fpt.capstone.etbs.model;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import java.util.*;
 
 @Data
 public class UserPrincipal implements UserDetails, OAuth2User {
@@ -24,8 +20,14 @@ public class UserPrincipal implements UserDetails, OAuth2User {
   private Collection<? extends GrantedAuthority> authorities;
   private Map<String, Object> attributes;
 
-  public UserPrincipal(UUID id, String fullName, String email, Boolean active, String password,
-      String imageUrl, List<GrantedAuthority> authorities) {
+  public UserPrincipal(
+      UUID id,
+      String fullName,
+      String email,
+      Boolean active,
+      String password,
+      String imageUrl,
+      List<GrantedAuthority> authorities) {
     this.id = id;
     this.fullName = fullName;
     this.email = email;
@@ -36,8 +38,8 @@ public class UserPrincipal implements UserDetails, OAuth2User {
   }
 
   public static UserPrincipal create(Account account) {
-    List<GrantedAuthority> grantedAuthorities = AuthorityUtils
-        .commaSeparatedStringToAuthorityList("ROLE_" + account.getRole().getName());
+    List<GrantedAuthority> grantedAuthorities =
+        AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_" + account.getRole().getName());
     return new UserPrincipal(
         account.getId(),
         account.getFullName(),
@@ -45,8 +47,7 @@ public class UserPrincipal implements UserDetails, OAuth2User {
         account.isActive(),
         account.getPassword(),
         account.getImageUrl(),
-        grantedAuthorities
-    );
+        grantedAuthorities);
   }
 
   public static UserPrincipal create(Account account, Map<String, Object> attributes) {
@@ -91,12 +92,12 @@ public class UserPrincipal implements UserDetails, OAuth2User {
 
   @Override
   public boolean equals(Object o) {
-      if (this == o) {
-          return true;
-      }
-      if (o == null || getClass() != o.getClass()) {
-          return false;
-      }
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     UserPrincipal that = (UserPrincipal) o;
     return Objects.equals(id, that.id);
   }

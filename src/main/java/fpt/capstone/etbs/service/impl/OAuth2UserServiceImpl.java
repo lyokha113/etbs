@@ -10,9 +10,6 @@ import fpt.capstone.etbs.model.Role;
 import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.model.Workspace;
 import fpt.capstone.etbs.repository.AccountRepository;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
@@ -23,11 +20,14 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Service
 public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
 
-  @Autowired
-  private AccountRepository accountRepository;
+  @Autowired private AccountRepository accountRepository;
 
   public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest)
       throws OAuth2AuthenticationException {
@@ -38,7 +38,8 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
     } catch (AuthenticationException ex) {
       throw ex;
     } catch (Exception ex) {
-      // Throwing an instance of AuthenticationException will trigger the OAuth2AuthenticationFailureHandler
+      // Throwing an instance of AuthenticationException will trigger the
+      // OAuth2AuthenticationFailureHandler
       throw new InternalAuthenticationServiceException(ex.getMessage(), ex.getCause());
     }
   }
@@ -53,9 +54,12 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
     if (userOptional.isPresent()) {
       account = userOptional.get();
       if (!account.getProvider().equals(AuthProvider.google)) {
-        throw new OAuth2AuthenticationProcessingException("Looks like you're signed up with " +
-            account.getProvider() + " account. Please use your " + account.getProvider() +
-            " account to login.");
+        throw new OAuth2AuthenticationProcessingException(
+            "Looks like you're signed up with "
+                + account.getProvider()
+                + " account. Please use your "
+                + account.getProvider()
+                + " account to login.");
       } else if (!account.isActive()) {
         throw new OAuth2AuthenticationProcessingException("Your account was locked");
       }
@@ -66,8 +70,8 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
     return UserPrincipal.create(account, oAuth2User.getAttributes());
   }
 
-  private Account registerNewUser(OAuth2UserRequest oAuth2UserRequest,
-      GoogleOAuth2UserInfo oAuth2UserInfo) {
+  private Account registerNewUser(
+      OAuth2UserRequest oAuth2UserRequest, GoogleOAuth2UserInfo oAuth2UserInfo) {
     Account account = new Account();
     account.setProvider(
         AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));

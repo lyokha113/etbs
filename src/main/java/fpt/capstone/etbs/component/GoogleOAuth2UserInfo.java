@@ -25,5 +25,4 @@ public class GoogleOAuth2UserInfo {
   public String getImageUrl() {
     return (String) attributes.get("picture");
   }
-
 }

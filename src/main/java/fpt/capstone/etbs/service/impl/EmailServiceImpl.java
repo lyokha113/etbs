@@ -24,36 +24,30 @@ import fpt.capstone.etbs.constant.MailProvider;
 import fpt.capstone.etbs.payload.DraftEmailCreateRequest;
 import fpt.capstone.etbs.payload.SendEmailRequest;
 import fpt.capstone.etbs.service.EmailService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+
+import javax.mail.*;
+import javax.mail.internet.MimeMessage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import javax.mail.Flags;
-import javax.mail.Folder;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Store;
-import javax.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Service;
 
 @Service
 public class EmailServiceImpl implements EmailService {
 
-  private static final List<String> SCOPES = Arrays
-      .asList(GmailScopes.GMAIL_INSERT, GmailScopes.MAIL_GOOGLE_COM);
+  private static final List<String> SCOPES =
+      Arrays.asList(GmailScopes.GMAIL_INSERT, GmailScopes.MAIL_GOOGLE_COM);
   private static final String APPLICATION_NAME = "ETBS";
   private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-  @Autowired
-  private JavaMailSender javaMailSender;
-  @Autowired
-  private SendGrid sendGrid;
-  @Autowired
-  private GoogleClientSecrets googleClientSecrets;
+  @Autowired private JavaMailSender javaMailSender;
+  @Autowired private SendGrid sendGrid;
+  @Autowired private GoogleClientSecrets googleClientSecrets;
 
   @Override
   public boolean sendEmail(SendEmailRequest request) throws MessagingException, IOException {
@@ -73,8 +67,8 @@ public class EmailServiceImpl implements EmailService {
       throws MessagingException, IOException, GeneralSecurityException {
     String provider = request.getProvider();
     if (provider.equalsIgnoreCase(MailProvider.GMAIL.name())) {
-      createDraftGMail(createMessage(request, Session.getInstance(System.getProperties())),
-          request.getEmail());
+      createDraftGMail(
+          createMessage(request, Session.getInstance(System.getProperties())), request.getEmail());
     } else if (provider.equalsIgnoreCase(MailProvider.YAHOO.name())) {
       createDraft(request);
     } else if (provider.equalsIgnoreCase(MailProvider.OUTLOOK.name())) {
@@ -142,10 +136,11 @@ public class EmailServiceImpl implements EmailService {
 
   private Gmail getGMailInstance() throws GeneralSecurityException, IOException {
     NetHttpTransport netHttpTransport = GoogleNetHttpTransport.newTrustedTransport();
-    GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-        netHttpTransport, JSON_FACTORY, googleClientSecrets, SCOPES)
-        .setAccessType("offline")
-        .build();
+    GoogleAuthorizationCodeFlow flow =
+        new GoogleAuthorizationCodeFlow.Builder(
+                netHttpTransport, JSON_FACTORY, googleClientSecrets, SCOPES)
+            .setAccessType("offline")
+            .build();
     LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
     Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
 
@@ -153,5 +148,4 @@ public class EmailServiceImpl implements EmailService {
         .setApplicationName(APPLICATION_NAME)
         .build();
   }
-
 }

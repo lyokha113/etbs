@@ -5,17 +5,16 @@ import fpt.capstone.etbs.model.Category;
 import fpt.capstone.etbs.payload.CategoryCreateRequest;
 import fpt.capstone.etbs.payload.CategoryUpdateRequest;
 import fpt.capstone.etbs.repository.CategoryRepository;
-import fpt.capstone.etbs.repository.TemplateRepository;
 import fpt.capstone.etbs.service.CategoryService;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-  @Autowired
-  private CategoryRepository categoryRepository;
+  @Autowired private CategoryRepository categoryRepository;
 
   @Override
   public List<Category> getCategories() {
@@ -27,7 +26,6 @@ public class CategoryServiceImpl implements CategoryService {
     return categoryRepository.getAllByActiveTrue();
   }
 
-
   @Override
   public Category createCategory(CategoryCreateRequest request) {
 
@@ -35,10 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
       throw new BadRequestException("Workspace name is existed");
     }
 
-    Category category = Category.builder()
-        .name(request.getName())
-        .active(true)
-        .build();
+    Category category = Category.builder().name(request.getName()).active(true).build();
 
     return categoryRepository.save(category);
   }
@@ -58,7 +53,6 @@ public class CategoryServiceImpl implements CategoryService {
     category.setName(request.getName());
     category.setActive(request.isActive());
     return categoryRepository.save(category);
-
   }
 
   private boolean isDuplicateName(String name) {
@@ -68,5 +62,4 @@ public class CategoryServiceImpl implements CategoryService {
   private boolean isDuplicateName(String name, Integer categoryId) {
     return categoryRepository.getByNameAndIdNot(name, categoryId).isPresent();
   }
-
 }

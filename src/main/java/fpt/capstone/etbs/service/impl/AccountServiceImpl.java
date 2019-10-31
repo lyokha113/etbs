@@ -12,26 +12,24 @@ import fpt.capstone.etbs.payload.RegisterRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.RoleRepository;
 import fpt.capstone.etbs.service.AccountService;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Service
 public class AccountServiceImpl extends DefaultOAuth2UserService implements AccountService {
 
-  @Autowired
-  private AccountRepository accountRepository;
+  @Autowired private AccountRepository accountRepository;
 
-  @Autowired
-  private RoleRepository roleRepository;
+  @Autowired private RoleRepository roleRepository;
 
-  @Autowired
-  private PasswordEncoder passwordEncoder;
+  @Autowired private PasswordEncoder passwordEncoder;
 
   @Override
   public List<Account> getAccounts() {
@@ -85,7 +83,6 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
     }
     return account;
   }
-
 
   @Override
   public Account updateAccount(UUID uuid, AccountUpdateRequest request) {

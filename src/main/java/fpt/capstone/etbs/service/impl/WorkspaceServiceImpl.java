@@ -9,22 +9,20 @@ import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.RawTemplateRepository;
 import fpt.capstone.etbs.repository.WorkspaceRepository;
 import fpt.capstone.etbs.service.WorkspaceService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class WorkspaceServiceImpl implements WorkspaceService {
 
-  private final static String DEFAULT_WORKSPACE_NAME = "Default";
-  @Autowired
-  private WorkspaceRepository workspaceRepository;
-  @Autowired
-  private AccountRepository accountRepository;
-  @Autowired
-  private RawTemplateRepository rawTemplateRepository;
+  private static final String DEFAULT_WORKSPACE_NAME = "Default";
+  @Autowired private WorkspaceRepository workspaceRepository;
+  @Autowired private AccountRepository accountRepository;
+  @Autowired private RawTemplateRepository rawTemplateRepository;
 
   @Override
   public List<Workspace> getWorkspacesOfAccount(UUID accountId) {
@@ -48,10 +46,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
       throw new BadRequestException("Workspace name is existed");
     }
 
-    Workspace workspace = Workspace.builder()
-        .account(account)
-        .name(request.getName())
-        .build();
+    Workspace workspace = Workspace.builder().account(account).name(request.getName()).build();
 
     return workspaceRepository.save(workspace);
   }
@@ -59,8 +54,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
   @Override
   public Workspace updateWorkspace(UUID accountId, Integer workspaceId, WorkspaceRequest request) {
 
-    Workspace workspace = workspaceRepository.getByIdAndAccount_Id(workspaceId, accountId)
-        .orElse(null);
+    Workspace workspace =
+        workspaceRepository.getByIdAndAccount_Id(workspaceId, accountId).orElse(null);
 
     if (workspace == null) {
       throw new BadRequestException("Workspace doesn't exist");
@@ -71,23 +66,23 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     workspace.setName(request.getName());
     return workspaceRepository.save(workspace);
-
   }
 
   @Override
   public void deleteWorkspace(UUID accountId, Integer workspaceId) {
 
-    Workspace workspace = workspaceRepository.getByIdAndAccount_Id(workspaceId, accountId)
-        .orElse(null);
+    Workspace workspace =
+        workspaceRepository.getByIdAndAccount_Id(workspaceId, accountId).orElse(null);
     if (workspace == null) {
       throw new BadRequestException("Workspace doesn't exist");
     }
 
     Set<RawTemplate> templates = workspace.getRawTemplates();
     if (templates.size() > 0) {
-      Workspace defaultWorkspace = workspaceRepository
-          .getByNameAndAccount_Id(DEFAULT_WORKSPACE_NAME, accountId)
-          .orElseThrow(() -> new BadRequestException("Default workspace doesn't exist"));
+      Workspace defaultWorkspace =
+          workspaceRepository
+              .getByNameAndAccount_Id(DEFAULT_WORKSPACE_NAME, accountId)
+              .orElseThrow(() -> new BadRequestException("Default workspace doesn't exist"));
 
       templates.forEach(t -> t.setWorkspace(defaultWorkspace));
       rawTemplateRepository.saveAll(templates);
@@ -101,8 +96,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
   }
 
   private boolean isDuplicateNameEachAccount(String name, UUID accountId, Integer workspaceId) {
-    return workspaceRepository.getByNameAndAccount_IdAndIdNot(name, accountId, workspaceId)
+    return workspaceRepository
+        .getByNameAndAccount_IdAndIdNot(name, accountId, workspaceId)
         .isPresent();
   }
-
 }

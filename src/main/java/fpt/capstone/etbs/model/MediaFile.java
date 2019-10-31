@@ -3,22 +3,12 @@ package fpt.capstone.etbs.model;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import java.util.UUID;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import java.util.UUID;
 
 @Entity
 @Data
@@ -29,13 +19,13 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(of = {"id"})
-@JsonIgnoreProperties(value = {"createdDate", "lastModifiedDate"}, allowGetters = true)
+@JsonIgnoreProperties(
+    value = {"createdDate", "lastModifiedDate"},
+    allowGetters = true)
 @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "id")
 public class MediaFile extends Auditing {
 
-  @Id
-  @Column
-  private UUID id;
+  @Id @Column private UUID id;
 
   @Column(nullable = false)
   @NotBlank
@@ -45,11 +35,8 @@ public class MediaFile extends Auditing {
   @NotBlank
   private String link;
 
-  @ManyToOne
-  @NonNull
-  private Account account;
+  @ManyToOne @NonNull private Account account;
 
   @Column(columnDefinition = "TINYINT(1) default 1")
   private boolean active;
-
 }

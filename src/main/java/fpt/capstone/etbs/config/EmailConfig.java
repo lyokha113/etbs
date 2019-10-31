@@ -5,18 +5,20 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.sendgrid.SendGrid;
 import fpt.capstone.etbs.EtbsApplication;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 @Configuration
 public class EmailConfig {
 
   private static final String CREDENTIALS_GOOGLE = "/etbs_gmail.json";
   private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+
   @Value("${app.sendgrid.apiKey}")
   private String SENDGRID_API_KEY;
 
@@ -30,5 +32,4 @@ public class EmailConfig {
     InputStream toLoad = EtbsApplication.class.getResourceAsStream(CREDENTIALS_GOOGLE);
     return GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(toLoad));
   }
-
 }

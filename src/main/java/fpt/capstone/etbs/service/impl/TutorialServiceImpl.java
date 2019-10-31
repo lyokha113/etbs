@@ -4,15 +4,15 @@ import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Tutorial;
 import fpt.capstone.etbs.repository.TutorialRepository;
 import fpt.capstone.etbs.service.TutorialService;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class TutorialServiceImpl implements TutorialService {
 
-  @Autowired
-  private TutorialRepository tutorialRepository;
+  @Autowired private TutorialRepository tutorialRepository;
 
   @Override
   public List<Tutorial> getTutorials() {

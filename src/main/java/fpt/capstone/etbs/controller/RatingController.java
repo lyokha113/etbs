@@ -18,16 +18,14 @@ import javax.validation.Valid;
 @RestController
 public class RatingController {
 
-    @Autowired
-    private RatingService ratingService;
+  @Autowired private RatingService ratingService;
 
-    @PostMapping("/rating")
-    private ResponseEntity<ApiResponse> rate(
-        Authentication auth,
-        @Valid @RequestBody RatingRequest request) {
-        UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-        Rating rate = ratingService.rate(userPrincipal.getId(), request);
-        return ResponseEntity.ok(
-                new ApiResponse<>(true, "Rated successful", RatingResponse.setResponse(rate)));
-    }
+  @PostMapping("/rating")
+  private ResponseEntity<ApiResponse> rate(
+      Authentication auth, @Valid @RequestBody RatingRequest request) {
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+    Rating rate = ratingService.rate(userPrincipal.getId(), request);
+    return ResponseEntity.ok(
+        new ApiResponse<>(true, "Rated successful", RatingResponse.setResponse(rate)));
+  }
 }

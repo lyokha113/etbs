@@ -5,13 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class RatingRequest {
-    private int templateId;
-    private boolean like;
+  private int templateId;
+  private boolean like;
 }
