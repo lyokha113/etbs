@@ -31,8 +31,8 @@ public class MediaFileSchedule {
   private MediaFileService mediaFileService;
 
   @Scheduled(fixedDelay = 1000 * 60 * 5, initialDelay = 1000 * 60 * 5)
-  public void deleteInactiveFile() {
-    logger.info("Start to delete inactive file");
+  public void deleteInactiveUserFile() {
+    logger.info("Start to delete inactive user file");
     List<MediaFile> deleteFiles = mediaFileService.getInactiveMediaFiles();
     deleteFiles = deleteFiles.stream()
         .filter(f -> {
@@ -59,6 +59,6 @@ public class MediaFileSchedule {
           }
         });
     mediaFileService.deleteMediaFile(deletedFiles);
-    logger.info("Finished delete inactive file");
+    logger.info("Finished delete inactive user file - " + deletedFiles.size() + " files deleted");
   }
 }

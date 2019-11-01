@@ -1,6 +1,7 @@
 package fpt.capstone.etbs.payload;
 
 import fpt.capstone.etbs.model.Category;
+import fpt.capstone.etbs.model.Rating;
 import fpt.capstone.etbs.model.Template;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,9 +52,9 @@ class TemplateOfCategory {
   private boolean active;
 
   static TemplateOfCategory setResponse(Template template) {
-    int vote = (int) template.getRatings().stream().filter(r -> r.isActive() && r.isVote()).count();
+    int vote = (int) template.getRatings().stream().filter(Rating::isVote).count();
     int downVote =
-        (int) template.getRatings().stream().filter(r -> r.isActive() && !r.isVote()).count();
+        (int) template.getRatings().stream().filter(r -> !r.isVote()).count();
     return TemplateOfCategory.builder()
         .id(template.getId())
         .name(template.getName())

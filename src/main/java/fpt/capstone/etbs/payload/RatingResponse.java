@@ -19,9 +19,9 @@ public class RatingResponse {
 
   public static RatingResponse setResponse(Rating rating) {
     Template template = rating.getTemplate();
-    int vote = (int) template.getRatings().stream().filter(r -> r.isActive() && r.isVote()).count();
+    int vote = (int) template.getRatings().stream().filter(Rating::isVote).count();
     int downVote =
-        (int) template.getRatings().stream().filter(r -> r.isActive() && !r.isVote()).count();
+        (int) template.getRatings().stream().filter(r -> !r.isVote()).count();
     return RatingResponse.builder()
         .templateId(rating.getTemplate().getId())
         .vote(vote)
