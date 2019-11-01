@@ -2,11 +2,14 @@ package fpt.capstone.etbs.service.impl;
 
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Category;
+import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.CategoryCreateRequest;
 import fpt.capstone.etbs.payload.CategoryUpdateRequest;
 import fpt.capstone.etbs.repository.CategoryRepository;
 import fpt.capstone.etbs.service.CategoryService;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +26,13 @@ public class CategoryServiceImpl implements CategoryService {
 
   @Override
   public List<Category> getActiveCategories() {
-    return categoryRepository.getAllByActiveTrue();
+    List<Category> categories = categoryRepository.getAllByActiveTrue();
+    categories.forEach(c -> {
+      Set<Template> templates = c.getTemplates();
+      templates = templates.stream().filter(Template::isActive).collect(Collectors.toSet());
+      c.setTemplates(templates);
+    });
+    return categories;
   }
 
   @Override

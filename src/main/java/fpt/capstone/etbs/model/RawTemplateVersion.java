@@ -53,6 +53,4 @@ public class RawTemplateVersion extends Auditing {
   @NonNull
   private RawTemplate template;
 
-  @Column(columnDefinition = "TINYINT(1) default 1")
-  private boolean active;
 }

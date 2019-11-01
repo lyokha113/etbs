@@ -13,4 +13,5 @@ public class AccountUpdateRequest {
 
   private String fullName;
   private String password;
+  private boolean active;
 }

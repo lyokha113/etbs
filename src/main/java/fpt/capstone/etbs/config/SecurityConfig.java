@@ -102,8 +102,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .and()
         .authorizeRequests()
         // Swagger
-        .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**")
-        .permitAll()
+        .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
         // All
         .antMatchers(HttpMethod.POST, "/login", "/register")
         .anonymous()
@@ -114,16 +113,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .hasAnyRole(RoleEnum.ADMINISTRATOR.getName(), RoleEnum.USER.getName())
         // User
         .antMatchers(HttpMethod.GET, "/file", "file/*", "/workspace", "/workspace/*", "/raw/**")
-        .permitAll()
+        .hasRole(RoleEnum.USER.getName())
         .antMatchers(HttpMethod.POST, "/file", "/workspace", "/email/*", "/rate", "/raw")
-        .permitAll()
+        .hasRole(RoleEnum.USER.getName())
         .antMatchers(HttpMethod.PUT, "/file/*", "/workspace/*", "/raw/*")
-        .permitAll()
+        .hasRole(RoleEnum.USER.getName())
         // Administrator
-        .antMatchers(HttpMethod.POST, "/category", "/template")
-        .permitAll()
-        .antMatchers(HttpMethod.PUT, "/category/*", "/template/*")
-        .permitAll()
+        .antMatchers(HttpMethod.GET, "/account")
+        .hasRole(RoleEnum.ADMINISTRATOR.getName())
+        .antMatchers(HttpMethod.POST, "/category", "/template", "/account")
+        .hasRole(RoleEnum.ADMINISTRATOR.getName())
+        .antMatchers(HttpMethod.PUT, "/category/*", "/template/*", "/account")
+        .hasRole(RoleEnum.ADMINISTRATOR.getName())
         .anyRequest()
         .authenticated();
 

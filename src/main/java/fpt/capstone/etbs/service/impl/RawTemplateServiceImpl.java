@@ -1,14 +1,18 @@
 package fpt.capstone.etbs.service.impl;
 
+import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.RawTemplate;
+import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.model.Workspace;
 import fpt.capstone.etbs.payload.RawTemplateCreateRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.RawTemplateRepository;
+import fpt.capstone.etbs.repository.TemplateRepository;
 import fpt.capstone.etbs.repository.WorkspaceRepository;
 import fpt.capstone.etbs.service.RawTemplateService;
+import fpt.capstone.etbs.service.TemplateService;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +28,9 @@ public class RawTemplateServiceImpl implements RawTemplateService {
 
   @Autowired
   private AccountRepository accountRepository;
+
+  @Autowired
+  private TemplateService templateService;
 
   @Override
   public RawTemplate getRawTemplate(Integer id, UUID accountId) {
@@ -47,14 +54,22 @@ public class RawTemplateServiceImpl implements RawTemplateService {
       throw new BadRequestException("Template name is existed in this workspace");
     }
 
-    RawTemplate rawTemplate =
-        RawTemplate.builder()
+    RawTemplate rawTemplate = RawTemplate.builder()
             .name(request.getName())
-            .content(request.getContent())
-            .thumbnail(request.getThumbnail())
+            .thumbnail(AppConstant.DEFAULT_RAW_TEMPLATE_THUMBNAIL)
             .description(request.getDescription())
             .workspace(workspace)
+            .active(true)
             .build();
+
+    if (request.getTemplateId() != null) {
+      Template template = templateService.getActiveTemplate(request.getTemplateId());
+      if (template == null) {
+        throw new BadRequestException("Template doesn't exist");
+      }
+
+      rawTemplate.setContent(template.getContent());
+    }
 
     return rawTemplateRepository.save(rawTemplate);
   }

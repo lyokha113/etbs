@@ -51,11 +51,14 @@ public class UserController {
   @PutMapping("/user")
   public ResponseEntity<ApiResponse> updateUser(
       @Valid @RequestBody AccountUpdateRequest request, Authentication auth) {
-    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-    Account account = accountService.getAccount(userPrincipal.getId());
-    account = accountService.updateAccount(account.getId(), request);
-    AccountResponse response = AccountResponse.setResponse(account);
-    return ResponseEntity.ok(new ApiResponse<>(true, "Update successful", response));
+    try {
+      UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+      Account account = accountService.updateAccount(userPrincipal.getId(), request);
+      AccountResponse response = AccountResponse.setResponse(account);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Account updated", response));
+    } catch (BadRequestException ex) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
   }
 
   @PostMapping("/login")

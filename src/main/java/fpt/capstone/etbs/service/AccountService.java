@@ -1,6 +1,7 @@
 package fpt.capstone.etbs.service;
 
 import fpt.capstone.etbs.model.Account;
+import fpt.capstone.etbs.payload.AccountCreateRequest;
 import fpt.capstone.etbs.payload.AccountUpdateRequest;
 import fpt.capstone.etbs.payload.RegisterRequest;
 import java.util.List;
@@ -16,7 +17,7 @@ public interface AccountService {
 
   Account registerAccount(RegisterRequest request);
 
-  Account createAccount(RegisterRequest request, int roleId);
+  Account createAccount(AccountCreateRequest request);
 
   Account updateAccount(UUID uuid, AccountUpdateRequest request);
 }

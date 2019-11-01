@@ -49,7 +49,4 @@ public class Rating extends Auditing {
 
   @Column(nullable = false)
   private boolean vote;
-
-  @Column(columnDefinition = "TINYINT(1) default 1")
-  private boolean active;
 }

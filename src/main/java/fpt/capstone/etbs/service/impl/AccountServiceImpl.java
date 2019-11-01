@@ -7,6 +7,7 @@ import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Role;
 import fpt.capstone.etbs.model.Workspace;
+import fpt.capstone.etbs.payload.AccountCreateRequest;
 import fpt.capstone.etbs.payload.AccountUpdateRequest;
 import fpt.capstone.etbs.payload.RegisterRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
@@ -35,7 +36,7 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
 
   @Override
   public List<Account> getAccounts() {
-    return null;
+    return accountRepository.findAll();
   }
 
   @Override
@@ -59,30 +60,38 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
   }
 
   @Override
-  public Account createAccount(RegisterRequest request, int roleId) {
+  public Account createAccount(AccountCreateRequest request) {
 
     if (getAccountByEmail(request.getEmail()) != null) {
       throw new BadRequestException("Email is existed");
     }
 
-    Role role = roleRepository.findById(roleId).orElse(null);
+    Role role = roleRepository.findById(request.getRoleId()).orElse(null);
     if (role == null) {
       throw new BadRequestException("Role doesn't exist");
     }
 
-    return setNewAccount(request, role);
+    return setNewAccount(
+        RegisterRequest.builder()
+            .email(request.getEmail())
+            .fullName(request.getFullName())
+            .password(request.getPassword())
+            .build(),
+        role);
   }
 
   @Override
   public Account updateAccount(UUID uuid, AccountUpdateRequest request) {
+
     Account account = getAccount(uuid);
-    if (account != null) {
-      account.setFullName(request.getFullName());
-      account.setPassword(passwordEncoder.encode(request.getPassword()));
-      accountRepository.save(account);
-      return account;
+    if (account == null) {
+      throw new BadRequestException("Account doesn't existed");
     }
-    return null;
+
+    account.setFullName(request.getFullName());
+    account.setPassword(passwordEncoder.encode(request.getPassword()));
+    account.setActive(request.isActive());
+    return accountRepository.save(account);
   }
 
   private Account setNewAccount(RegisterRequest request, Role role) {

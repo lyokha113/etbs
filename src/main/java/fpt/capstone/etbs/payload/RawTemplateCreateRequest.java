@@ -12,8 +12,7 @@ import lombok.NoArgsConstructor;
 public class RawTemplateCreateRequest {
 
   private String name;
-  private String content;
   private String description;
-  private String thumbnail;
+  private Integer templateId;
   private int workspaceId;
 }
