@@ -1,14 +1,13 @@
 package fpt.capstone.etbs.payload;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.Collections;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
-
-import java.util.Collections;
-import java.util.List;
 
 @Data
 @Builder

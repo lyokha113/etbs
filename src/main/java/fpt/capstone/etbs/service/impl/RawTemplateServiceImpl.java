@@ -9,18 +9,21 @@ import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.RawTemplateRepository;
 import fpt.capstone.etbs.repository.WorkspaceRepository;
 import fpt.capstone.etbs.service.RawTemplateService;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
 public class RawTemplateServiceImpl implements RawTemplateService {
-  @Autowired private RawTemplateRepository rawTemplateRepository;
 
-  @Autowired private WorkspaceRepository workspaceRepository;
+  @Autowired
+  private RawTemplateRepository rawTemplateRepository;
 
-  @Autowired private AccountRepository accountRepository;
+  @Autowired
+  private WorkspaceRepository workspaceRepository;
+
+  @Autowired
+  private AccountRepository accountRepository;
 
   @Override
   public RawTemplate getRawTemplate(Integer id, UUID accountId) {
@@ -59,43 +62,5 @@ public class RawTemplateServiceImpl implements RawTemplateService {
   private boolean isDuplicateNameEachWorkspace(String name, Integer workspaceId) {
     return rawTemplateRepository.getByNameAndWorkspace_Id(name, workspaceId).isPresent();
   }
-
-  //    @Override
-  //    public RawTemplate createTemplate(UUID accountId, RawTemplateCreateRequest request) {
-  //
-  //
-  //
-  //        RawTemplate rawTemplate = new RawTemplate();
-  //        rawTemplate.setContent(request.getContent());
-  //        rawTemplate.setDescription(request.getDescription());
-  //        rawTemplate.setName(request.getName());
-  //        Workspace workspace = workspaceRepository.findById(request.getWorkspaceId()).get();
-  //        rawTemplate.setWorkspace(workspace);
-  //        rawTemplate.setActive(true);
-  //        rawTemplateRepository.save(rawTemplate);
-  //
-  //        RawTemplateCreateResponse response = new RawTemplateCreateResponse();
-  //        response.setId(rawTemplate.getId());
-  //        return response;
-  //    }
-  //
-  //    @Override
-  //    public List<RawTemplateResponse> getTemplateByWorkspaceId(int wId) {
-  //        List<RawTemplate> rawTemplate = rawTemplateRepository.getAllByWorkspace_Id(wId);
-  //        List<RawTemplateResponse> response = new ArrayList<>();
-  //        for (int i = 0; i < rawTemplate.size(); i++) {
-  //            RawTemplateResponse temp = new RawTemplateResponse();
-  //            temp.setId(rawTemplate.get(i).getId());
-  //            temp.setName(rawTemplate.get(i).getName());
-  //            temp.setWorkspaceId(wId);
-  //            temp.setContent(rawTemplate.get(i).getContent());
-  //            temp.setDescription(rawTemplate.get(i).getDescription());
-  //            temp.setThumbnail(rawTemplate.get(i).getThumbnail());
-  //
-  //            response.add(temp);
-  //        }
-  //
-  //        return response;
-  //    }
 
 }

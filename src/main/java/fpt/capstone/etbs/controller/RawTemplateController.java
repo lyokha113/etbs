@@ -7,17 +7,21 @@ import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.RawTemplateCreateRequest;
 import fpt.capstone.etbs.payload.RawTemplateResponse;
 import fpt.capstone.etbs.service.RawTemplateService;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class RawTemplateController {
 
-  @Autowired private RawTemplateService rawTemplateService;
+  @Autowired
+  private RawTemplateService rawTemplateService;
 
   @GetMapping("/raw/{id}")
   public ResponseEntity<ApiResponse> getRawTemplate(
@@ -26,7 +30,7 @@ public class RawTemplateController {
     RawTemplate response = rawTemplateService.getRawTemplate(id, userPrincipal.getId());
     return response != null
         ? ResponseEntity.ok(
-            new ApiResponse<>(true, "", RawTemplateResponse.setResponseWithContent(response)))
+        new ApiResponse<>(true, "", RawTemplateResponse.setResponseWithContent(response)))
         : ResponseEntity.badRequest().body(new ApiResponse<>(true, "Not found", null));
   }
 

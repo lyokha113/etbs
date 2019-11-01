@@ -6,6 +6,8 @@ import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.DraftEmailRequest;
 import fpt.capstone.etbs.payload.SendEmailRequest;
 import fpt.capstone.etbs.service.EmailService;
+import java.security.GeneralSecurityException;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,13 +15,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-import java.security.GeneralSecurityException;
-
 @RestController
 public class EmailController {
 
-  @Autowired private EmailService emailSenderService;
+  @Autowired
+  private EmailService emailSenderService;
 
   @PostMapping("/email/draft")
   public ResponseEntity<ApiResponse> makeDraftEmail(

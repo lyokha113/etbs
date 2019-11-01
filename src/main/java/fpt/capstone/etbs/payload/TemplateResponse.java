@@ -2,15 +2,14 @@ package fpt.capstone.etbs.payload;
 
 import fpt.capstone.etbs.model.Category;
 import fpt.capstone.etbs.model.Template;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
@@ -66,6 +65,7 @@ public class TemplateResponse {
 @NoArgsConstructor
 @AllArgsConstructor
 class CategoryOfTemplate {
+
   private int id;
   private String name;
 

@@ -10,6 +10,9 @@ import fpt.capstone.etbs.model.Role;
 import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.model.Workspace;
 import fpt.capstone.etbs.repository.AccountRepository;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
@@ -20,14 +23,11 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 @Service
 public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
 
-  @Autowired private AccountRepository accountRepository;
+  @Autowired
+  private AccountRepository accountRepository;
 
   public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest)
       throws OAuth2AuthenticationException {
@@ -82,7 +82,10 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
     account.setActive(true);
     account.setProvider(AuthProvider.google);
     account.setWorkspaces(
-        Stream.of(Workspace.builder().name(AppConstant.DEFAULT_WORKSPACE_NAME).build())
+        Stream.of(Workspace.builder()
+            .name(AppConstant.DEFAULT_WORKSPACE_NAME)
+            .account(account)
+            .build())
             .collect(Collectors.toSet()));
     return accountRepository.save(account);
   }

@@ -9,20 +9,22 @@ import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.RawTemplateRepository;
 import fpt.capstone.etbs.repository.WorkspaceRepository;
 import fpt.capstone.etbs.service.WorkspaceService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class WorkspaceServiceImpl implements WorkspaceService {
 
   private static final String DEFAULT_WORKSPACE_NAME = "Default";
-  @Autowired private WorkspaceRepository workspaceRepository;
-  @Autowired private AccountRepository accountRepository;
-  @Autowired private RawTemplateRepository rawTemplateRepository;
+  @Autowired
+  private WorkspaceRepository workspaceRepository;
+  @Autowired
+  private AccountRepository accountRepository;
+  @Autowired
+  private RawTemplateRepository rawTemplateRepository;
 
   @Override
   public List<Workspace> getWorkspacesOfAccount(UUID accountId) {

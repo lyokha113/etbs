@@ -29,13 +29,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-  @Autowired private CustomUserDetailsServiceImpl customUserDetailsService;
+  @Autowired
+  private CustomUserDetailsServiceImpl customUserDetailsService;
 
-  @Autowired private OAuth2UserServiceImpl customOAuth2UserService;
+  @Autowired
+  private OAuth2UserServiceImpl customOAuth2UserService;
 
-  @Autowired private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+  @Autowired
+  private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
-  @Autowired private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+  @Autowired
+  private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
   @Bean
   public HttpCookieOAuth2AuthorizationRequest cookieAuthorizationRequestRepository() {

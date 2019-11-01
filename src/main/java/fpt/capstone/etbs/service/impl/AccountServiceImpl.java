@@ -12,24 +12,26 @@ import fpt.capstone.etbs.payload.RegisterRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.RoleRepository;
 import fpt.capstone.etbs.service.AccountService;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 @Service
 public class AccountServiceImpl extends DefaultOAuth2UserService implements AccountService {
 
-  @Autowired private AccountRepository accountRepository;
+  @Autowired
+  private AccountRepository accountRepository;
 
-  @Autowired private RoleRepository roleRepository;
+  @Autowired
+  private RoleRepository roleRepository;
 
-  @Autowired private PasswordEncoder passwordEncoder;
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
   @Override
   public List<Account> getAccounts() {
@@ -53,35 +55,22 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
       throw new BadRequestException("Email is existed");
     }
 
-    Account account = new Account();
-    account.setEmail(request.getEmail());
-    account.setFullName(request.getFullName());
-    account.setPassword(passwordEncoder.encode(request.getPassword()));
-    account.setImageUrl(AppConstant.DEFAULT_AVATAR_URL);
-    account.setActive(true);
-    account.setRole(Role.builder().id(RoleEnum.USER.getId()).build());
-    account.setProvider(AuthProvider.local);
-    account.setWorkspaces(
-        Stream.of(Workspace.builder().name(AppConstant.DEFAULT_WORKSPACE_NAME).build())
-            .collect(Collectors.toSet()));
-    return accountRepository.save(account);
+    return setNewAccount(request, Role.builder().id(RoleEnum.USER.getId()).build());
   }
 
   @Override
   public Account createAccount(RegisterRequest request, int roleId) {
-    Account account = getAccountByEmail(request.getEmail());
-    if (account == null) {
-      account = new Account();
-      account.setEmail(request.getEmail());
-      account.setFullName(request.getFullName());
-      account.setPassword(passwordEncoder.encode(request.getPassword()));
-      account.setActive(true);
-      if (roleRepository.findById(roleId).isPresent()) {
-        account.setRole(roleRepository.findById(roleId).get());
-      }
-      accountRepository.save(account);
+
+    if (getAccountByEmail(request.getEmail()) != null) {
+      throw new BadRequestException("Email is existed");
     }
-    return account;
+
+    Role role = roleRepository.findById(roleId).orElse(null);
+    if (role == null) {
+      throw new BadRequestException("Role doesn't exist");
+    }
+
+    return setNewAccount(request, role);
   }
 
   @Override
@@ -94,5 +83,24 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
       return account;
     }
     return null;
+  }
+
+  private Account setNewAccount(RegisterRequest request, Role role) {
+    Account account = new Account();
+    account.setEmail(request.getEmail());
+    account.setFullName(request.getFullName());
+    account.setPassword(passwordEncoder.encode(request.getPassword()));
+    account.setImageUrl(AppConstant.DEFAULT_AVATAR_URL);
+    account.setActive(true);
+    account.setRole(role);
+    account.setProvider(AuthProvider.local);
+    account.setWorkspaces(
+        Stream.of(Workspace.builder()
+            .name(AppConstant.DEFAULT_WORKSPACE_NAME)
+            .account(account)
+            .build())
+            .collect(Collectors.toSet()));
+
+    return accountRepository.save(account);
   }
 }

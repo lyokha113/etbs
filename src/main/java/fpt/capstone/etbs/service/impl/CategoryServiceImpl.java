@@ -6,15 +6,15 @@ import fpt.capstone.etbs.payload.CategoryCreateRequest;
 import fpt.capstone.etbs.payload.CategoryUpdateRequest;
 import fpt.capstone.etbs.repository.CategoryRepository;
 import fpt.capstone.etbs.service.CategoryService;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-  @Autowired private CategoryRepository categoryRepository;
+  @Autowired
+  private CategoryRepository categoryRepository;
 
   @Override
   public List<Category> getCategories() {

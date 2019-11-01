@@ -1,7 +1,7 @@
 package fpt.capstone.etbs.service;
 
 import fpt.capstone.etbs.model.Tutorial;
-
+import fpt.capstone.etbs.payload.TutorialRequest;
 import java.util.List;
 
 public interface TutorialService {
@@ -14,7 +14,7 @@ public interface TutorialService {
 
   Tutorial getActiveTutorial(Integer id);
 
-  Tutorial createTutorial(Tutorial tutorial);
+  Tutorial createTutorial(TutorialRequest tutorial) throws Exception;
 
-  Tutorial updateTutorial(Integer id, Tutorial tutorial);
+  Tutorial updateTutorial(Integer id, TutorialRequest tutorial) throws Exception;
 }

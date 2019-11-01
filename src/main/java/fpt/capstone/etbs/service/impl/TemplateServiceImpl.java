@@ -8,18 +8,22 @@ import fpt.capstone.etbs.repository.CategoryRepository;
 import fpt.capstone.etbs.repository.RatingRepository;
 import fpt.capstone.etbs.repository.TemplateRepository;
 import fpt.capstone.etbs.service.TemplateService;
+import java.util.List;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.UUID;
-
 @Service
 public class TemplateServiceImpl implements TemplateService {
-  @Autowired TemplateRepository templateRepository;
-  @Autowired AccountRepository accountRepository;
-  @Autowired CategoryRepository categoryRepository;
-  @Autowired RatingRepository ratingRepository;
+
+  @Autowired
+  TemplateRepository templateRepository;
+  @Autowired
+  AccountRepository accountRepository;
+  @Autowired
+  CategoryRepository categoryRepository;
+  @Autowired
+  RatingRepository ratingRepository;
 
   @Override
   public List<Template> getTemplates() {

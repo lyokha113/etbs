@@ -6,19 +6,25 @@ import fpt.capstone.etbs.model.MediaFile;
 import fpt.capstone.etbs.payload.MediaFileUpdateRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.MediaFileRepository;
+import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.MediaFileService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class MediaFileServiceImpl implements MediaFileService {
 
-  @Autowired private MediaFileRepository mediaFileRepository;
+  @Autowired
+  private MediaFileRepository mediaFileRepository;
 
-  @Autowired private AccountRepository accountRepository;
+  @Autowired
+  private AccountRepository accountRepository;
+
+  @Autowired
+  private FirebaseService firebaseService;
 
   @Override
   public List<MediaFile> getMediaFilesOfAccount(UUID accountId) {
@@ -36,13 +42,15 @@ public class MediaFileServiceImpl implements MediaFileService {
   }
 
   @Override
-  public MediaFile createMediaFile(UUID accountId, UUID id, String name, String link) {
+  public MediaFile createMediaFile(UUID accountId, UUID id, String name, MultipartFile file)
+      throws Exception {
 
     Account account = accountRepository.findById(accountId).orElse(null);
     if (account == null) {
       throw new BadRequestException("Account doesn't exist");
     }
 
+    String link = firebaseService.createUserImage(file, accountId.toString(), id.toString());
     MediaFile mediaFile =
         MediaFile.builder().id(id).name(name).link(link).account(account).active(true).build();
 

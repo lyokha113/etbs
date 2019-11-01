@@ -9,12 +9,11 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.firebase.cloud.StorageClient;
 import fpt.capstone.etbs.EtbsApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.annotation.PostConstruct;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class FirebaseConfig {
@@ -37,17 +36,15 @@ public class FirebaseConfig {
 
     InputStream serviceAccount = EtbsApplication.class.getResourceAsStream(SDK_FILE);
     GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccount);
-    FirestoreOptions firestoreOptions =
-        FirestoreOptions.newBuilder()
-            .setCredentials(credentials)
-            .setTimestampsInSnapshotsEnabled(true)
-            .build();
-    FirebaseOptions options =
-        new FirebaseOptions.Builder()
-            .setCredentials(credentials)
-            .setFirestoreOptions(firestoreOptions)
-            .setStorageBucket(BUCKET_URL)
-            .build();
+    FirestoreOptions firestoreOptions = FirestoreOptions.newBuilder()
+        .setCredentials(credentials)
+        .setTimestampsInSnapshotsEnabled(true)
+        .build();
+    FirebaseOptions options = new FirebaseOptions.Builder()
+        .setCredentials(credentials)
+        .setFirestoreOptions(firestoreOptions)
+        .setStorageBucket(BUCKET_URL)
+        .build();
     FirebaseApp.initializeApp(options);
   }
 }

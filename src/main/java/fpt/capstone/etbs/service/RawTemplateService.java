@@ -2,7 +2,6 @@ package fpt.capstone.etbs.service;
 
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.payload.RawTemplateCreateRequest;
-
 import java.util.UUID;
 
 public interface RawTemplateService {

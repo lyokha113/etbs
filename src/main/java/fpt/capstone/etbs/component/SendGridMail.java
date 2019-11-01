@@ -5,8 +5,13 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.sendgrid.helpers.mail.objects.*;
-
+import com.sendgrid.helpers.mail.objects.ASM;
+import com.sendgrid.helpers.mail.objects.Attachments;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
+import com.sendgrid.helpers.mail.objects.MailSettings;
+import com.sendgrid.helpers.mail.objects.Personalization;
+import com.sendgrid.helpers.mail.objects.TrackingSettings;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +31,9 @@ public class SendGridMail {
     SORTED_MAPPER.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
   }
 
-  /** The email's from field. */
+  /**
+   * The email's from field.
+   */
   @JsonProperty("from")
   public Email from;
   /**
@@ -42,13 +49,19 @@ public class SendGridMail {
    */
   @JsonProperty("personalizations")
   public List<Personalization> personalization;
-  /** The email's content. */
+  /**
+   * The email's content.
+   */
   @JsonProperty("content")
   public List<Content> content;
-  /** The email's attachments. */
+  /**
+   * The email's attachments.
+   */
   @JsonProperty("attachments")
   public List<Attachments> attachments;
-  /** The email's template ID. */
+  /**
+   * The email's template ID.
+   */
   @JsonProperty("template_id")
   public String templateId;
   /**
@@ -57,10 +70,14 @@ public class SendGridMail {
    */
   @JsonProperty("sections")
   public Map<String, String> sections;
-  /** The email's headers. */
+  /**
+   * The email's headers.
+   */
   @JsonProperty("headers")
   public Map<String, String> headers;
-  /** The email's categories. */
+  /**
+   * The email's categories.
+   */
   @JsonProperty("categories")
   public List<String> categories;
   /**
@@ -82,28 +99,39 @@ public class SendGridMail {
   /**
    * This ID represents a batch of emails to be sent at the same time. Including a batch_id in your
    * request allows you include this email in that batch, and also enables you to cancel or pause
-   * the delivery of that batch. For more information, see
-   * https://sendgrid.com/docs/API_Reference/Web_API_v3/cancel_schedule_send.
+   * the delivery of that batch. For more information, see https://sendgrid.com/docs/API_Reference/Web_API_v3/cancel_schedule_send.
    */
   @JsonProperty("batch_id")
   public String batchId;
-  /** The email's unsubscribe handling object. */
+  /**
+   * The email's unsubscribe handling object.
+   */
   @JsonProperty("asm")
   public ASM asm;
-  /** The email's IP pool name. */
+  /**
+   * The email's IP pool name.
+   */
   @JsonProperty("ip_pool_name")
   public String ipPoolId;
-  /** The email's mail settings. */
+  /**
+   * The email's mail settings.
+   */
   @JsonProperty("mail_settings")
   public MailSettings mailSettings;
-  /** The email's tracking settings. */
+  /**
+   * The email's tracking settings.
+   */
   @JsonProperty("tracking_settings")
   public TrackingSettings trackingSettings;
-  /** The email's reply to address. */
+  /**
+   * The email's reply to address.
+   */
   @JsonProperty("reply_to")
   public Email replyTo;
 
-  /** Construct a new Mail object. */
+  /**
+   * Construct a new Mail object.
+   */
   public SendGridMail() {
     return;
   }
@@ -111,9 +139,9 @@ public class SendGridMail {
   /**
    * Construct a new Mail object.
    *
-   * @param from the email's from address.
+   * @param from    the email's from address.
    * @param subject the email's subject line.
-   * @param to the email's recipient.
+   * @param to      the email's recipient.
    * @param content the email's content.
    */
   public SendGridMail(Email from, String subject, Email to, Content content) {
@@ -247,7 +275,8 @@ public class SendGridMail {
   }
 
   /**
-   * Get the email's attachments. Attachments added to the returned list will be included when sent.
+   * Get the email's attachments. Attachments added to the returned list will be included when
+   * sent.
    *
    * @return the email's attachments.
    */
@@ -303,7 +332,7 @@ public class SendGridMail {
   /**
    * Add a section to the email.
    *
-   * @param key the section's key.
+   * @param key   the section's key.
    * @param value the section's value.
    */
   public void addSection(String key, String value) {
@@ -323,7 +352,7 @@ public class SendGridMail {
   /**
    * Add a header to the email.
    *
-   * @param key the header's key.
+   * @param key   the header's key.
    * @param value the header's value.
    */
   public void addHeader(String key, String value) {
@@ -363,7 +392,7 @@ public class SendGridMail {
   /**
    * Add a custom argument to the email.
    *
-   * @param key argument's key.
+   * @param key   argument's key.
    * @param value the argument's value.
    */
   public void addCustomArg(String key, String value) {

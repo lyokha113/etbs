@@ -6,8 +6,14 @@ import fpt.capstone.etbs.constant.AuthProvider;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.UserPrincipal;
-import fpt.capstone.etbs.payload.*;
+import fpt.capstone.etbs.payload.AccountResponse;
+import fpt.capstone.etbs.payload.AccountUpdateRequest;
+import fpt.capstone.etbs.payload.ApiResponse;
+import fpt.capstone.etbs.payload.JwtAuthenticationResponse;
+import fpt.capstone.etbs.payload.LoginRequest;
+import fpt.capstone.etbs.payload.RegisterRequest;
 import fpt.capstone.etbs.service.AccountService;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,18 +22,23 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class UserController {
 
-  @Autowired private AccountService accountService;
+  @Autowired
+  private AccountService accountService;
 
-  @Autowired private AuthenticationManager authenticationManager;
+  @Autowired
+  private AuthenticationManager authenticationManager;
 
-  @Autowired private JwtTokenProvider tokenProvider;
+  @Autowired
+  private JwtTokenProvider tokenProvider;
 
   @GetMapping("/user")
   public ResponseEntity<ApiResponse> getUserDetail(Authentication auth) {
@@ -51,8 +62,7 @@ public class UserController {
   public ResponseEntity<ApiResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest)
       throws Exception {
     try {
-      Authentication authentication =
-          authenticationManager.authenticate(
+      Authentication authentication = authenticationManager.authenticate(
               new UsernamePasswordAuthenticationToken(
                   loginRequest.getEmail(), loginRequest.getPassword()));
       SecurityContextHolder.getContext().setAuthentication(authentication);

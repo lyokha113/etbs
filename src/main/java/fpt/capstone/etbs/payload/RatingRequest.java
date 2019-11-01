@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RatingRequest {
+
   private int templateId;
   private boolean vote;
 }

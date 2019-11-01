@@ -1,11 +1,20 @@
 package fpt.capstone.etbs.component;
 
+import static fpt.capstone.etbs.component.HttpCookieOAuth2AuthorizationRequest.REDIRECT_URI_PARAM_COOKIE_NAME;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.payload.AccountResponse;
 import fpt.capstone.etbs.util.CookieUtils;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Optional;
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -13,25 +22,17 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Optional;
-
-import static fpt.capstone.etbs.component.HttpCookieOAuth2AuthorizationRequest.REDIRECT_URI_PARAM_COOKIE_NAME;
-
 @Component
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
   @Value("${app.oauth2.authorizedRedirectUris}")
   private String authorizedRedirectUri;
 
-  @Autowired private JwtTokenProvider tokenProvider;
+  @Autowired
+  private JwtTokenProvider tokenProvider;
 
-  @Autowired private HttpCookieOAuth2AuthorizationRequest httpCookieOAuth2AuthorizationRequest;
+  @Autowired
+  private HttpCookieOAuth2AuthorizationRequest httpCookieOAuth2AuthorizationRequest;
 
   @Override
   public void onAuthenticationSuccess(
@@ -62,8 +63,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
     UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
-    AccountResponse account =
-        AccountResponse.builder()
+    AccountResponse account = AccountResponse.builder()
             .id(user.getId())
             .fullName(user.getFullName())
             .email(user.getEmail())

@@ -1,12 +1,11 @@
 package fpt.capstone.etbs.payload;
 
 import fpt.capstone.etbs.model.Account;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @Data
 @Builder

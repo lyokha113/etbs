@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RawTemplateResponse {
+
   private Integer id;
   private Integer workspaceId;
   private String name;

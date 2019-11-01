@@ -8,25 +8,29 @@ import fpt.capstone.etbs.payload.CategoryResponse;
 import fpt.capstone.etbs.payload.CategoryUpdateRequest;
 import fpt.capstone.etbs.service.CategoryService;
 import fpt.capstone.etbs.util.RoleUtils;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class CategoryController {
 
-  @Autowired private CategoryService categoryService;
+  @Autowired
+  private CategoryService categoryService;
 
   @GetMapping("/category")
   private ResponseEntity<ApiResponse> getCategories(Authentication auth) {
 
-    List<Category> categories =
-        RoleUtils.hasAdminRole(auth)
+    List<Category> categories = RoleUtils.hasAdminRole(auth)
             ? categoryService.getCategories()
             : categoryService.getActiveCategories();
 
