@@ -55,6 +55,7 @@ public class RawTemplateVersionServiceImpl implements RawTemplateVersionService 
         .name(request.getName())
         .template(rawTemplate)
         .content(rawTemplate.getCurrentVersion().getContent())
+        .thumbnail(rawTemplate.getCurrentVersion().getThumbnail())
         .build();
 
     version = rawTemplateVersionRepository.save(version);

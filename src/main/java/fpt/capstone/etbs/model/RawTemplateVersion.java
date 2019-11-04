@@ -49,6 +49,9 @@ public class RawTemplateVersion extends Auditing {
   @NotBlank
   private String content;
 
+  @Column(columnDefinition = "text")
+  private String thumbnail;
+
   @ManyToOne
   @NonNull
   private RawTemplate template;

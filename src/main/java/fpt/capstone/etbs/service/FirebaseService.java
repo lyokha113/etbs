@@ -8,11 +8,11 @@ public interface FirebaseService {
 
   String createTutorialImage(MultipartFile file, String path, String name) throws Exception;
 
-  String createRawTemplateThumbnail(MultipartFile file, String path, String name) throws Exception;
+  String createRawTemplateThumbnail(MultipartFile file, String name) throws Exception;
 
-  String createTemplateThumbnail(MultipartFile file, String path, String name) throws Exception;
+  String createTemplateThumbnail(MultipartFile file, String name) throws Exception;
 
-  String createTutorialThumbnail(MultipartFile file, String path, String name) throws Exception;
+  String createTutorialThumbnail(MultipartFile file, String name) throws Exception;
 
   boolean deleteImage(String fbPath) throws Exception;
 }

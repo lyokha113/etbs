@@ -15,6 +15,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -71,14 +72,22 @@ public class TemplateController {
 
   @PutMapping("/template/{id}")
   private ResponseEntity<ApiResponse> updateTemplate(
-      Authentication auth,
       @PathVariable("id") Integer id,
-      @Valid @RequestBody TemplateUpdateRequest request) {
-    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+      @Valid @RequestBody TemplateUpdateRequest request) throws Exception {
     try {
-      Template template = templateService.updateTemplate(userPrincipal.getId(), id, request);
+      Template template = templateService.updateTemplate(id, request);
       TemplateResponse response = TemplateResponse.setResponse(template);
       return ResponseEntity.ok(new ApiResponse<>(true, "Template updated", response));
+    } catch (BadRequestException ex) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
+  }
+
+  @DeleteMapping("/template/{id}")
+  public ResponseEntity<ApiResponse> deleteWorkspace(@PathVariable("id") int id) {
+    try {
+      templateService.deleteTemplate(id);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Template deleted", null));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }

@@ -3,6 +3,7 @@ package fpt.capstone.etbs.constant;
 import java.util.Arrays;
 
 public enum RoleEnum {
+
   ADMINISTRATOR(1, "ADMINISTRATOR"),
   USER(2, "USER");
 

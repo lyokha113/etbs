@@ -33,23 +33,23 @@ public class FirebaseServiceImpl implements FirebaseService {
   }
 
   @Override
-  public String createRawTemplateThumbnail(MultipartFile file, String path, String name)
+  public String createRawTemplateThumbnail(MultipartFile file, String name)
       throws Exception {
-    String fbPath = AppConstant.RAW_TEMPLATE_THUMBNAIL + path + "/" + name;
+    String fbPath = AppConstant.RAW_TEMPLATE_THUMBNAIL + name;
     return createImage(fbPath, file);
   }
 
   @Override
-  public String createTemplateThumbnail(MultipartFile file, String path, String name)
+  public String createTemplateThumbnail(MultipartFile file, String name)
       throws Exception {
-    String fbPath = AppConstant.TEMPLATE_THUMBNAIL + path + "/" + name;
+    String fbPath = AppConstant.TEMPLATE_THUMBNAIL + name;
     return createImage(fbPath, file);
   }
 
   @Override
-  public String createTutorialThumbnail(MultipartFile file, String path, String name)
+  public String createTutorialThumbnail(MultipartFile file, String name)
       throws Exception {
-    String fbPath = AppConstant.TUTORIAL_THUMBNAIL + path + "/" + name;
+    String fbPath = AppConstant.TUTORIAL_THUMBNAIL + name;
     return createImage(fbPath, file);
   }
 

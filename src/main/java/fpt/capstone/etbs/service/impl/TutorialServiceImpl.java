@@ -56,8 +56,8 @@ public class TutorialServiceImpl implements TutorialService {
 
     tutorial = tutorialRepository.save(tutorial);
 
-    String thumbnail = firebaseService.createTutorialThumbnail(
-        request.getThumbnail(), tutorial.getId().toString(), "thumbnail");
+    String thumbnail = firebaseService
+        .createTutorialThumbnail(request.getThumbnail(), tutorial.getId().toString());
 
     tutorial.setThumbnail(thumbnail);
     return tutorialRepository.save(tutorial);
@@ -71,8 +71,8 @@ public class TutorialServiceImpl implements TutorialService {
       throw new BadRequestException("Tutorial doesn't exist");
     }
 
-    String thumbnail = firebaseService.createTutorialThumbnail(
-        request.getThumbnail(), tutorial.getId().toString(), "thumbnail");
+    String thumbnail = firebaseService
+        .createTutorialThumbnail(request.getThumbnail(), tutorial.getId().toString());
 
     tutorial.setName(request.getName());
     tutorial.setDescription(request.getDescription());

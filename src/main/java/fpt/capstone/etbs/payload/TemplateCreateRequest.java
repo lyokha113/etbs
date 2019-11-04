@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TemplateCreateRequest {
 
-  private UUID rawTemplateId;
+  private Integer rawTemplateId;
   private String name;
   private String description;
   private List<Integer> categoryIds;

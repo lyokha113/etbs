@@ -11,7 +11,8 @@ public interface RawTemplateService {
 
   RawTemplate createRawTemplate(UUID accountId, RawTemplateCreateRequest request);
 
-  RawTemplate updateRawTemplate(UUID accountId, Integer id, RawTemplateUpdateRequest request);
+  RawTemplate updateRawTemplate(UUID accountId, Integer id, RawTemplateUpdateRequest request)
+      throws Exception;
 
   RawTemplate changeVersion(UUID accountId, Integer id, Integer versionId);
 

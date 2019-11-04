@@ -1,15 +1,20 @@
 package fpt.capstone.etbs.service.impl;
 
+import fpt.capstone.etbs.constant.AppConstant;
+import fpt.capstone.etbs.exception.BadRequestException;
+import fpt.capstone.etbs.model.Category;
+import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.TemplateCreateRequest;
 import fpt.capstone.etbs.payload.TemplateUpdateRequest;
-import fpt.capstone.etbs.repository.AccountRepository;
-import fpt.capstone.etbs.repository.CategoryRepository;
-import fpt.capstone.etbs.repository.RatingRepository;
+import fpt.capstone.etbs.repository.RawTemplateRepository;
 import fpt.capstone.etbs.repository.TemplateRepository;
+import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.TemplateService;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +22,13 @@ import org.springframework.stereotype.Service;
 public class TemplateServiceImpl implements TemplateService {
 
   @Autowired
-  TemplateRepository templateRepository;
+  private TemplateRepository templateRepository;
+
   @Autowired
-  AccountRepository accountRepository;
+  private RawTemplateRepository rawTemplateRepository;
+
   @Autowired
-  CategoryRepository categoryRepository;
-  @Autowired
-  RatingRepository ratingRepository;
+  private FirebaseService firebaseService;
 
   @Override
   public List<Template> getTemplates() {
@@ -47,12 +52,75 @@ public class TemplateServiceImpl implements TemplateService {
 
   @Override
   public Template createTemplate(UUID accountId, TemplateCreateRequest request) {
-    return null;
+
+    RawTemplate rawTemplate = rawTemplateRepository
+        .getByIdAndWorkspace_Account_Id(request.getRawTemplateId(), accountId)
+        .orElse(null);
+
+    if (rawTemplate == null) {
+      throw new BadRequestException("Raw template doesn't exist");
+    }
+
+    // Process publish stage
+    // Process categoryId
+    // Process thumbnail
+
+    Set<Category> categories = request.getCategoryIds()
+        .stream()
+        .map(cId -> Category.builder().id(cId).build())
+        .collect(Collectors.toSet());
+
+    Template template = Template.builder()
+        .name(request.getName())
+        .description(request.getDescription())
+        .thumbnail(AppConstant.DEFAULT_RAW_TEMPLATE_THUMBNAIL)
+        .content(rawTemplate.getCurrentVersion().getContent())
+        .author(rawTemplate.getWorkspace().getAccount())
+        .active(true)
+        .categories(categories)
+        .build();
+
+    return templateRepository.save(template);
+
   }
 
   @Override
-  public Template updateTemplate(UUID accountId, Integer id, TemplateUpdateRequest request) {
-    return null;
+  public Template updateTemplate(Integer id, TemplateUpdateRequest request) throws Exception {
+
+    Template template = templateRepository.findById(id).orElse(null);
+
+    if (template == null) {
+      throw new BadRequestException("Template doesn't exist");
+    }
+
+    // Process categoryId
+
+    Set<Category> categories = request.getCategoryIds()
+        .stream()
+        .map(cId -> Category.builder().id(cId).build())
+        .collect(Collectors.toSet());
+
+    String thumbnail = firebaseService.createTemplateThumbnail(request.getThumbnail(), id.toString());
+
+    template.setName(request.getName());
+    template.setContent(request.getContent());
+    template.setThumbnail(thumbnail);
+    template.setDescription(request.getDescription());
+    template.setActive(request.isActive());
+    template.setCategories(categories);
+    return templateRepository.save(template);
+  }
+
+  @Override
+  public void deleteTemplate(Integer id) {
+    Template template = templateRepository.findById(id).orElse(null);
+
+    if (template == null) {
+      throw new BadRequestException("Template doesn't exist");
+    }
+
+    templateRepository.delete(template);
+    // Process publish data
   }
 
   @Override
@@ -60,128 +128,4 @@ public class TemplateServiceImpl implements TemplateService {
     return null;
   }
 
-  //    @Override
-  //    public TemplateCreateResponse createTemplate(TemplateCreateRequest request) {
-  //        if (accountRepository.findById(request.getAuthor()).isPresent()) {
-  //            Template template = new Template();
-  //            template.setActive(true);
-  //            template.setVote(0);
-  //            template.setName(request.getName());
-  //            template.setAuthor(Account.builder().id(request.getAuthor()).build());
-  //            template.setContent(request.getContent());
-  //            template.setThumbnail("");
-  //            template.setDescription(request.getDescription());
-  //            Set<Category> categories = new HashSet<>();
-  //            for (int i = 0; i < request.getCategories().size(); i++) {
-  //                if (categoryRepository.findById(request.getCategories().get(i)).isPresent()) {
-  //
-  // categories.add(Category.builder().id(request.getCategories().get(i)).build());
-  //                }
-  //            }
-  //            template.setCategories(categories);
-  //            templateRepository.save(template);
-  //            TemplateCreateResponse response = new TemplateCreateResponse();
-  //            response.setId(template.getId());
-  //            response.setCategories(request.getCategories());
-  //            response.setThumbnail(template.getThumbnail());
-  //            return response;
-  //        }
-  //      }
-  //      templateRepository.save(template);
-  //      TemplateCreateResponse response = new TemplateCreateResponse();
-  //      response.setId(template.getId());
-  //      response.setCategories(request.getCategories());
-  //      response.setThumpnail(template.getThumbnail());
-  //      return response;
-  //    }
-  //    return null;
-  //  }
-  //
-  //  @Override
-  //  public TemplateResponse getTemplate(int id) {
-  //    if (templateRepository.findById(id).isPresent()) {
-  //      Template template = templateRepository.findById(id).get();
-  //      TemplateResponse temp = new TemplateResponse();
-  //      temp.setThumbnail(template.getThumbnail());
-  //      List<Category> categoryList = categoryRepository.getAllByTemplates(template);
-  //      List<CategoriesOfTemplate> list = new ArrayList<>();
-  //      for (Category category : categoryList) {
-  //        list.add(new CategoriesOfTemplate(category.getId(),
-  //            category.getName()));
-  //      }
-  //      temp.setContent(template.getContent());
-  //      temp.setDescription(template.getDescription());
-  //      temp.setCategories(list);
-  //      temp.setName(template.getName());
-  //    }
-  //    return null;
-  //  }
-  //
-  //    @Override
-  //    public boolean updateTemplate(int id, TemplateUpdateRequest request) {
-  //        if (templateRepository.findById(id).isPresent()) {
-  //            Template template = templateRepository.findById(id).get();
-  //            template.setActive(request.isActive());
-  //            template.setName(request.getName());
-  //            template.setAuthor(Account.builder().id(request.getAuthor()).build());
-  //            template.setContent(request.getContent());
-  //            template.setThumbnail(request.getThumbnail());
-  //            template.setDescription(request.getDescription());
-  //            for (int i = 0; i < request.getCategories().size(); i++) {
-  //                if (categoryRepository.findById(request.getCategories().get(i)).isPresent()) {
-  //
-  // template.getCategories().add(Category.builder().id(request.getCategories().get(i)).build());
-  //                }
-  //            }
-  //            templateRepository.save(template);
-  //            return true;
-  //        }
-  //      }
-  //      templateRepository.save(template);
-  //      return true;
-  //    }
-  //    return false;
-  //  }
-  //
-  //  @Override
-  //  public List<TemplateResponse> getListTemplate(UUID id) {
-  //    List<TemplateResponse> responses = new ArrayList<>();
-  //    List<Template> templateList = templateRepository.getAllByAuthor_Id(id);
-  //    return setValueToResponse(responses, templateList);
-  //  }
-  //
-  //    @Override
-  //    public List<TemplateResponse> getAllListTemplate() {
-  //        List<TemplateResponse> responses = new ArrayList<>();
-  //        List<Template> templateList = templateRepository.findAll();
-  //        return setValueToResponse(responses, templateList);
-  //    }
-  //
-  //    @Override
-  //    public List<TemplateResponse> getHighRatingTemplate(int quantity) {
-  //
-  //        return null;
-  //    }
-  //
-  //    private List<TemplateResponse> setValueToResponse(List<TemplateResponse> responses,
-  // List<Template> templateList) {
-  //        for (Template template : templateList) {
-  //            TemplateResponse temp = new TemplateResponse();
-  //            List<Category> categoryList = categoryRepository.getAllByTemplates(template);
-  //            List<CategoriesOfTemplate> list = new ArrayList<>();
-  //            for (Category category : categoryList) {
-  //                list.add(new CategoriesOfTemplate(category.getId(),
-  //                        category.getName()));
-  //            }
-  //            temp.setContent(template.getContent());
-  //            temp.setDescription(template.getDescription());
-  //            temp.setCategories(list);
-  //            temp.setThumbnail(template.getThumbnail());
-  //            temp.setName(template.getName());
-  //            responses.add(temp);
-  //        }
-  //        return responses;
-  //    }
-  //    return responses;
-  //  }
 }

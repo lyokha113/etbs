@@ -28,7 +28,7 @@ public class RawTemplateResponse {
     return RawTemplateResponse.builder()
         .id(rawTemplate.getId())
         .name(rawTemplate.getName())
-        .thumbnail(rawTemplate.getThumbnail())
+        .thumbnail(rawTemplate.getCurrentVersion().getThumbnail())
         .workspaceId(rawTemplate.getWorkspace().getId())
         .description(rawTemplate.getDescription())
         .currentVersion(VersionOfTemplate.setResponse(rawTemplate.getCurrentVersion()))

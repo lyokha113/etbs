@@ -18,7 +18,9 @@ public interface TemplateService {
 
   Template createTemplate(UUID accountId, TemplateCreateRequest request);
 
-  Template updateTemplate(UUID accountId, Integer id, TemplateUpdateRequest request);
+  Template updateTemplate(Integer id, TemplateUpdateRequest request) throws Exception;
+
+  void deleteTemplate(Integer id);
 
   List<Template> getHighRatingTemplate(int quantity);
 }

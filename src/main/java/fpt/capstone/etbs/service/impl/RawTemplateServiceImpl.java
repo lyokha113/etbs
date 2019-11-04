@@ -13,6 +13,7 @@ import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.RawTemplateRepository;
 import fpt.capstone.etbs.repository.RawTemplateVersionRepository;
 import fpt.capstone.etbs.repository.WorkspaceRepository;
+import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.RawTemplateService;
 import fpt.capstone.etbs.service.TemplateService;
 import java.util.UUID;
@@ -40,6 +41,9 @@ public class RawTemplateServiceImpl implements RawTemplateService {
   @Autowired
   private TemplateService templateService;
 
+  @Autowired
+  private FirebaseService firebaseService;
+
   @Override
   public RawTemplate getRawTemplate(Integer id, UUID accountId) {
     return rawTemplateRepository.getByIdAndWorkspace_Account_Id(id, accountId).orElse(null);
@@ -65,7 +69,6 @@ public class RawTemplateServiceImpl implements RawTemplateService {
 
     RawTemplate rawTemplate = RawTemplate.builder()
         .name(request.getName())
-        .thumbnail(AppConstant.DEFAULT_RAW_TEMPLATE_THUMBNAIL)
         .description(request.getDescription())
         .workspace(workspace)
         .build();
@@ -73,6 +76,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
     RawTemplateVersion currentVersion = RawTemplateVersion.builder()
         .name(AppConstant.DEFAULT_VERSION_NAME)
         .content("")
+        .thumbnail(AppConstant.DEFAULT_RAW_TEMPLATE_THUMBNAIL)
         .template(rawTemplate)
         .build();
 
@@ -85,6 +89,8 @@ public class RawTemplateServiceImpl implements RawTemplateService {
         throw new BadRequestException("Template doesn't exist");
       }
       currentVersion.setContent(template.getContent());
+
+      // Process thumbnail
     }
 
     return rawTemplateRepository.save(rawTemplate);
@@ -92,7 +98,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
 
   @Override
   public RawTemplate updateRawTemplate(UUID accountId, Integer id,
-      RawTemplateUpdateRequest request) {
+      RawTemplateUpdateRequest request) throws Exception {
 
     RawTemplate rawTemplate = rawTemplateRepository.getByIdAndWorkspace_Account_Id(id, accountId)
         .orElse(null);
@@ -114,8 +120,11 @@ public class RawTemplateServiceImpl implements RawTemplateService {
       rawTemplate.setDescription(request.getDescription());
     }
 
-    if (StringUtils.isEmpty(request.getContent())) {
+    if (StringUtils.isEmpty(request.getContent()) && request.getThumbnail() != null) {
       rawTemplate.getCurrentVersion().setContent(request.getContent());
+
+      String thumbnail = firebaseService.createTemplateThumbnail(request.getThumbnail(), rawTemplate.getId().toString());
+      rawTemplate.getCurrentVersion().setThumbnail(thumbnail);
     }
 
     return rawTemplateRepository.save(rawTemplate);
