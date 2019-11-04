@@ -20,10 +20,13 @@ import org.springframework.stereotype.Service;
 public class RawTemplateVersionServiceImpl implements RawTemplateVersionService {
 
   private static final int MAX_VERSION_EACH_TEMPLATE = 5;
+
   @Autowired
   private RawTemplateRepository rawTemplateRepository;
+
   @Autowired
   private RawTemplateVersionRepository rawTemplateVersionRepository;
+
   @Autowired
   private AccountRepository accountRepository;
 

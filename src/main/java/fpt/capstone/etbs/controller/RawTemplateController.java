@@ -39,11 +39,15 @@ public class RawTemplateController {
 
   @PostMapping("/raw")
   private ResponseEntity<ApiResponse> createRawTemplate(
-      Authentication auth, @Valid @RequestBody RawTemplateCreateRequest request) {
+      Authentication auth, @Valid @RequestBody RawTemplateCreateRequest request) throws Exception {
 
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       RawTemplate template = rawTemplateService.createRawTemplate(userPrincipal.getId(), request);
+      if (request.getTemplateId() != null) {
+        template = rawTemplateService
+            .updateRawTemplate(request.getTemplateId(), template, request.getThumbnail());
+      }
       RawTemplateResponse response = RawTemplateResponse.setResponseWithContent(template);
       return ResponseEntity.ok(new ApiResponse<>(true, "Raw template created", response));
     } catch (BadRequestException ex) {
@@ -59,7 +63,8 @@ public class RawTemplateController {
 
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      RawTemplate template = rawTemplateService.updateRawTemplate(userPrincipal.getId(), id, request);
+      RawTemplate template = rawTemplateService
+          .updateRawTemplate(userPrincipal.getId(), id, request);
       RawTemplateResponse response = RawTemplateResponse.setResponse(template);
       return ResponseEntity.ok(new ApiResponse<>(true, "Raw template updated", response));
     } catch (BadRequestException ex) {

@@ -5,6 +5,7 @@ import fpt.capstone.etbs.payload.TemplateCreateRequest;
 import fpt.capstone.etbs.payload.TemplateUpdateRequest;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface TemplateService {
 
@@ -19,6 +20,8 @@ public interface TemplateService {
   Template createTemplate(UUID accountId, TemplateCreateRequest request);
 
   Template updateTemplate(Integer id, TemplateUpdateRequest request) throws Exception;
+
+  Template updateThumbnail(Template template, MultipartFile thumbnail) throws Exception;
 
   void deleteTemplate(Integer id);
 

@@ -7,16 +7,20 @@ import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.TemplateCreateRequest;
 import fpt.capstone.etbs.payload.TemplateUpdateRequest;
+import fpt.capstone.etbs.repository.CategoryRepository;
 import fpt.capstone.etbs.repository.RawTemplateRepository;
 import fpt.capstone.etbs.repository.TemplateRepository;
 import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.TemplateService;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class TemplateServiceImpl implements TemplateService {
@@ -26,6 +30,9 @@ public class TemplateServiceImpl implements TemplateService {
 
   @Autowired
   private RawTemplateRepository rawTemplateRepository;
+
+  @Autowired
+  private CategoryRepository categoryRepository;
 
   @Autowired
   private FirebaseService firebaseService;
@@ -62,13 +69,8 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     // Process publish stage
-    // Process categoryId
-    // Process thumbnail
-
-    Set<Category> categories = request.getCategoryIds()
-        .stream()
-        .map(cId -> Category.builder().id(cId).build())
-        .collect(Collectors.toSet());
+    Set<Category> categories = new HashSet<>(categoryRepository
+        .getAllByActiveTrueAndIdIn(request.getCategoryIds()));
 
     Template template = Template.builder()
         .name(request.getName())
@@ -81,7 +83,6 @@ public class TemplateServiceImpl implements TemplateService {
         .build();
 
     return templateRepository.save(template);
-
   }
 
   @Override
@@ -93,13 +94,8 @@ public class TemplateServiceImpl implements TemplateService {
       throw new BadRequestException("Template doesn't exist");
     }
 
-    // Process categoryId
-
-    Set<Category> categories = request.getCategoryIds()
-        .stream()
-        .map(cId -> Category.builder().id(cId).build())
-        .collect(Collectors.toSet());
-
+    Set<Category> categories = new HashSet<>(categoryRepository
+        .getAllByActiveTrueAndIdIn(request.getCategoryIds()));
     String thumbnail = firebaseService.createTemplateThumbnail(request.getThumbnail(), id.toString());
 
     template.setName(request.getName());
@@ -108,6 +104,15 @@ public class TemplateServiceImpl implements TemplateService {
     template.setDescription(request.getDescription());
     template.setActive(request.isActive());
     template.setCategories(categories);
+    return templateRepository.save(template);
+  }
+
+  @Override
+  public Template updateThumbnail(Template template, MultipartFile thumbnail) throws Exception {
+    String link = firebaseService
+        .createTemplateThumbnail(thumbnail, template.getId().toString());
+
+    template.setThumbnail(link);
     return templateRepository.save(template);
   }
 

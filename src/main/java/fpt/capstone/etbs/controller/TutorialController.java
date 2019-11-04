@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.controller;
 
+import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Tutorial;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.TutorialRequest;
@@ -28,8 +29,8 @@ public class TutorialController {
   @GetMapping("/tutorial")
   public ResponseEntity<ApiResponse> getActiveTutorials(Authentication auth) {
     List<Tutorial> tutorials = RoleUtils.hasAdminRole(auth)
-            ? tutorialService.getTutorials()
-            : tutorialService.getActiveTutorials();
+        ? tutorialService.getTutorials()
+        : tutorialService.getActiveTutorials();
     List<TutorialResponse> response =
         tutorials.stream().map(TutorialResponse::setResponse).collect(Collectors.toList());
     return ResponseEntity.ok(new ApiResponse<>(true, "", response));
@@ -39,8 +40,8 @@ public class TutorialController {
   public ResponseEntity<ApiResponse> getActiveTutorial(
       Authentication auth, @PathVariable("id") Integer id) {
     Tutorial response = RoleUtils.hasAdminRole(auth)
-            ? tutorialService.getTutorial(id)
-            : tutorialService.getActiveTutorial(id);
+        ? tutorialService.getTutorial(id)
+        : tutorialService.getActiveTutorial(id);
     return response != null
         ? ResponseEntity.ok(
         new ApiResponse<>(true, "", TutorialResponse.setResponseWithContent(response)))
@@ -50,21 +51,26 @@ public class TutorialController {
   @PostMapping("/tutorial")
   public ResponseEntity<ApiResponse> createTutorial(@Valid @RequestBody TutorialRequest tutorial)
       throws Exception {
-    Tutorial response = tutorialService.createTutorial(tutorial);
-    return response != null
-        ? ResponseEntity.ok(
-        new ApiResponse<>(true, "Tutorial created", TutorialResponse.setResponse(response)))
-        : ResponseEntity.badRequest().body(new ApiResponse<>(true, "Tutorial create failed", null));
+    try {
+      Tutorial response = tutorialService.createTutorial(tutorial);
+      response = tutorialService.updateThumbnail(response, tutorial.getThumbnail());
+      return ResponseEntity.ok(
+          new ApiResponse<>(true, "Tutorial created", TutorialResponse.setResponse(response)));
+    } catch (BadRequestException ex) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
   }
 
   @PutMapping("/tutorial/{id}")
   public ResponseEntity<ApiResponse> updateTutorial(
       @PathVariable("id") Integer id, @Valid @RequestBody TutorialRequest tutorial)
       throws Exception {
-    Tutorial response = tutorialService.updateTutorial(id, tutorial);
-    return response != null
-        ? ResponseEntity.ok(
-        new ApiResponse<>(true, "Tutorial updated", TutorialResponse.setResponse(response)))
-        : ResponseEntity.badRequest().body(new ApiResponse<>(true, "Tutorial update failed", null));
+    try {
+      Tutorial response = tutorialService.updateTutorial(id, tutorial);
+      return ResponseEntity.ok(
+          new ApiResponse<>(true, "Tutorial updated", TutorialResponse.setResponse(response)));
+    } catch (BadRequestException ex) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
   }
 }

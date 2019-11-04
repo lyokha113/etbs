@@ -16,5 +16,6 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
   List<Category> getAllByActiveTrue();
 
-  List<Category> getAllByTemplates(Template template);
+  List<Category> getAllByActiveTrueAndIdIn(List<Integer> ids);
+
 }

@@ -10,6 +10,7 @@ import fpt.capstone.etbs.service.TutorialService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class TutorialServiceImpl implements TutorialService {
@@ -54,13 +55,8 @@ public class TutorialServiceImpl implements TutorialService {
         .active(true)
         .build();
 
-    tutorial = tutorialRepository.save(tutorial);
+    return  tutorialRepository.save(tutorial);
 
-    String thumbnail = firebaseService
-        .createTutorialThumbnail(request.getThumbnail(), tutorial.getId().toString());
-
-    tutorial.setThumbnail(thumbnail);
-    return tutorialRepository.save(tutorial);
   }
 
   @Override
@@ -80,6 +76,16 @@ public class TutorialServiceImpl implements TutorialService {
     tutorial.setActive(request.isActive());
     tutorial.setThumbnail(thumbnail);
 
+    return tutorialRepository.save(tutorial);
+  }
+
+  @Override
+  public Tutorial updateThumbnail(Tutorial tutorial, MultipartFile thumbnail) throws Exception {
+
+    String link = firebaseService
+        .createTutorialThumbnail(thumbnail, tutorial.getId().toString());
+
+    tutorial.setThumbnail(link);
     return tutorialRepository.save(tutorial);
   }
 }

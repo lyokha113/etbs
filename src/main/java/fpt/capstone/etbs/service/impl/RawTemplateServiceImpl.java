@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class RawTemplateServiceImpl implements RawTemplateService {
@@ -50,7 +51,8 @@ public class RawTemplateServiceImpl implements RawTemplateService {
   }
 
   @Override
-  public RawTemplate createRawTemplate(UUID accountId, RawTemplateCreateRequest request) {
+  public RawTemplate createRawTemplate(UUID accountId, RawTemplateCreateRequest request)
+      throws Exception {
     Account account = accountRepository.findById(accountId).orElse(null);
     if (account == null) {
       throw new BadRequestException("Account doesn't exist");
@@ -82,17 +84,6 @@ public class RawTemplateServiceImpl implements RawTemplateService {
 
     rawTemplate.setCurrentVersion(currentVersion);
     rawTemplate.setVersions(Stream.of(currentVersion).collect(Collectors.toSet()));
-
-    if (request.getTemplateId() != null) {
-      Template template = templateService.getActiveTemplate(request.getTemplateId());
-      if (template == null) {
-        throw new BadRequestException("Template doesn't exist");
-      }
-      currentVersion.setContent(template.getContent());
-
-      // Process thumbnail
-    }
-
     return rawTemplateRepository.save(rawTemplate);
   }
 
@@ -123,11 +114,30 @@ public class RawTemplateServiceImpl implements RawTemplateService {
     if (StringUtils.isEmpty(request.getContent()) && request.getThumbnail() != null) {
       rawTemplate.getCurrentVersion().setContent(request.getContent());
 
-      String thumbnail = firebaseService.createTemplateThumbnail(request.getThumbnail(), rawTemplate.getId().toString());
+      String thumbnail = firebaseService
+          .createTemplateThumbnail(request.getThumbnail(), rawTemplate.getId().toString());
       rawTemplate.getCurrentVersion().setThumbnail(thumbnail);
     }
 
     return rawTemplateRepository.save(rawTemplate);
+  }
+
+  @Override
+  public RawTemplate updateRawTemplate(Integer templateId, RawTemplate rawTemplate,
+      MultipartFile thumbnail) throws Exception {
+
+    Template template = templateService.getActiveTemplate(templateId);
+    if (template == null) {
+      throw new BadRequestException("Template doesn't exist");
+    }
+
+    RawTemplateUpdateRequest request = RawTemplateUpdateRequest.builder()
+        .content(template.getContent())
+        .thumbnail(thumbnail)
+        .build();
+    return updateRawTemplate(rawTemplate.getWorkspace().getAccount().getId(), rawTemplate.getId(),
+        request);
+
   }
 
   @Override
@@ -141,7 +151,8 @@ public class RawTemplateServiceImpl implements RawTemplateService {
     }
 
     RawTemplateVersion version = rawTemplateVersionRepository
-        .getByIdAndTemplate_IdAndTemplate_Workspace_Account_Id(versionId, rawTemplate.getId(), accountId)
+        .getByIdAndTemplate_IdAndTemplate_Workspace_Account_Id(versionId, rawTemplate.getId(),
+            accountId)
         .orElse(null);
 
     if (version == null) {

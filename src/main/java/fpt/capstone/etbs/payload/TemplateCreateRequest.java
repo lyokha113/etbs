@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class TemplateCreateRequest {
 
   private Integer rawTemplateId;
+  private MultipartFile thumbnail;
   private String name;
   private String description;
   private List<Integer> categoryIds;
