@@ -1,10 +1,14 @@
 package fpt.capstone.etbs.service;
 
 import fpt.capstone.etbs.model.RawTemplateVersion;
-import fpt.capstone.etbs.model.Template;
+import fpt.capstone.etbs.payload.RawTemplateVersionRequest;
+import java.util.UUID;
 
 public interface RawTemplateVersionService {
 
-  RawTemplateVersion createRawTemplateVersion(Template template, String name,
-      String json_content);
+  RawTemplateVersion createVersion(UUID accountId, RawTemplateVersionRequest request);
+
+  RawTemplateVersion updateVersion(UUID accountId, Integer id, RawTemplateVersionRequest request);
+
+  void deleteVersion(UUID accountId, Integer id);
 }

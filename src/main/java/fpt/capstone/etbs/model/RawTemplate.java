@@ -50,10 +50,6 @@ public class RawTemplate extends Auditing {
   @NotBlank
   private String name;
 
-  @Column(columnDefinition = "longtext")
-  @NotBlank
-  private String content;
-
   @Column(columnDefinition = "text")
   private String description;
 
@@ -71,6 +67,4 @@ public class RawTemplate extends Auditing {
   @OneToMany(mappedBy = "template", cascade = CascadeType.ALL)
   private Set<RawTemplateVersion> versions;
 
-  @Column(columnDefinition = "TINYINT(1) default 1")
-  private boolean active;
 }

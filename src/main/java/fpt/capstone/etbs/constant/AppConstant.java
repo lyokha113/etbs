@@ -2,7 +2,7 @@ package fpt.capstone.etbs.constant;
 
 public class AppConstant {
 
-  public static final String DEFAULT_WORKSPACE_NAME = "Default";
+  public static final String DEFAULT_WORKSPACE_NAME = "Default workspace";
   public static final String DEFAULT_VERSION_NAME = "Default version";
   public static final String DEFAULT_AVATAR_URL =
       "https://firebasestorage.googleapis.com/v0/b/etbs-441a1.appspot.com/o/default%2Fdefault_avatar.png?alt=media&token=ebb2ae07-77c1-4dd3-b5b3-985f4fb9eb99";

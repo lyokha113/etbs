@@ -74,7 +74,7 @@ public class EmailServiceImpl implements EmailService {
       throw new BadRequestException("Template doesn't existed");
     }
     String subject = template.getName().toUpperCase();
-    String content = template.getContent();
+    String content = template.getCurrentVersion().getContent();
 
     if (provider.equalsIgnoreCase(MailProvider.GMAIL.name())) {
       javaMailSender.send(createMessage(request, subject, content));
@@ -92,7 +92,7 @@ public class EmailServiceImpl implements EmailService {
       throw new BadRequestException("Template doesn't existed");
     }
     String subject = template.getName().toUpperCase();
-    String content = template.getContent();
+    String content = template.getCurrentVersion().getContent();
 
     if (provider.equalsIgnoreCase(MailProvider.GMAIL.name())) {
       createDraftGMail(

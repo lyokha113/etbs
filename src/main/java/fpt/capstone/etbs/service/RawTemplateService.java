@@ -2,6 +2,7 @@ package fpt.capstone.etbs.service;
 
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.payload.RawTemplateCreateRequest;
+import fpt.capstone.etbs.payload.RawTemplateUpdateRequest;
 import java.util.UUID;
 
 public interface RawTemplateService {
@@ -10,8 +11,9 @@ public interface RawTemplateService {
 
   RawTemplate createRawTemplate(UUID accountId, RawTemplateCreateRequest request);
 
-  //  RawTemplate updateRawTemplate(Integer workspaceId, Integer id, RawTemplateUpdateRequest
-  // request);
-  //
-  //  void deleteWorkspace(UUID accountId, Integer workspaceId);
+  RawTemplate updateRawTemplate(UUID accountId, Integer id, RawTemplateUpdateRequest request);
+
+  RawTemplate changeVersion(UUID accountId, Integer id, Integer versionId);
+
+  void deleteRawTemplate(UUID accountId, Integer id);
 }

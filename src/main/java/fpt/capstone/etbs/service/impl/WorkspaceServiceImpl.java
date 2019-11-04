@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.service.impl;
 
+import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.RawTemplate;
@@ -62,6 +63,11 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     if (workspace == null) {
       throw new BadRequestException("Workspace doesn't exist");
     }
+
+    if (workspace.getName().equals(AppConstant.DEFAULT_WORKSPACE_NAME)) {
+      throw new BadRequestException("Can't update default workspace name");
+    }
+
     if (isDuplicateNameEachAccount(request.getName(), accountId, workspaceId)) {
       throw new BadRequestException("Workspace name is existed");
     }
@@ -75,8 +81,13 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     Workspace workspace =
         workspaceRepository.getByIdAndAccount_Id(workspaceId, accountId).orElse(null);
+
     if (workspace == null) {
       throw new BadRequestException("Workspace doesn't exist");
+    }
+
+    if (workspace.getName().equals(AppConstant.DEFAULT_WORKSPACE_NAME)) {
+      throw new BadRequestException("Can't delete default workspace");
     }
 
     Set<RawTemplate> templates = workspace.getRawTemplates();

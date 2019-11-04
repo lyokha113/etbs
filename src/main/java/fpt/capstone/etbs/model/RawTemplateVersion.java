@@ -47,7 +47,7 @@ public class RawTemplateVersion extends Auditing {
 
   @Column(columnDefinition = "longtext")
   @NotBlank
-  private String jsonContent;
+  private String content;
 
   @ManyToOne
   @NonNull
