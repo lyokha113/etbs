@@ -14,17 +14,17 @@ import lombok.NoArgsConstructor;
 public class RatingResponse {
 
   private int templateId;
-  private int vote;
+  private int upVote;
   private int downVote;
 
   public static RatingResponse setResponse(Rating rating) {
     Template template = rating.getTemplate();
-    int vote = (int) template.getRatings().stream().filter(Rating::isVote).count();
+    int upVote = (int) template.getRatings().stream().filter(Rating::isVote).count();
     int downVote =
         (int) template.getRatings().stream().filter(r -> !r.isVote()).count();
     return RatingResponse.builder()
         .templateId(rating.getTemplate().getId())
-        .vote(vote)
+        .upVote(upVote)
         .downVote(downVote)
         .build();
   }

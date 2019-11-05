@@ -47,12 +47,12 @@ class TemplateOfCategory {
   private String authorName;
   private String authorId;
   private String thumbnail;
-  private int vote;
+  private int upVote;
   private int downVote;
   private boolean active;
 
   static TemplateOfCategory setResponse(Template template) {
-    int vote = (int) template.getRatings().stream().filter(Rating::isVote).count();
+    int upVote = (int) template.getRatings().stream().filter(Rating::isVote).count();
     int downVote =
         (int) template.getRatings().stream().filter(r -> !r.isVote()).count();
     return TemplateOfCategory.builder()
@@ -61,7 +61,7 @@ class TemplateOfCategory {
         .authorName(template.getAuthor().getFullName())
         .authorId(template.getAuthor().getId().toString())
         .thumbnail(template.getThumbnail())
-        .vote(vote)
+        .upVote(upVote)
         .downVote(downVote)
         .build();
   }

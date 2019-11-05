@@ -77,11 +77,10 @@ public class RawTemplateServiceImpl implements RawTemplateService {
 
     RawTemplateVersion currentVersion = RawTemplateVersion.builder()
         .name(AppConstant.DEFAULT_VERSION_NAME)
-        .content("")
+        .content("Test Content")
         .thumbnail(AppConstant.DEFAULT_RAW_TEMPLATE_THUMBNAIL)
         .template(rawTemplate)
         .build();
-
     rawTemplate.setCurrentVersion(currentVersion);
     rawTemplate.setVersions(Stream.of(currentVersion).collect(Collectors.toSet()));
     return rawTemplateRepository.save(rawTemplate);

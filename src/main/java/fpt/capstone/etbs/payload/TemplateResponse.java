@@ -24,7 +24,7 @@ public class TemplateResponse {
   private String authorId;
   private String content;
   private String thumbnail;
-  private int vote;
+  private int upVote;
   private int downVote;
   private boolean active;
   private String description;
@@ -36,17 +36,20 @@ public class TemplateResponse {
         categories == null
             ? new ArrayList<>()
             : categories.stream().map(CategoryOfTemplate::setResponse).collect(Collectors.toList());
-
-    int vote = (int) template.getRatings().stream().filter(Rating::isVote).count();
-    int downVote =
-        (int) template.getRatings().stream().filter(r -> !r.isVote()).count();
+    int upVote = 0;
+    int downVote = 0;
+    if (template.getRatings() != null) {
+      upVote = (int) template.getRatings().stream().filter(Rating::isVote).count();
+      downVote =
+          (int) template.getRatings().stream().filter(r -> !r.isVote()).count();
+    }
     return TemplateResponse.builder()
         .id(template.getId())
         .name(template.getName())
         .authorName(template.getAuthor().getFullName())
         .authorId(template.getAuthor().getId().toString())
         .thumbnail(template.getThumbnail())
-        .vote(vote)
+        .upVote(upVote)
         .downVote(downVote)
         .active(template.isActive())
         .description(template.getDescription())
