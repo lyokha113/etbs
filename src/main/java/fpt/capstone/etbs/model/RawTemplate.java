@@ -61,7 +61,7 @@ public class RawTemplate extends Auditing {
   @JoinColumn(name = "current_version_id", referencedColumnName = "id")
   private RawTemplateVersion currentVersion;
 
-  @OneToMany(mappedBy = "template", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<RawTemplateVersion> versions;
 
 }

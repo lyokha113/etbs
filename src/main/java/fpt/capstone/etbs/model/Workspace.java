@@ -52,6 +52,6 @@ public class Workspace extends Auditing {
   @NonNull
   private Account account;
 
-  @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<RawTemplate> rawTemplates;
 }

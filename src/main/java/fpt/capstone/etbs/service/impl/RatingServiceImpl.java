@@ -10,7 +10,11 @@ import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.RatingRepository;
 import fpt.capstone.etbs.repository.TemplateRepository;
 import fpt.capstone.etbs.service.RatingService;
+import java.util.HashSet;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +54,10 @@ public class RatingServiceImpl implements RatingService {
       rating = Rating.builder()
           .id(RatingIdentity.builder().accountId(accountId).templateId(template.getId()).build())
           .account(account).template(template).vote(request.isVote()).build();
-      return ratingRepository.save(rating);
+
+      rating = ratingRepository.save(rating);
+      template.setRatings(Stream.of(rating).collect(Collectors.toSet()));
+      return rating;
     }
 
     if (!rating.getAccount().getId().equals(accountId)) {
@@ -58,13 +65,13 @@ public class RatingServiceImpl implements RatingService {
     }
 
     if (rating.isVote() == request.isVote()) {
-      ratingRepository.delete(rating);
+      Rating finalRating = rating;
+      template.getRatings().removeIf(r -> r.equals(finalRating));
+      templateRepository.save(template);
       return null;
     }
 
     rating.setVote(request.isVote());
     return ratingRepository.save(rating);
-
-
   }
 }

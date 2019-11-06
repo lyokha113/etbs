@@ -7,4 +7,5 @@ import java.util.UUID;
 public interface RatingService {
 
   Rating rate(UUID accountId, RatingRequest request);
+
 }

@@ -73,6 +73,6 @@ public class Template extends Auditing {
       inverseJoinColumns = {@JoinColumn(name = "templates_id")})
   private Set<Category> categories;
 
-  @OneToMany(mappedBy = "template", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<Rating> ratings;
 }

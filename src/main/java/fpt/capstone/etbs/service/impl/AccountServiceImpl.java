@@ -56,7 +56,10 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
       throw new BadRequestException("Email is existed");
     }
 
-    return setNewAccount(request, Role.builder().id(RoleEnum.USER.getId()).build());
+    return setNewAccount(request, Role.builder()
+        .id(RoleEnum.USER.getId())
+        .name(RoleEnum.USER.toString())
+        .build());
   }
 
   @Override

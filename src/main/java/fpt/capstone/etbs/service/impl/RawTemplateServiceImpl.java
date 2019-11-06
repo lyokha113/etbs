@@ -110,13 +110,21 @@ public class RawTemplateServiceImpl implements RawTemplateService {
       rawTemplate.setDescription(request.getDescription());
     }
 
-    if (!StringUtils.isEmpty(request.getContent()) && request.getThumbnail() != null) {
+    if (!StringUtils.isEmpty(request.getContent())) {
       rawTemplate.getCurrentVersion().setContent(request.getContent());
-
-      String thumbnail = firebaseService
-          .createTemplateThumbnail(request.getThumbnail(), rawTemplate.getId().toString());
-      rawTemplate.getCurrentVersion().setThumbnail(thumbnail);
+//
+//      String thumbnail = firebaseService
+//          .createTemplateThumbnail(request.getThumbnail(), rawTemplate.getId().toString());
+//      rawTemplate.getCurrentVersion().setThumbnail(thumbnail);
     }
+
+//    if (!StringUtils.isEmpty(request.getContent()) && request.getThumbnail() != null) {
+//      rawTemplate.getCurrentVersion().setContent(request.getContent());
+//
+//      String thumbnail = firebaseService
+//          .createTemplateThumbnail(request.getThumbnail(), rawTemplate.getId().toString());
+//      rawTemplate.getCurrentVersion().setThumbnail(thumbnail);
+//    }
 
     return rawTemplateRepository.save(rawTemplate);
   }

@@ -46,7 +46,6 @@ public class TemplateResponse {
     return TemplateResponse.builder()
         .id(template.getId())
         .name(template.getName())
-        .content(template.getContent())
         .authorName(template.getAuthor().getFullName())
         .authorId(template.getAuthor().getId().toString())
         .thumbnail(template.getThumbnail())
