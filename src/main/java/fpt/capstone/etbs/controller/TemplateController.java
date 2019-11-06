@@ -75,7 +75,7 @@ public class TemplateController {
   @PutMapping("/template/{id}")
   private ResponseEntity<ApiResponse> updateTemplate(
       @PathVariable("id") Integer id,
-      @Valid @RequestBody TemplateUpdateRequest request) throws Exception {
+      @Valid @ModelAttribute TemplateUpdateRequest request) throws Exception {
     try {
       Template template = templateService.updateTemplate(id, request);
       TemplateResponse response = TemplateResponse.setResponse(template);

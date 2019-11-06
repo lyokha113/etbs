@@ -40,7 +40,8 @@ public class RawTemplateController {
 
   @PostMapping("/raw")
   private ResponseEntity<ApiResponse> createRawTemplate(
-      Authentication auth, @Valid @ModelAttribute RawTemplateCreateRequest request) throws Exception {
+      Authentication auth, @Valid @ModelAttribute RawTemplateCreateRequest request)
+      throws Exception {
 
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
@@ -58,10 +59,9 @@ public class RawTemplateController {
 
   @PutMapping("/raw/{id}")
   private ResponseEntity<ApiResponse> updateRawTemplate(
-      Authentication auth,
-      @PathVariable("id") Integer id,
-      @Valid @RequestBody RawTemplateUpdateRequest request) throws Exception {
-
+      Authentication auth, @PathVariable("id") Integer id,
+      @Valid @ModelAttribute RawTemplateUpdateRequest request)
+      throws Exception {
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       RawTemplate template = rawTemplateService

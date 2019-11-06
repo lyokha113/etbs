@@ -25,7 +25,7 @@ public class RatingController {
       Authentication auth, @Valid @RequestBody RatingRequest request) {
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     Rating rate = ratingService.rate(userPrincipal.getId(), request);
-    return rate == null
+    return rate != null
         ? ResponseEntity.ok(new ApiResponse<>(
         true, "Rated successful", RatingResponse.setResponse(rate)))
         : ResponseEntity.ok(new ApiResponse<>(
