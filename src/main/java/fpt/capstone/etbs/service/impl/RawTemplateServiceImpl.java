@@ -102,15 +102,15 @@ public class RawTemplateServiceImpl implements RawTemplateService {
       throw new BadRequestException("Template name is existed in this workspace");
     }
 
-    if (StringUtils.isEmpty(request.getName())) {
+    if (!StringUtils.isEmpty(request.getName())) {
       rawTemplate.setName(request.getName());
     }
 
-    if (StringUtils.isEmpty(request.getDescription())) {
+    if (!StringUtils.isEmpty(request.getDescription())) {
       rawTemplate.setDescription(request.getDescription());
     }
 
-    if (StringUtils.isEmpty(request.getContent()) && request.getThumbnail() != null) {
+    if (!StringUtils.isEmpty(request.getContent()) && request.getThumbnail() != null) {
       rawTemplate.getCurrentVersion().setContent(request.getContent());
 
       String thumbnail = firebaseService

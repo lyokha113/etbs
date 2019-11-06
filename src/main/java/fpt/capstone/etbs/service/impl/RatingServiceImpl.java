@@ -3,6 +3,7 @@ package fpt.capstone.etbs.service.impl;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Rating;
+import fpt.capstone.etbs.model.RatingIdentity;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.RatingRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
@@ -46,7 +47,9 @@ public class RatingServiceImpl implements RatingService {
             .orElse(null);
 
     if (rating == null) {
-      rating = Rating.builder().account(account).template(template).vote(request.isVote()).build();
+      rating = Rating.builder()
+          .id(RatingIdentity.builder().accountId(accountId).templateId(template.getId()).build())
+          .account(account).template(template).vote(request.isVote()).build();
       return ratingRepository.save(rating);
     }
 

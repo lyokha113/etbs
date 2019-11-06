@@ -112,19 +112,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers("/user")
         .hasAnyRole(RoleEnum.ADMINISTRATOR.getName(), RoleEnum.USER.getName())
         // User
-        .antMatchers(HttpMethod.GET, "/file", "file/*", "/workspace", "/workspace/*", "/raw/**")
+        .antMatchers(HttpMethod.GET, "/rating", "/file", "file/*", "/workspace", "/workspace/*",
+            "/raw/**")
         .hasRole(RoleEnum.USER.getName())
-        .antMatchers(HttpMethod.POST, "/template", "/file", "/workspace", "/email/*", "/rate",
+        .antMatchers(HttpMethod.POST, "/rating", "/template", "/file", "/workspace", "/email/*",
+            "/rate",
             "/raw", "/version")
         .hasRole(RoleEnum.USER.getName())
-        .antMatchers(HttpMethod.PUT, "/file/*", "/workspace/*", "/raw/**", "/version/*")
+        .antMatchers(HttpMethod.PUT, "/rating", "/file/*", "/workspace/*", "/raw/**", "/version/*")
         .hasRole(RoleEnum.USER.getName())
-        .antMatchers(HttpMethod.DELETE, "/file/*", "/workspace/*", "/raw/*", "/version/*")
+        .antMatchers(HttpMethod.DELETE, "/rating", "/file/*", "/workspace/*", "/raw/*",
+            "/version/*")
         .hasRole(RoleEnum.USER.getName())
         // Administrator
         .antMatchers(HttpMethod.GET, "/account")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
-        .antMatchers(HttpMethod.POST, "/category", "/template", "/account")
+        .antMatchers(HttpMethod.POST, "/category", "/account")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
         .antMatchers(HttpMethod.PUT, "/category/*", "/template/*", "/account")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
