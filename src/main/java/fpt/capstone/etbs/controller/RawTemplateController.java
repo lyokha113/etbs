@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 public class RawTemplateController {
@@ -48,7 +49,7 @@ public class RawTemplateController {
       RawTemplate template = rawTemplateService.createRawTemplate(userPrincipal.getId(), request);
       if (request.getTemplateId() != null) {
         template = rawTemplateService
-            .updateRawTemplate(request.getTemplateId(), template, request.getThumbnail());
+            .updateRawTemplate(request.getTemplateId(), template);
       }
       RawTemplateResponse response = RawTemplateResponse.setResponseWithContent(template);
       return ResponseEntity.ok(new ApiResponse<>(true, "Raw template created", response));

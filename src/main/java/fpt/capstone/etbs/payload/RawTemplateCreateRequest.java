@@ -14,7 +14,6 @@ public class RawTemplateCreateRequest {
 
   private String name;
   private String description;
-  private MultipartFile thumbnail;
   private Integer templateId;
   private Integer workspaceId;
 }

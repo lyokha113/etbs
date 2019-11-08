@@ -1,6 +1,7 @@
 package fpt.capstone.etbs.service.impl;
 
 import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Blob.BlobSourceOption;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Bucket;
@@ -9,6 +10,7 @@ import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.service.FirebaseService;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
+import org.graalvm.compiler.core.common.type.ArithmeticOpTable.BinaryOp.Mul;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,10 +35,18 @@ public class FirebaseServiceImpl implements FirebaseService {
   }
 
   @Override
-  public String createRawTemplateThumbnail(MultipartFile file, String name)
+  public String createRawTemplateThumbnail(Integer templateId, String name)
       throws Exception {
-    String fbPath = AppConstant.RAW_TEMPLATE_THUMBNAIL + name;
-    return createImage(fbPath, file);
+    String fbPath = AppConstant.TEMPLATE_THUMBNAIL + templateId;
+    Storage storage = bucket.getStorage();
+    BlobId blobId = BlobId.of(bucket.getName(), fbPath);
+    Blob blob = storage.get(blobId);
+    fbPath = AppConstant.RAW_TEMPLATE_THUMBNAIL + name;
+    blobId = BlobId.of(bucket.getName(), fbPath);
+    blob.copyTo(blobId);
+    blob = storage.get(blobId);
+    URL url = blob.signUrl(365, TimeUnit.DAYS);
+    return url.toString();
   }
 
   @Override

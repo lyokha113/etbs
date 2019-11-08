@@ -117,7 +117,6 @@ public class RawTemplateServiceImpl implements RawTemplateService {
 //          .createTemplateThumbnail(request.getThumbnail(), rawTemplate.getId().toString());
 //      rawTemplate.getCurrentVersion().setThumbnail(thumbnail);
     }
-
 //    if (!StringUtils.isEmpty(request.getContent()) && request.getThumbnail() != null) {
 //      rawTemplate.getCurrentVersion().setContent(request.getContent());
 //
@@ -125,19 +124,22 @@ public class RawTemplateServiceImpl implements RawTemplateService {
 //          .createTemplateThumbnail(request.getThumbnail(), rawTemplate.getId().toString());
 //      rawTemplate.getCurrentVersion().setThumbnail(thumbnail);
 //    }
-
+    if (!StringUtils.isEmpty(request.getThumbnail())) {
+      rawTemplate.getCurrentVersion().setThumbnail(request.getThumbnail());
+    }
     return rawTemplateRepository.save(rawTemplate);
   }
 
   @Override
-  public RawTemplate updateRawTemplate(Integer templateId, RawTemplate rawTemplate,
-      MultipartFile thumbnail) throws Exception {
+  public RawTemplate updateRawTemplate(Integer templateId, RawTemplate rawTemplate)
+      throws Exception {
 
     Template template = templateService.getActiveTemplate(templateId);
     if (template == null) {
       throw new BadRequestException("Template doesn't exist");
     }
-
+    String thumbnail = firebaseService
+        .createRawTemplateThumbnail(template.getId(), rawTemplate.getName());
     RawTemplateUpdateRequest request = RawTemplateUpdateRequest.builder()
         .content(template.getContent())
         .thumbnail(thumbnail)

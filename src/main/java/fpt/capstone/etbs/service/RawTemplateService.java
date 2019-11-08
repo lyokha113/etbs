@@ -16,7 +16,7 @@ public interface RawTemplateService {
   RawTemplate updateRawTemplate(UUID accountId, Integer id, RawTemplateUpdateRequest request)
       throws Exception;
 
-  RawTemplate updateRawTemplate(Integer templateId, RawTemplate rawTemplate, MultipartFile thumbnail) throws Exception;
+  RawTemplate updateRawTemplate(Integer templateId, RawTemplate rawTemplate) throws Exception;
 
   RawTemplate changeVersion(UUID accountId, Integer id, Integer versionId);
 
