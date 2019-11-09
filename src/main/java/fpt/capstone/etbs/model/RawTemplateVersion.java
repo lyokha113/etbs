@@ -54,6 +54,6 @@ public class RawTemplateVersion extends Auditing {
 
   @ManyToOne
   @NonNull
-  private RawTemplate template;
+  private RawTemplate rawTemplate;
 
 }

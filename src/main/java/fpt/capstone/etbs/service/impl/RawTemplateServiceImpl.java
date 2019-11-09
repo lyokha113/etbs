@@ -22,7 +22,6 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class RawTemplateServiceImpl implements RawTemplateService {
@@ -79,7 +78,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
         .name(AppConstant.DEFAULT_VERSION_NAME)
         .content("Test Content")
         .thumbnail(AppConstant.DEFAULT_RAW_TEMPLATE_THUMBNAIL)
-        .template(rawTemplate)
+        .rawTemplate(rawTemplate)
         .build();
     rawTemplate.setCurrentVersion(currentVersion);
     rawTemplate.setVersions(Stream.of(currentVersion).collect(Collectors.toSet()));
@@ -160,7 +159,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
     }
 
     RawTemplateVersion version = rawTemplateVersionRepository
-        .getByIdAndTemplate_IdAndTemplate_Workspace_Account_Id(versionId, rawTemplate.getId(),
+        .getByIdAndRawTemplate_IdAndRawTemplate_Workspace_Account_Id(versionId, rawTemplate.getId(),
             accountId)
         .orElse(null);
 

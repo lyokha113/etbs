@@ -56,7 +56,7 @@ public class RawTemplateVersionServiceImpl implements RawTemplateVersionService 
 
     RawTemplateVersion version = RawTemplateVersion.builder()
         .name(request.getName())
-        .template(rawTemplate)
+        .rawTemplate(rawTemplate)
         .content(rawTemplate.getCurrentVersion().getContent())
         .thumbnail(rawTemplate.getCurrentVersion().getThumbnail())
         .build();
@@ -76,7 +76,7 @@ public class RawTemplateVersionServiceImpl implements RawTemplateVersionService 
       RawTemplateVersionRequest request) {
 
     RawTemplateVersion version = rawTemplateVersionRepository
-        .getByIdAndTemplate_IdAndTemplate_Workspace_Account_Id(id, request.getRawTemplateId(), accountId)
+        .getByIdAndRawTemplate_IdAndRawTemplate_Workspace_Account_Id(id, request.getRawTemplateId(), accountId)
         .orElse(null);
 
     if (version == null) {
@@ -99,7 +99,7 @@ public class RawTemplateVersionServiceImpl implements RawTemplateVersionService 
   public void deleteVersion(UUID accountId, Integer id) {
 
     RawTemplateVersion version = rawTemplateVersionRepository
-        .getByIdAndTemplate_Workspace_Account_Id(id, accountId)
+        .getByIdAndRawTemplate_Workspace_Account_Id(id, accountId)
         .orElse(null);
 
     if (version == null) {
@@ -110,7 +110,7 @@ public class RawTemplateVersionServiceImpl implements RawTemplateVersionService 
       throw new BadRequestException("Can't delete default version");
     }
 
-    RawTemplate rawTemplate = version.getTemplate();
+    RawTemplate rawTemplate = version.getRawTemplate();
     if (version.getId().equals(rawTemplate.getCurrentVersion().getId())) {
       RawTemplateVersion defaultVersion = rawTemplate.getVersions().stream()
           .filter(v -> v.getName().equals(AppConstant.DEFAULT_VERSION_NAME)).findAny().orElse(null);
@@ -126,7 +126,7 @@ public class RawTemplateVersionServiceImpl implements RawTemplateVersionService 
   }
 
   private boolean isDuplicateNameEachTemplate(String name, Integer templateId, Integer id) {
-    return rawTemplateVersionRepository.getByNameAndTemplate_IdAndIdNot(name, templateId, id)
+    return rawTemplateVersionRepository.getByNameAndRawTemplate_IdAndIdNot(name, templateId, id)
         .isPresent();
   }
 }
