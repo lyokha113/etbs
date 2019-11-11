@@ -1,7 +1,6 @@
 package fpt.capstone.etbs.service.impl;
 
 import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.Blob.BlobSourceOption;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Bucket;
@@ -10,7 +9,6 @@ import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.service.FirebaseService;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
-import org.graalvm.compiler.core.common.type.ArithmeticOpTable.BinaryOp.Mul;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
