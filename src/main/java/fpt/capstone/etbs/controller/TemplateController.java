@@ -69,7 +69,7 @@ public class TemplateController {
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       Template template = templateService.createTemplate(userPrincipal.getId(), request);
-      template = templateService.updateThumbnail(template, request.getThumbnail());
+      template = templateService.updateThumbnail(template, request.getRawTemplateId());
       TemplateResponse response = TemplateResponse.setResponse(template);
       return ResponseEntity.ok(new ApiResponse<>(true, "Template created", response));
     } catch (BadRequestException ex) {
