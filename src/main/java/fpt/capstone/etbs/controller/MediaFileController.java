@@ -1,12 +1,12 @@
 package fpt.capstone.etbs.controller;
 
+import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.MediaFile;
 import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.MediaFileResponse;
 import fpt.capstone.etbs.payload.MediaFileUpdateRequest;
-import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.MediaFileService;
 import java.util.List;
 import java.util.UUID;
@@ -31,8 +31,12 @@ public class MediaFileController {
   @Autowired
   private MediaFileService mediaFileService;
 
+  @Autowired
+  private AuthenticationFacade authenticationFacade;
+
   @GetMapping("/file")
-  public ResponseEntity<ApiResponse> getMediaFilesOfAccount(Authentication auth) {
+  public ResponseEntity<ApiResponse> getMediaFilesOfAccount() {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     List<MediaFile> files = mediaFileService.getMediaFilesOfAccount(userPrincipal.getId());
     List<MediaFileResponse> response =
@@ -42,7 +46,8 @@ public class MediaFileController {
 
   @GetMapping("/file/{id}")
   public ResponseEntity<ApiResponse> getMediaFileOfAccount(
-      Authentication auth, @PathVariable("id") UUID id) {
+      @PathVariable("id") UUID id) {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     MediaFile response = mediaFileService.getMediaFileOfAccount(id, userPrincipal.getId());
     return response != null
@@ -52,9 +57,9 @@ public class MediaFileController {
 
   @PostMapping("/file")
   public ResponseEntity<ApiResponse> createMediaFile(
-      Authentication auth,
       @RequestParam("file") MultipartFile file,
       @RequestParam("name") String name) throws Exception {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     UUID id = UUID.randomUUID();
     try {
@@ -69,9 +74,9 @@ public class MediaFileController {
 
   @PutMapping("/file/{id}")
   public ResponseEntity<ApiResponse> updateMediaFile(
-      Authentication auth,
       @PathVariable("id") UUID id,
       @Valid @RequestBody MediaFileUpdateRequest request) {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       MediaFile mediaFile = mediaFileService.updateMediaFile(userPrincipal.getId(), id, request);
@@ -84,7 +89,8 @@ public class MediaFileController {
 
   @DeleteMapping("/file/{id}")
   public ResponseEntity<ApiResponse> deleteMediaFile(
-      Authentication auth, @PathVariable("id") UUID id) {
+      @PathVariable("id") UUID id) {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       mediaFileService.deactivateMediaFile(userPrincipal.getId(), id);

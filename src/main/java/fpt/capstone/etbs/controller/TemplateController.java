@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.controller;
 
+import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.model.UserPrincipal;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -30,9 +30,13 @@ public class TemplateController {
   @Autowired
   private TemplateService templateService;
 
-  @GetMapping("/template")
-  private ResponseEntity<ApiResponse> getTemplates(Authentication auth) {
+  @Autowired
+  private AuthenticationFacade authenticationFacade;
 
+  @GetMapping("/template")
+  private ResponseEntity<ApiResponse> getTemplates() {
+
+    Authentication auth = authenticationFacade.getAuthentication();
     List<Template> templates =
         RoleUtils.hasAdminRole(auth)
             ? templateService.getTemplates()
@@ -44,9 +48,9 @@ public class TemplateController {
   }
 
   @GetMapping("/template/{id}")
-  private ResponseEntity<ApiResponse> getTemplate(
-      Authentication auth, @PathVariable("id") Integer id) {
+  private ResponseEntity<ApiResponse> getTemplate(@PathVariable("id") Integer id) {
 
+    Authentication auth = authenticationFacade.getAuthentication();
     Template response =
         RoleUtils.hasAdminRole(auth)
             ? templateService.getTemplate(id)
@@ -60,7 +64,8 @@ public class TemplateController {
 
   @PostMapping("/template")
   private ResponseEntity<ApiResponse> createTemplate(
-      Authentication auth, @Valid @ModelAttribute TemplateCreateRequest request) throws Exception {
+      @Valid @ModelAttribute TemplateCreateRequest request) throws Exception {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       Template template = templateService.createTemplate(userPrincipal.getId(), request);

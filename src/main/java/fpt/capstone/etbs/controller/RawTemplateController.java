@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.controller;
 
+import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.model.UserPrincipal;
@@ -27,9 +28,12 @@ public class RawTemplateController {
   @Autowired
   private RawTemplateService rawTemplateService;
 
+  @Autowired
+  private AuthenticationFacade authenticationFacade;
+
   @GetMapping("/raw/{id}")
-  public ResponseEntity<ApiResponse> getRawTemplate(
-      Authentication auth, @PathVariable("id") Integer id) {
+  public ResponseEntity<ApiResponse> getRawTemplate(@PathVariable("id") Integer id) {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     RawTemplate response = rawTemplateService.getRawTemplate(id, userPrincipal.getId());
     return response != null
@@ -40,9 +44,9 @@ public class RawTemplateController {
 
   @PostMapping("/raw")
   private ResponseEntity<ApiResponse> createRawTemplate(
-      Authentication auth, @Valid @ModelAttribute RawTemplateCreateRequest request)
+      @Valid @ModelAttribute RawTemplateCreateRequest request)
       throws Exception {
-
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       RawTemplate template = rawTemplateService.createRawTemplate(userPrincipal.getId(), request);
@@ -59,9 +63,10 @@ public class RawTemplateController {
 
   @PutMapping("/raw/{id}")
   private ResponseEntity<ApiResponse> updateRawTemplate(
-      Authentication auth, @PathVariable("id") Integer id,
+      @PathVariable("id") Integer id,
       @Valid @RequestBody RawTemplateUpdateRequest request)
       throws Exception {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       RawTemplate template = rawTemplateService
@@ -75,10 +80,10 @@ public class RawTemplateController {
 
   @PutMapping("/raw/{id}/version/{vid}")
   private ResponseEntity<ApiResponse> changeVersion(
-      Authentication auth,
+
       @PathVariable("id") Integer id,
       @PathVariable("vid") Integer versionId) {
-
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       RawTemplate template = rawTemplateService.changeVersion(userPrincipal.getId(), id, versionId);
@@ -91,7 +96,8 @@ public class RawTemplateController {
 
   @DeleteMapping("/raw/{id}")
   public ResponseEntity<ApiResponse> deleteRawTemplate(
-      Authentication auth, @PathVariable("id") int id) {
+      @PathVariable("id") int id) {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       rawTemplateService.deleteRawTemplate(userPrincipal.getId(), id);

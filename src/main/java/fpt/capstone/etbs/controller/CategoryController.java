@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.controller;
 
+import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Category;
 import fpt.capstone.etbs.payload.ApiResponse;
@@ -27,12 +28,16 @@ public class CategoryController {
   @Autowired
   private CategoryService categoryService;
 
-  @GetMapping("/category")
-  private ResponseEntity<ApiResponse> getCategories(Authentication auth) {
+  @Autowired
+  private AuthenticationFacade authenticationFacade;
 
+  @GetMapping("/category")
+  private ResponseEntity<ApiResponse> getCategories() {
+
+    Authentication auth = authenticationFacade.getAuthentication();
     List<Category> categories = RoleUtils.hasAdminRole(auth)
-            ? categoryService.getCategories()
-            : categoryService.getActiveCategories();
+        ? categoryService.getCategories()
+        : categoryService.getActiveCategories();
 
     List<CategoryResponse> response =
         categories.stream().map(CategoryResponse::setResponse).collect(Collectors.toList());

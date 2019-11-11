@@ -76,7 +76,8 @@ public class RawTemplateVersionServiceImpl implements RawTemplateVersionService 
       RawTemplateVersionRequest request) {
 
     RawTemplateVersion version = rawTemplateVersionRepository
-        .getByIdAndTemplate_IdAndTemplate_Workspace_Account_Id(id, request.getRawTemplateId(), accountId)
+        .getByIdAndTemplate_IdAndTemplate_Workspace_Account_Id(id, request.getRawTemplateId(),
+            accountId)
         .orElse(null);
 
     if (version == null) {

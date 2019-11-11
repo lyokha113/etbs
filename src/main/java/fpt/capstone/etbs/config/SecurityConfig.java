@@ -105,7 +105,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
         // All
         .antMatchers(HttpMethod.POST, "/login", "/register")
-        .anonymous()
+        .permitAll()
         .antMatchers(HttpMethod.GET, "/category", "/template", "/template/*")
         .permitAll()
         // Logged

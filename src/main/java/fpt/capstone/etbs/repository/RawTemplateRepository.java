@@ -13,5 +13,6 @@ public interface RawTemplateRepository extends JpaRepository<RawTemplate, Intege
 
   Optional<RawTemplate> getByNameAndWorkspace_Id(String name, Integer workspaceId);
 
-  Optional<RawTemplate> getByNameAndWorkspace_IdAndIdNot(String name, Integer workspaceId, Integer id);
+  Optional<RawTemplate> getByNameAndWorkspace_IdAndIdNot(String name, Integer workspaceId,
+      Integer id);
 }

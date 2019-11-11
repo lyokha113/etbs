@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class AccountServiceImpl extends DefaultOAuth2UserService implements AccountService {
@@ -92,8 +93,10 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
     }
 
     account.setFullName(request.getFullName());
-    account.setPassword(passwordEncoder.encode(request.getPassword()));
     account.setActive(request.isActive());
+    if (!StringUtils.isEmpty(request.getPassword())) {
+      account.setPassword(passwordEncoder.encode(request.getPassword()));
+    }
     return accountRepository.save(account);
   }
 

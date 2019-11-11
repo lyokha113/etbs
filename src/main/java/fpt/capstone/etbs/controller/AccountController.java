@@ -2,14 +2,10 @@ package fpt.capstone.etbs.controller;
 
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
-import fpt.capstone.etbs.model.UserPrincipal;
-import fpt.capstone.etbs.model.Workspace;
 import fpt.capstone.etbs.payload.AccountCreateRequest;
 import fpt.capstone.etbs.payload.AccountResponse;
 import fpt.capstone.etbs.payload.AccountUpdateRequest;
 import fpt.capstone.etbs.payload.ApiResponse;
-import fpt.capstone.etbs.payload.WorkspaceRequest;
-import fpt.capstone.etbs.payload.WorkspaceResponse;
 import fpt.capstone.etbs.service.AccountService;
 import java.util.List;
 import java.util.UUID;
@@ -17,7 +13,6 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,7 +35,8 @@ public class AccountController {
   }
 
   @PostMapping("/account")
-  public ResponseEntity<ApiResponse> createAccount(@Valid @RequestBody AccountCreateRequest request) {
+  public ResponseEntity<ApiResponse> createAccount(
+      @Valid @RequestBody AccountCreateRequest request) {
     try {
       Account account = accountService.createAccount(request);
       AccountResponse response = AccountResponse.setResponse(account);

@@ -1,7 +1,6 @@
 package fpt.capstone.etbs.service;
 
 import fpt.capstone.etbs.model.RawTemplate;
-import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.RawTemplateCreateRequest;
 import fpt.capstone.etbs.payload.RawTemplateUpdateRequest;
 import java.util.UUID;
@@ -16,7 +15,8 @@ public interface RawTemplateService {
   RawTemplate updateRawTemplate(UUID accountId, Integer id, RawTemplateUpdateRequest request)
       throws Exception;
 
-  RawTemplate updateRawTemplate(Integer templateId, RawTemplate rawTemplate, MultipartFile thumbnail) throws Exception;
+  RawTemplate updateRawTemplate(Integer templateId, RawTemplate rawTemplate,
+      MultipartFile thumbnail) throws Exception;
 
   RawTemplate changeVersion(UUID accountId, Integer id, Integer versionId);
 

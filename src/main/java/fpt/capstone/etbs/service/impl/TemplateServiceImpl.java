@@ -16,8 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -96,7 +94,8 @@ public class TemplateServiceImpl implements TemplateService {
 
     Set<Category> categories = new HashSet<>(categoryRepository
         .getAllByActiveTrueAndIdIn(request.getCategoryIds()));
-    String thumbnail = firebaseService.createTemplateThumbnail(request.getThumbnail(), id.toString());
+    String thumbnail = firebaseService
+        .createTemplateThumbnail(request.getThumbnail(), id.toString());
 
     template.setName(request.getName());
     template.setContent(request.getContent());

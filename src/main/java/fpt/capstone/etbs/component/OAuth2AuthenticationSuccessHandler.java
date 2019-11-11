@@ -64,14 +64,14 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
     AccountResponse account = AccountResponse.builder()
-            .id(user.getId())
-            .fullName(user.getFullName())
-            .email(user.getEmail())
-            .imageUrl(user.getImageUrl())
-            .active(true)
-            .roleName(RoleEnum.USER.getName())
-            .roleId(RoleEnum.USER.getId())
-            .build();
+        .id(user.getId())
+        .fullName(user.getFullName())
+        .email(user.getEmail())
+        .imageUrl(user.getImageUrl())
+        .active(true)
+        .roleName(RoleEnum.USER.getName())
+        .roleId(RoleEnum.USER.getId())
+        .build();
     String token = tokenProvider.generateToken(account);
 
     return UriComponentsBuilder.fromUriString(targetUrl)
