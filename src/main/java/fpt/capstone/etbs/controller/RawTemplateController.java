@@ -44,7 +44,7 @@ public class RawTemplateController {
 
   @PostMapping("/raw")
   private ResponseEntity<ApiResponse> createRawTemplate(
-      @Valid @ModelAttribute RawTemplateCreateRequest request)
+      @Valid @RequestBody RawTemplateCreateRequest request)
       throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();

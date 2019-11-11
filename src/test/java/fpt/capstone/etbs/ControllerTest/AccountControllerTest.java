@@ -29,7 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
     locations = "classpath:application-test.properties")
 public class AccountControllerTest {
 
-  private static final String email = "testemail@gmail.com";
+  private static final String email = "testemail4@gmail.com";
   private static final String fullname = "Thai Test";
   private static final String password = "123456";
 
@@ -52,13 +52,13 @@ public class AccountControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.message").value("Account created"))
         .andExpect(jsonPath("$.data.id").isString())
-        .andExpect(jsonPath("$.data.fullName").value(request.getFullName()))
+        .andExpect(jsonPath("$.data.fullName").value(fullname))
         .andExpect(jsonPath("$.data.email").value(request.getEmail()))
         .andExpect(jsonPath("$.data.imageUrl").isString())
         .andExpect(jsonPath("$.data.active").value(true))
-        .andExpect(jsonPath("$.data.provider").value(AuthProvider.local))
+        .andExpect(jsonPath("$.data.provider").value("local"))
         .andExpect(jsonPath("$.data.roleId").value(RoleEnum.USER.getId()))
-        .andExpect(jsonPath("$.data.fullName").value(RoleEnum.USER.getName()))
+        .andExpect(jsonPath("$.data.roleName").value(RoleEnum.USER.getName()))
     ;
   }
 

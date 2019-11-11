@@ -33,10 +33,10 @@ public class RawTemplateControllerTest {
   @Autowired
   private RawTemplateController rawTemplateController;
 
-  private static final String description = "Test raw template description 4";
-  private static final String name = "Test raw template name 4";
+  private static final String description = "Test raw template description";
+  private static final String name = "Test raw template name";
   private static final Integer worspaceId = 1;
-  private static final Integer templateId = 16;
+  private static final Integer templateId = 1;
   private static final String token = IntegrationTest.TOKEN_TEST;
 
   @Test

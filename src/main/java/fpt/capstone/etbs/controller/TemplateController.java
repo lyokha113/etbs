@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -64,7 +65,7 @@ public class TemplateController {
 
   @PostMapping("/template")
   private ResponseEntity<ApiResponse> createTemplate(
-      @Valid @ModelAttribute TemplateCreateRequest request) throws Exception {
+      @Valid @RequestBody TemplateCreateRequest request) throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
@@ -80,7 +81,7 @@ public class TemplateController {
   @PutMapping("/template/{id}")
   private ResponseEntity<ApiResponse> updateTemplate(
       @PathVariable("id") Integer id,
-      @Valid @ModelAttribute TemplateUpdateRequest request) throws Exception {
+      @Valid @RequestBody TemplateUpdateRequest request) throws Exception {
     try {
       Template template = templateService.updateTemplate(id, request);
       TemplateResponse response = TemplateResponse.setResponse(template);

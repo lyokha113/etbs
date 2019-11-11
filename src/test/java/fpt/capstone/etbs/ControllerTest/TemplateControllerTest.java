@@ -46,7 +46,7 @@ public class TemplateControllerTest {
     categories.add(3);
     TemplateCreateRequest request = TemplateCreateRequest
         .builder()
-        .rawTemplateId(4)
+        .rawTemplateId(1)
         .categoryIds(categories)
         .description(description)
         .name(name)
