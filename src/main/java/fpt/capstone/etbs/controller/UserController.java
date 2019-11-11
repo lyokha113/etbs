@@ -1,6 +1,7 @@
 package fpt.capstone.etbs.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.component.JwtTokenProvider;
 import fpt.capstone.etbs.constant.AuthProvider;
 import fpt.capstone.etbs.exception.BadRequestException;
@@ -38,10 +39,14 @@ public class UserController {
   private AuthenticationManager authenticationManager;
 
   @Autowired
+  private AuthenticationFacade authenticationFacade;
+
+  @Autowired
   private JwtTokenProvider tokenProvider;
 
   @GetMapping("/user")
-  public ResponseEntity<ApiResponse> getUserDetail(Authentication auth) {
+  public ResponseEntity<ApiResponse> getUserDetail() {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     Account account = accountService.getAccount(userPrincipal.getId());
     AccountResponse response = AccountResponse.setResponse(account);
@@ -50,8 +55,9 @@ public class UserController {
 
   @PutMapping("/user")
   public ResponseEntity<ApiResponse> updateUser(
-      @Valid @RequestBody AccountUpdateRequest request, Authentication auth) {
+      @Valid @RequestBody AccountUpdateRequest request) {
     try {
+      Authentication auth = authenticationFacade.getAuthentication();
       UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
       Account account = accountService.updateAccount(userPrincipal.getId(), request);
       AccountResponse response = AccountResponse.setResponse(account);
@@ -66,8 +72,8 @@ public class UserController {
       throws Exception {
     try {
       Authentication authentication = authenticationManager.authenticate(
-              new UsernamePasswordAuthenticationToken(
-                  loginRequest.getEmail(), loginRequest.getPassword()));
+          new UsernamePasswordAuthenticationToken(
+              loginRequest.getEmail(), loginRequest.getPassword()));
       SecurityContextHolder.getContext().setAuthentication(authentication);
 
       Account account = accountService.getAccountByEmail(loginRequest.getEmail());

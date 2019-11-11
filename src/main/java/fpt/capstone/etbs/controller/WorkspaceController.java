@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.controller;
 
+import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.model.Workspace;
@@ -27,8 +28,12 @@ public class WorkspaceController {
   @Autowired
   private WorkspaceService workspaceService;
 
+  @Autowired
+  private AuthenticationFacade authenticationFacade;
+
   @GetMapping("/workspace")
-  public ResponseEntity<ApiResponse> getWorkspacesOfAccount(Authentication auth) {
+  public ResponseEntity<ApiResponse> getWorkspacesOfAccount() {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     List<Workspace> workspaces = workspaceService.getWorkspacesOfAccount(userPrincipal.getId());
     List<WorkspaceResponse> response =
@@ -37,8 +42,8 @@ public class WorkspaceController {
   }
 
   @GetMapping("/workspace/{id}")
-  public ResponseEntity<ApiResponse> getWorkspaceOfAccount(
-      Authentication auth, @PathVariable("id") Integer id) {
+  public ResponseEntity<ApiResponse> getWorkspaceOfAccount(@PathVariable("id") Integer id) {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     Workspace response = workspaceService.getWorkspaceOfAccount(id, userPrincipal.getId());
     return response != null
@@ -47,8 +52,8 @@ public class WorkspaceController {
   }
 
   @PostMapping("/workspace")
-  public ResponseEntity<ApiResponse> createWorkspace(
-      Authentication auth, @Valid @RequestBody WorkspaceRequest request) {
+  public ResponseEntity<ApiResponse> createWorkspace(@Valid @RequestBody WorkspaceRequest request) {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       Workspace workspace = workspaceService.createWorkspace(userPrincipal.getId(), request);
@@ -61,9 +66,9 @@ public class WorkspaceController {
 
   @PutMapping("/workspace/{id}")
   public ResponseEntity<ApiResponse> updateWorkspace(
-      Authentication auth,
       @PathVariable("id") int id,
       @Valid @RequestBody WorkspaceRequest request) {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       Workspace workspace = workspaceService.updateWorkspace(userPrincipal.getId(), id, request);
@@ -76,7 +81,8 @@ public class WorkspaceController {
 
   @DeleteMapping("/workspace/{id}")
   public ResponseEntity<ApiResponse> deleteWorkspace(
-      Authentication auth, @PathVariable("id") int id) {
+      @PathVariable("id") int id) {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       workspaceService.deleteWorkspace(userPrincipal.getId(), id);

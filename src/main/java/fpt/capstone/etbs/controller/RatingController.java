@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.controller;
 
+import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.model.Rating;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.model.UserPrincipal;
@@ -25,9 +26,13 @@ public class RatingController {
   @Autowired
   private TemplateService templateService;
 
+  @Autowired
+  private AuthenticationFacade authenticationFacade;
+
   @PostMapping("/rating")
   private ResponseEntity<ApiResponse> rate(
-      Authentication auth, @Valid @RequestBody RatingRequest request) {
+      @Valid @RequestBody RatingRequest request) {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     Rating rate = ratingService.rate(userPrincipal.getId(), request);
     if (rate == null) {

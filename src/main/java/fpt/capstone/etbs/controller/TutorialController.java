@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.controller;
 
+import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Tutorial;
 import fpt.capstone.etbs.payload.ApiResponse;
@@ -26,8 +27,12 @@ public class TutorialController {
   @Autowired
   private TutorialService tutorialService;
 
+  @Autowired
+  private AuthenticationFacade authenticationFacade;
+
   @GetMapping("/tutorial")
-  public ResponseEntity<ApiResponse> getActiveTutorials(Authentication auth) {
+  public ResponseEntity<ApiResponse> getActiveTutorials() {
+    Authentication auth = authenticationFacade.getAuthentication();
     List<Tutorial> tutorials = RoleUtils.hasAdminRole(auth)
         ? tutorialService.getTutorials()
         : tutorialService.getActiveTutorials();
@@ -37,8 +42,8 @@ public class TutorialController {
   }
 
   @GetMapping("/tutorial/{id}")
-  public ResponseEntity<ApiResponse> getActiveTutorial(
-      Authentication auth, @PathVariable("id") Integer id) {
+  public ResponseEntity<ApiResponse> getActiveTutorial(@PathVariable("id") Integer id) {
+    Authentication auth = authenticationFacade.getAuthentication();
     Tutorial response = RoleUtils.hasAdminRole(auth)
         ? tutorialService.getTutorial(id)
         : tutorialService.getActiveTutorial(id);

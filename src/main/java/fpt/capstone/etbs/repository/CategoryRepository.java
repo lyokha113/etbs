@@ -1,7 +1,6 @@
 package fpt.capstone.etbs.repository;
 
 import fpt.capstone.etbs.model.Category;
-import fpt.capstone.etbs.model.Template;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

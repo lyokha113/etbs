@@ -2,5 +2,5 @@ package fpt.capstone.etbs.constant;
 
 public enum PublishStatus {
 
-  PENDING, DENIED, DUPLICATED, UPDATED, PUBLISHED;
+  PENDING, DENIED, DUPLICATED, UPDATED, PUBLISHED
 }

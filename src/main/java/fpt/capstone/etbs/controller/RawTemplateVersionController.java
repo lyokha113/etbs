@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.controller;
 
+import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.RawTemplateVersion;
 import fpt.capstone.etbs.model.UserPrincipal;
@@ -24,11 +25,13 @@ public class RawTemplateVersionController {
   @Autowired
   private RawTemplateVersionService rawTemplateVersionService;
 
+  @Autowired
+  private AuthenticationFacade authenticationFacade;
+
   @PostMapping("/version")
   private ResponseEntity<ApiResponse> createVersion(
-      Authentication auth,
       @Valid @RequestBody RawTemplateVersionRequest request) {
-
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       RawTemplateVersion version = rawTemplateVersionService
@@ -42,10 +45,9 @@ public class RawTemplateVersionController {
 
   @PutMapping("/version/{id}")
   private ResponseEntity<ApiResponse> updateVersion(
-      Authentication auth,
       @PathVariable("id") Integer id,
       @Valid @RequestBody RawTemplateVersionRequest request) {
-
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       RawTemplateVersion version = rawTemplateVersionService
@@ -59,7 +61,8 @@ public class RawTemplateVersionController {
 
   @DeleteMapping("/version/{id}")
   public ResponseEntity<ApiResponse> deleteVersion(
-      Authentication auth, @PathVariable("id") int id) {
+      @PathVariable("id") int id) {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       rawTemplateVersionService.deleteVersion(userPrincipal.getId(), id);

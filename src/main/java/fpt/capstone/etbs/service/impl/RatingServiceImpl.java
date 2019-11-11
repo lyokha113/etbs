@@ -10,11 +10,9 @@ import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.RatingRepository;
 import fpt.capstone.etbs.repository.TemplateRepository;
 import fpt.capstone.etbs.service.RatingService;
-import java.util.HashSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

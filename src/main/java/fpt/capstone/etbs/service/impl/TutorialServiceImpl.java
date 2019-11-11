@@ -55,7 +55,7 @@ public class TutorialServiceImpl implements TutorialService {
         .active(true)
         .build();
 
-    return  tutorialRepository.save(tutorial);
+    return tutorialRepository.save(tutorial);
 
   }
 

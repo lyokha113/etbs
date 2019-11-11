@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.controller;
 
+import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.payload.ApiResponse;
@@ -21,9 +22,13 @@ public class EmailController {
   @Autowired
   private EmailService emailSenderService;
 
+  @Autowired
+  private AuthenticationFacade authenticationFacade;
+
   @PostMapping("/email/draft")
-  public ResponseEntity<ApiResponse> makeDraftEmail(
-      Authentication auth, @Valid @RequestBody DraftEmailRequest request) throws Exception {
+  public ResponseEntity<ApiResponse> makeDraftEmail(@Valid @RequestBody DraftEmailRequest request)
+      throws Exception {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       emailSenderService.makeDraftEmail(userPrincipal.getId(), request);
@@ -38,7 +43,8 @@ public class EmailController {
 
   @PostMapping("/email/send/")
   public ResponseEntity<ApiResponse> sendEmail(
-      Authentication auth, @Valid @RequestBody SendEmailRequest request) throws Exception {
+      @Valid @RequestBody SendEmailRequest request) throws Exception {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       emailSenderService.sendEmail(userPrincipal.getId(), request);
