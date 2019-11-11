@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import fpt.capstone.etbs.constant.IntegrationTest;
 import fpt.capstone.etbs.controller.RatingController;
 import fpt.capstone.etbs.model.Rating;
 import fpt.capstone.etbs.payload.RatingRequest;
@@ -31,7 +32,7 @@ public class RatingControllerTest {
   @Autowired
   private RatingController ratingController;
 
-  private static final String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ7XCJpZFwiOlwiOTgyNWExOWUtMGY0OS00YTBmLWE5NDgtYmFmNDNhNWY5NjU3XCIsXCJmdWxsTmFtZVwiOlwiVGhhaSBUZXN0XCIsXCJlbWFpbFwiOlwidGVzdGVtYWlsMUBnbWFpbC5jb21cIixcImltYWdlVXJsXCI6XCJodHRwczovL2ZpcmViYXNlc3RvcmFnZS5nb29nbGVhcGlzLmNvbS92MC9iL2V0YnMtNDQxYTEuYXBwc3BvdC5jb20vby9kZWZhdWx0JTJGZGVmYXVsdF9hdmF0YXIucG5nP2FsdD1tZWRpYSZ0b2tlbj1lYmIyYWUwNy03N2MxLTRkZDMtYjViMy05ODVmNGZiOWViOTlcIixcImFjdGl2ZVwiOnRydWUsXCJwcm92aWRlclwiOlwibG9jYWxcIixcInJvbGVJZFwiOjEsXCJyb2xlTmFtZVwiOlwiQURNSU5JU1RSQVRPUlwifSIsImlhdCI6MTU3MzExNjU5NywiZXhwIjoxNTczNzIxMzk3fQ.mPHz_arR17dTrhKzfTPd9e9Ew97KhCcC_s7R1o-zWoKSgn-KRvYHE8DG2b5y9tNmQJKBqHd6oQQ88i-NqA0mVw";
+  private static final String token = IntegrationTest.TOKEN_TEST;
 
   @Test
   public void rateUpvote() throws Exception {

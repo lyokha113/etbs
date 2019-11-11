@@ -15,5 +15,6 @@ public class RawTemplateUpdateRequest {
   private String name;
   private String description;
   private String content;
+  private MultipartFile thumbnailFile;
   private String thumbnail;
 }

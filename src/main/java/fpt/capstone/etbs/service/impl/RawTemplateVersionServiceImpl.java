@@ -43,7 +43,7 @@ public class RawTemplateVersionServiceImpl implements RawTemplateVersionService 
         .orElse(null);
 
     if (rawTemplate == null) {
-      throw new BadRequestException("Template doesn't exist");
+      throw new BadRequestException("Raw template doesn't exist");
     }
 
     if (rawTemplate.getVersions().size() == MAX_VERSION_EACH_TEMPLATE) {

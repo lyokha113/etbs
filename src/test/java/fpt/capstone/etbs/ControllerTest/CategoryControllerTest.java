@@ -2,6 +2,7 @@ package fpt.capstone.etbs.ControllerTest;
 
 import static fpt.capstone.etbs.ControllerTest.AccountControllerTest.asJsonString;
 import static org.junit.Assert.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -29,17 +30,17 @@ import org.springframework.test.web.servlet.MockMvc;
     locations = "classpath:application-test.properties")
 public class CategoryControllerTest {
 
-//  private static final String category = "Hotel";
+  //  private static final String category = "Hotel";
 //  private static final String category = "Art";
-  private static final String category = "Auto & Moto";
+//  private static final String category = "Auto & Moto";
 //  private static final String category = "Beauty & Personal Care";
-//  private static final String category = "Beverages";
-//  private static final String category = "Business";
+  private static final String category = "Beverages";
+  //  private static final String category = "Business";
 //  private static final String category = "Construction";
 //  private static final String category = "Consulting";
 //  private static final String category = "Education";
 //  private static final String category = "Electronics";
-  private static final String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ7XCJpZFwiOlwiOTgyNWExOWUtMGY0OS00YTBmLWE5NDgtYmFmNDNhNWY5NjU3XCIsXCJmdWxsTmFtZVwiOlwiVGhhaSBUZXN0XCIsXCJlbWFpbFwiOlwidGVzdGVtYWlsMUBnbWFpbC5jb21cIixcImltYWdlVXJsXCI6XCJodHRwczovL2ZpcmViYXNlc3RvcmFnZS5nb29nbGVhcGlzLmNvbS92MC9iL2V0YnMtNDQxYTEuYXBwc3BvdC5jb20vby9kZWZhdWx0JTJGZGVmYXVsdF9hdmF0YXIucG5nP2FsdD1tZWRpYSZ0b2tlbj1lYmIyYWUwNy03N2MxLTRkZDMtYjViMy05ODVmNGZiOWViOTlcIixcImFjdGl2ZVwiOnRydWUsXCJwcm92aWRlclwiOlwibG9jYWxcIixcInJvbGVJZFwiOjEsXCJyb2xlTmFtZVwiOlwiQURNSU5JU1RSQVRPUlwifSIsImlhdCI6MTU3MzExNjU5NywiZXhwIjoxNTczNzIxMzk3fQ.mPHz_arR17dTrhKzfTPd9e9Ew97KhCcC_s7R1o-zWoKSgn-KRvYHE8DG2b5y9tNmQJKBqHd6oQQ88i-NqA0mVw";
+  private static final String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ7XCJpZFwiOlwiOWIyYWM2MmMtODU5Zi00MjE1LTkyNTctMjA5MDE4NjMzMjM0XCIsXCJmdWxsTmFtZVwiOlwiVGhhaSBUZXN0XCIsXCJlbWFpbFwiOlwidGVzdGVtYWlsQGdtYWlsLmNvbVwiLFwiaW1hZ2VVcmxcIjpcImh0dHBzOi8vZmlyZWJhc2VzdG9yYWdlLmdvb2dsZWFwaXMuY29tL3YwL2IvZXRicy00NDFhMS5hcHBzcG90LmNvbS9vL2RlZmF1bHQlMkZkZWZhdWx0X2F2YXRhci5wbmc_YWx0PW1lZGlhJnRva2VuPWViYjJhZTA3LTc3YzEtNGRkMy1iNWIzLTk4NWY0ZmI5ZWI5OVwiLFwiYWN0aXZlXCI6dHJ1ZSxcInByb3ZpZGVyXCI6XCJsb2NhbFwiLFwicm9sZUlkXCI6MixcInJvbGVOYW1lXCI6XCJVU0VSXCJ9IiwiaWF0IjoxNTczMjg3ODcwLCJleHAiOjE1NzM4OTI2NzB9.8mEksc6z8SchddGXuv9xcqHag1bowv1fiw5dpv81j6FkUURq8Nk9Gjjrp84TU-vRBZN6SqHmNURKzcRip5NsDw";
   @Autowired
   private MockMvc mockMvc;
 
@@ -57,5 +58,16 @@ public class CategoryControllerTest {
         .andExpect(status().isOk())
         .andExpect(content().contentType("application/json;charset=UTF-8"))
         .andExpect(jsonPath("$.message").value("Category created"));
+  }
+
+  @Test
+  public void getListCategory() throws Exception {
+    this.mockMvc.perform(get("/category")
+        .header("Authorization", "Bearer " + token)
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType("application/json;charset=UTF-8"))
+        .andExpect(jsonPath("$.success").value(true))
+        .andExpect(jsonPath("$.data").hasJsonPath());
   }
 }

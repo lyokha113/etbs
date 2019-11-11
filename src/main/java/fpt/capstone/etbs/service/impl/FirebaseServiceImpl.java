@@ -34,19 +34,11 @@ public class FirebaseServiceImpl implements FirebaseService {
     return createImage(fbPath, file);
   }
 
+
   @Override
-  public String createRawTemplateThumbnail(Integer templateId, String name)
-      throws Exception {
-    String fbPath = AppConstant.TEMPLATE_THUMBNAIL + templateId;
-    Storage storage = bucket.getStorage();
-    BlobId blobId = BlobId.of(bucket.getName(), fbPath);
-    Blob blob = storage.get(blobId);
-    fbPath = AppConstant.RAW_TEMPLATE_THUMBNAIL + name;
-    blobId = BlobId.of(bucket.getName(), fbPath);
-    blob.copyTo(blobId);
-    blob = storage.get(blobId);
-    URL url = blob.signUrl(365, TimeUnit.DAYS);
-    return url.toString();
+  public String updateRawTemplateThumbnail(MultipartFile file, String name) throws Exception {
+    String fbPath = AppConstant.RAW_TEMPLATE_THUMBNAIL + name;
+    return createImage(fbPath, file);
   }
 
   @Override
@@ -68,6 +60,33 @@ public class FirebaseServiceImpl implements FirebaseService {
     Storage storage = bucket.getStorage();
     BlobId blobId = BlobId.of(bucket.getName(), fbPath);
     return storage.delete(blobId);
+  }
+
+  @Override
+  public String createRawThumbnailFromTemplate(Integer templateId, Integer rawTemplateId)
+      throws Exception {
+    String fbPathFrom = AppConstant.TEMPLATE_THUMBNAIL + templateId;
+    String fbPathTo = AppConstant.RAW_TEMPLATE_THUMBNAIL + rawTemplateId;
+    return createBlobFromAnotherBlob(fbPathFrom, fbPathTo);
+  }
+
+  @Override
+  public String createTemplateThumbnailFromRaw(Integer rawTemplateId, Integer templateId)
+      throws Exception {
+    String fbPathFrom = AppConstant.RAW_TEMPLATE_THUMBNAIL + rawTemplateId;
+    String fbPathTo = AppConstant.TEMPLATE_THUMBNAIL + templateId;
+    return createBlobFromAnotherBlob(fbPathFrom, fbPathTo);
+  }
+
+  private String createBlobFromAnotherBlob(String fbPathFrom, String fbPathTo) {
+    BlobId blobId = BlobId.of(bucket.getName(), fbPathFrom);
+    Storage storage = bucket.getStorage();
+    Blob blob = storage.get(blobId);
+    blobId = BlobId.of(bucket.getName(), fbPathTo);
+    blob.copyTo(blobId);
+    blob = storage.get(blobId);
+    URL url = blob.signUrl(365, TimeUnit.DAYS);
+    return url.toString();
   }
 
   private String createImage(String fbPath, MultipartFile image) throws Exception {

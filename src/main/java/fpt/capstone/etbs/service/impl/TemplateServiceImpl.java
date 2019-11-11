@@ -16,11 +16,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class TemplateServiceImpl implements TemplateService {
@@ -71,7 +68,6 @@ public class TemplateServiceImpl implements TemplateService {
     // Process publish stage
     Set<Category> categories = new HashSet<>(categoryRepository
         .getAllByActiveTrueAndIdIn(request.getCategoryIds()));
-
     Template template = Template.builder()
         .name(request.getName())
         .description(request.getDescription())
@@ -96,7 +92,8 @@ public class TemplateServiceImpl implements TemplateService {
 
     Set<Category> categories = new HashSet<>(categoryRepository
         .getAllByActiveTrueAndIdIn(request.getCategoryIds()));
-    String thumbnail = firebaseService.createTemplateThumbnail(request.getThumbnail(), id.toString());
+    String thumbnail = firebaseService
+        .createTemplateThumbnail(request.getThumbnail(), id.toString());
 
     template.setName(request.getName());
     template.setContent(request.getContent());
@@ -108,11 +105,13 @@ public class TemplateServiceImpl implements TemplateService {
   }
 
   @Override
-  public Template updateThumbnail(Template template, MultipartFile thumbnail) throws Exception {
-    String link = firebaseService
-        .createTemplateThumbnail(thumbnail, template.getId().toString());
-
-    template.setThumbnail(link);
+  public Template updateThumbnail(Template template, Integer rawTemplateId) throws Exception {
+    if (rawTemplateRepository.findById(rawTemplateId).isPresent()) {
+      String link = firebaseService
+          .createTemplateThumbnailFromRaw(rawTemplateRepository.findById(rawTemplateId).get().getCurrentVersion().getId(),
+              template.getId());
+      template.setThumbnail(link);
+    }
     return templateRepository.save(template);
   }
 
@@ -125,7 +124,6 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     templateRepository.delete(template);
-    // Process publish data
   }
 
   @Override

@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class TemplateCreateRequest {
 
   private Integer rawTemplateId;
-  private MultipartFile thumbnail;
   private String name;
   private String description;
   private List<Integer> categoryIds;

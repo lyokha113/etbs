@@ -1,11 +1,9 @@
 package fpt.capstone.etbs.service;
 
 import fpt.capstone.etbs.model.RawTemplate;
-import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.RawTemplateCreateRequest;
 import fpt.capstone.etbs.payload.RawTemplateUpdateRequest;
 import java.util.UUID;
-import org.springframework.web.multipart.MultipartFile;
 
 public interface RawTemplateService {
 

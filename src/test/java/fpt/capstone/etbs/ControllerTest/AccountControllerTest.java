@@ -6,6 +6,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fpt.capstone.etbs.constant.AuthProvider;
+import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.controller.AccountController;
 import fpt.capstone.etbs.payload.LoginRequest;
 import fpt.capstone.etbs.payload.RegisterRequest;
@@ -27,7 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
     locations = "classpath:application-test.properties")
 public class AccountControllerTest {
 
-  private static final String email = "testemail3@gmail.com";
+  private static final String email = "testemail@gmail.com";
   private static final String fullname = "Thai Test";
   private static final String password = "123456";
 
@@ -46,9 +48,18 @@ public class AccountControllerTest {
     this.mockMvc.perform(post("/register")
         .content(asJsonString(request))
         .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
         .andExpect(content().contentType("application/json;charset=UTF-8"))
-        .andExpect(jsonPath("$.message").value("Account created"));
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.message").value("Account created"))
+        .andExpect(jsonPath("$.data.id").isString())
+        .andExpect(jsonPath("$.data.fullName").value(request.getFullName()))
+        .andExpect(jsonPath("$.data.email").value(request.getEmail()))
+        .andExpect(jsonPath("$.data.imageUrl").isString())
+        .andExpect(jsonPath("$.data.active").value(true))
+        .andExpect(jsonPath("$.data.provider").value(AuthProvider.local))
+        .andExpect(jsonPath("$.data.roleId").value(RoleEnum.USER.getId()))
+        .andExpect(jsonPath("$.data.fullName").value(RoleEnum.USER.getName()))
+    ;
   }
 
   @Test

@@ -21,7 +21,7 @@ public interface TemplateService {
 
   Template updateTemplate(Integer id, TemplateUpdateRequest request) throws Exception;
 
-  Template updateThumbnail(Template template, MultipartFile thumbnail) throws Exception;
+  Template updateThumbnail(Template template, Integer rawTemplateId) throws Exception;
 
   void deleteTemplate(Integer id);
 
