@@ -21,6 +21,7 @@ public class CategoryResponse {
   private int id;
   private String name;
   private List<TemplateOfCategory> templates;
+  private boolean active;
 
   public static CategoryResponse setResponse(Category category) {
     Set<Template> templates = category.getTemplates();
@@ -32,6 +33,7 @@ public class CategoryResponse {
         .id(category.getId())
         .name(category.getName())
         .templates(templatesOfCategory)
+        .active(category.isActive())
         .build();
   }
 }
