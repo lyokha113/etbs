@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.controller;
 
+import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.model.UserPrincipal;
@@ -17,10 +18,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -29,9 +30,13 @@ public class TemplateController {
   @Autowired
   private TemplateService templateService;
 
-  @GetMapping("/template")
-  private ResponseEntity<ApiResponse> getTemplates(Authentication auth) {
+  @Autowired
+  private AuthenticationFacade authenticationFacade;
 
+  @GetMapping("/template")
+  private ResponseEntity<ApiResponse> getTemplates() {
+
+    Authentication auth = authenticationFacade.getAuthentication();
     List<Template> templates =
         RoleUtils.hasAdminRole(auth)
             ? templateService.getTemplates()
@@ -43,9 +48,9 @@ public class TemplateController {
   }
 
   @GetMapping("/template/{id}")
-  private ResponseEntity<ApiResponse> getTemplate(
-      Authentication auth, @PathVariable("id") Integer id) {
+  private ResponseEntity<ApiResponse> getTemplate(@PathVariable("id") Integer id) {
 
+    Authentication auth = authenticationFacade.getAuthentication();
     Template response =
         RoleUtils.hasAdminRole(auth)
             ? templateService.getTemplate(id)
@@ -59,11 +64,12 @@ public class TemplateController {
 
   @PostMapping("/template")
   private ResponseEntity<ApiResponse> createTemplate(
-      Authentication auth, @Valid @RequestBody TemplateCreateRequest request) throws Exception {
+      @Valid @ModelAttribute TemplateCreateRequest request) throws Exception {
+    Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       Template template = templateService.createTemplate(userPrincipal.getId(), request);
-      template = templateService.updateThumbnail(template, request.getRawTemplateId());
+      template = templateService.updateThumbnail(template, request.getThumbnail());
       TemplateResponse response = TemplateResponse.setResponse(template);
       return ResponseEntity.ok(new ApiResponse<>(true, "Template created", response));
     } catch (BadRequestException ex) {
@@ -74,7 +80,7 @@ public class TemplateController {
   @PutMapping("/template/{id}")
   private ResponseEntity<ApiResponse> updateTemplate(
       @PathVariable("id") Integer id,
-      @Valid @RequestBody TemplateUpdateRequest request) throws Exception {
+      @Valid @ModelAttribute TemplateUpdateRequest request) throws Exception {
     try {
       Template template = templateService.updateTemplate(id, request);
       TemplateResponse response = TemplateResponse.setResponse(template);
