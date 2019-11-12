@@ -116,8 +116,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/raw/**")
         .hasRole(RoleEnum.USER.getName())
         .antMatchers(HttpMethod.POST, "/rating", "/template", "/file", "/workspace", "/email/send/",
-            "/rate",
-            "/raw", "/version")
+            "/rate", "/raw", "/version")
         .hasRole(RoleEnum.USER.getName())
         .antMatchers(HttpMethod.PUT, "/rating", "/file/*", "/workspace/*", "/raw/**", "/version/*")
         .hasRole(RoleEnum.USER.getName())
