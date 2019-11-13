@@ -18,6 +18,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.ToString;
+import org.hibernate.annotations.Type;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
@@ -37,6 +38,7 @@ public class MediaFile extends Auditing {
 
   @Id
   @Column
+  @Type(type = "uuid-char")
   private UUID id;
 
   @Column(nullable = false)

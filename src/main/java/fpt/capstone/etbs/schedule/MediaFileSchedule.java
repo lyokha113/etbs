@@ -30,7 +30,8 @@ public class MediaFileSchedule {
   @Autowired
   private MediaFileService mediaFileService;
 
-  @Scheduled(fixedDelay = 1000 * 60 * 5, initialDelay = 1000 * 60 * 5)
+//  @Scheduled(fixedDelay = 1000 * 60 * 30, initialDelay = 1000 * 60 * 30)
+  @Scheduled(cron = "0 0 23 1/1 * ? *", zone = "Asia/Ho_Chi_Minh")
   public void deleteInactiveUserFile() {
     logger.info("Start to delete inactive user file");
     List<MediaFile> deleteFiles = mediaFileService.getInactiveMediaFiles();

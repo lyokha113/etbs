@@ -6,6 +6,7 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import fpt.capstone.etbs.constant.AppConstant;
+import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.service.FirebaseService;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +23,7 @@ public class FirebaseServiceImpl implements FirebaseService {
 
   @Override
   public String createUserImage(MultipartFile file, String path, String name) throws Exception {
-    String fbPath = AppConstant.RAW_TEMPLATE_THUMBNAIL + path + "/" + name;
+    String fbPath = AppConstant.USER_IMAGES + path + "/" + name;
     return createImage(fbPath, file);
   }
 
@@ -61,16 +62,14 @@ public class FirebaseServiceImpl implements FirebaseService {
   }
 
   @Override
-  public String createRawThumbnailFromTemplate(Integer templateId, Integer rawTemplateId)
-      throws Exception {
+  public String createRawThumbnailFromTemplate(Integer templateId, Integer rawTemplateId) {
     String fbPathFrom = AppConstant.TEMPLATE_THUMBNAIL + templateId;
     String fbPathTo = AppConstant.RAW_TEMPLATE_THUMBNAIL + rawTemplateId;
     return createBlobFromAnotherBlob(fbPathFrom, fbPathTo);
   }
 
   @Override
-  public String createTemplateThumbnailFromRaw(Integer rawTemplateId, Integer templateId)
-      throws Exception {
+  public String createTemplateThumbnailFromRaw(Integer rawTemplateId, Integer templateId) {
     String fbPathFrom = AppConstant.RAW_TEMPLATE_THUMBNAIL + rawTemplateId;
     String fbPathTo = AppConstant.TEMPLATE_THUMBNAIL + templateId;
     return createBlobFromAnotherBlob(fbPathFrom, fbPathTo);
@@ -89,8 +88,12 @@ public class FirebaseServiceImpl implements FirebaseService {
 
   private String createImage(String fbPath, MultipartFile image) throws Exception {
     Storage storage = bucket.getStorage();
+    String mime = image.getContentType();
+    if (mime == null || (!mime.equals("image/png") &&  !mime.equals("image/jpeg"))) {
+      throw new BadRequestException("File not supported");
+    }
     BlobId blobId = BlobId.of(bucket.getName(), fbPath);
-    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(image.getContentType()).build();
+    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(mime).build();
     Blob blob = storage.create(blobInfo, image.getBytes());
     URL url = blob.signUrl(365, TimeUnit.DAYS);
     return url.toString();
