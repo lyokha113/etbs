@@ -6,12 +6,14 @@ import fpt.capstone.etbs.model.Category;
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.TemplateCreateRequest;
+import fpt.capstone.etbs.payload.TemplateListByCategories;
 import fpt.capstone.etbs.payload.TemplateUpdateRequest;
 import fpt.capstone.etbs.repository.CategoryRepository;
 import fpt.capstone.etbs.repository.RawTemplateRepository;
 import fpt.capstone.etbs.repository.TemplateRepository;
 import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.TemplateService;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -129,6 +131,13 @@ public class TemplateServiceImpl implements TemplateService {
   @Override
   public List<Template> getHighRatingTemplate(int quantity) {
     return null;
+  }
+
+  @Override
+  public List<Template> getListByCategories(TemplateListByCategories request) {
+    List<Category> categories = new ArrayList<>(categoryRepository
+        .getAllByActiveTrueAndIdIn(request.getCategories()));
+    return templateRepository.findAllByCategoriesInAndActiveTrue(categories);
   }
 
 }

@@ -17,5 +17,5 @@ public interface TemplateRepository extends JpaRepository<Template, Integer> {
 
   List<Template> getAllByAuthor_Id(UUID id);
 
-  List<Template> getAllByCategories(Category category);
+  List<Template> findAllByCategoriesInAndActiveTrue(List<Category> categoryList);
 }
