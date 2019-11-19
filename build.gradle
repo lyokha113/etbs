@@ -49,4 +49,8 @@ dependencies {
     implementation 'com.google.apis:google-api-services-gmail:v1-rev83-1.23.0'
     implementation 'com.google.apis:google-api-services-people:v1-rev277-1.23.0'
     implementation group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
+    //jsoup
+    // https://mvnrepository.com/artifact/org.jsoup/jsoup
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.12.1'
+
 }
