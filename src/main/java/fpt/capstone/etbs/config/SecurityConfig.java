@@ -1,6 +1,7 @@
 package fpt.capstone.etbs.config;
 
 import fpt.capstone.etbs.component.HttpCookieOAuth2AuthorizationRequest;
+import fpt.capstone.etbs.component.JwtAuthenticationEntryPoint;
 import fpt.capstone.etbs.component.OAuth2AuthenticationFailureHandler;
 import fpt.capstone.etbs.component.OAuth2AuthenticationSuccessHandler;
 import fpt.capstone.etbs.constant.RoleEnum;
@@ -40,6 +41,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
   private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+
+  @Autowired
+  private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
   @Bean
   public HttpCookieOAuth2AuthorizationRequest cookieAuthorizationRequestRepository() {
@@ -84,7 +88,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .exceptionHandling()
-        .authenticationEntryPoint(new Http403ForbiddenEntryPoint())
+        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
         .and()
         .oauth2Login()
         .authorizationEndpoint()
@@ -108,9 +112,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .permitAll()
         .antMatchers(HttpMethod.GET, "/category", "/template", "/template/*")
         .permitAll()
-        // Logged
-        .antMatchers("/user")
-        .hasAnyRole(RoleEnum.ADMINISTRATOR.getName(), RoleEnum.USER.getName())
         // User
         .antMatchers(HttpMethod.GET, "/rating", "/file", "file/*", "/workspace", "/workspace/*",
             "/raw/**")
@@ -128,12 +129,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
         .antMatchers(HttpMethod.POST, "/category", "/account")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
-        .antMatchers(HttpMethod.PUT, "/category/*", "/template/*", "/account")
+        .antMatchers(HttpMethod.PUT, "/category/*", "/template/*", "/account/*")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
         .antMatchers(HttpMethod.DELETE, "/template/*")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
+        // Logged
+        .antMatchers("/user")
+        .authenticated()
         .anyRequest()
-        .authenticated();
+        .denyAll();
 
     http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
   }

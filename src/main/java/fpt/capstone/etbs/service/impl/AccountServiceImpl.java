@@ -92,6 +92,10 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
       throw new BadRequestException("Account doesn't existed");
     }
 
+    if (account.getProvider().equals(AuthProvider.google)) {
+      throw new BadRequestException("Google account can't be updated");
+    }
+
     account.setFullName(request.getFullName());
     account.setActive(request.isActive());
     if (!StringUtils.isEmpty(request.getPassword())) {

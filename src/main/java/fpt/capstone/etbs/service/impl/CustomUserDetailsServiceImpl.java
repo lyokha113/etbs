@@ -30,6 +30,8 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService, U
     if (account == null) {
       throw new UsernameNotFoundException("User not found");
     }
+    account = accountRepository.findById(account.getId())
+        .orElseThrow(() -> new UsernameNotFoundException("User not found\""));
     return UserPrincipal.create(account);
   }
 }

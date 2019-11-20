@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -31,7 +32,7 @@ public class TutorialController {
   private AuthenticationFacade authenticationFacade;
 
   @GetMapping("/tutorial")
-  public ResponseEntity<ApiResponse> getActiveTutorials() {
+  public ResponseEntity<ApiResponse> getTutorials() {
     Authentication auth = authenticationFacade.getAuthentication();
     List<Tutorial> tutorials = RoleUtils.hasAdminRole(auth)
         ? tutorialService.getTutorials()
@@ -42,7 +43,7 @@ public class TutorialController {
   }
 
   @GetMapping("/tutorial/{id}")
-  public ResponseEntity<ApiResponse> getActiveTutorial(@PathVariable("id") Integer id) {
+  public ResponseEntity<ApiResponse> getTutorial(@PathVariable("id") Integer id) {
     Authentication auth = authenticationFacade.getAuthentication();
     Tutorial response = RoleUtils.hasAdminRole(auth)
         ? tutorialService.getTutorial(id)
@@ -54,7 +55,7 @@ public class TutorialController {
   }
 
   @PostMapping("/tutorial")
-  public ResponseEntity<ApiResponse> createTutorial(@Valid @RequestBody TutorialRequest tutorial)
+  public ResponseEntity<ApiResponse> createTutorial(@Valid @ModelAttribute TutorialRequest tutorial)
       throws Exception {
     try {
       Tutorial response = tutorialService.createTutorial(tutorial);
@@ -68,7 +69,7 @@ public class TutorialController {
 
   @PutMapping("/tutorial/{id}")
   public ResponseEntity<ApiResponse> updateTutorial(
-      @PathVariable("id") Integer id, @Valid @RequestBody TutorialRequest tutorial)
+      @PathVariable("id") Integer id, @Valid @ModelAttribute TutorialRequest tutorial)
       throws Exception {
     try {
       Tutorial response = tutorialService.updateTutorial(id, tutorial);
