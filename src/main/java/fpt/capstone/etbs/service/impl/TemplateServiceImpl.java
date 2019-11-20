@@ -18,6 +18,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -110,10 +113,24 @@ public class TemplateServiceImpl implements TemplateService {
   public Template updateThumbnail(Template template, Integer rawTemplateId) throws Exception {
     if (rawTemplateRepository.findById(rawTemplateId).isPresent()) {
       String link = firebaseService
-          .createTemplateThumbnailFromRaw(rawTemplateRepository.findById(rawTemplateId).get().getCurrentVersion().getId(),
+          .createTemplateThumbnailFromRaw(
+              rawTemplateRepository.findById(rawTemplateId).get().getCurrentVersion().getId(),
               template.getId());
       template.setThumbnail(link);
     }
+    String content = template.getContent();
+    Document doc = Jsoup.parse(content, "UTF-8");
+    int count = 1;
+    for (Element element : doc.select("img")) {
+      String imgSrc = element.absUrl("src");
+      if (!imgSrc.contains(AppConstant.TEMPLATE_IMAGE)) {
+        String order = template.getId() + "-" + count;
+        String replace = firebaseService.replaceImageFromUserContent(imgSrc, order);
+        content = content.replaceAll(imgSrc, replace);
+        count++;
+      }
+    }
+    template.setContent(content);
     return templateRepository.save(template);
   }
 

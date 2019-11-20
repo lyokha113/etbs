@@ -8,8 +8,15 @@ import com.google.cloud.storage.Storage;
 import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.service.FirebaseService;
+import java.awt.Image;
+import java.awt.image.RenderedImage;
+import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
+import javax.imageio.ImageIO;
+import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class FirebaseServiceImpl implements FirebaseService {
 
+  private static final Logger logger = LoggerFactory.getLogger(FirebaseServiceImpl.class);
   @Autowired
   private Bucket bucket;
 
@@ -62,6 +70,23 @@ public class FirebaseServiceImpl implements FirebaseService {
   }
 
   @Override
+  public String replaceImageFromUserContent(String html, String order) throws IOException {
+    Image image = null;
+    URL url = new URL(html);
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    image = ImageIO.read(url);
+    ImageIO.write((RenderedImage) image, "png", baos);
+    baos.flush();
+    Storage storage = bucket.getStorage();
+    String fbPath = AppConstant.TEMPLATE_IMAGE + order;
+    BlobId blobId = BlobId.of(bucket.getName(), fbPath);
+    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/png").build();
+    Blob blob = storage.create(blobInfo, baos.toByteArray());
+    url = blob.signUrl(365, TimeUnit.DAYS);
+    return url.toString();
+  }
+
+  @Override
   public String createRawThumbnailFromTemplate(Integer templateId, Integer rawTemplateId) {
     String fbPathFrom = AppConstant.TEMPLATE_THUMBNAIL + templateId;
     String fbPathTo = AppConstant.RAW_TEMPLATE_THUMBNAIL + rawTemplateId;
@@ -89,7 +114,7 @@ public class FirebaseServiceImpl implements FirebaseService {
   private String createImage(String fbPath, MultipartFile image) throws Exception {
     Storage storage = bucket.getStorage();
     String mime = image.getContentType();
-    if (mime == null || (!mime.equals("image/png") &&  !mime.equals("image/jpeg"))) {
+    if (mime == null || (!mime.equals("image/png") && !mime.equals("image/jpeg"))) {
       throw new BadRequestException("File not supported");
     }
     BlobId blobId = BlobId.of(bucket.getName(), fbPath);
