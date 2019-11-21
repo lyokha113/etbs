@@ -110,7 +110,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // All
         .antMatchers(HttpMethod.POST, "/login", "/register")
         .permitAll()
-        .antMatchers(HttpMethod.GET, "/category", "/template", "/template/*")
+        .antMatchers(HttpMethod.GET, "/category", "/template", "/template/*", "/tutorial", "/tutorial/*")
         .permitAll()
         // User
         .antMatchers(HttpMethod.GET, "/rating", "/file", "file/*", "/workspace", "/workspace/*",
@@ -127,9 +127,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // Administrator
         .antMatchers(HttpMethod.GET, "/account")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
-        .antMatchers(HttpMethod.POST, "/category", "/account")
+        .antMatchers(HttpMethod.POST, "/category", "/account", "/tutorial")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
-        .antMatchers(HttpMethod.PUT, "/category/*", "/template/*", "/account/*")
+        .antMatchers(HttpMethod.PUT, "/category/*", "/template/*", "/account/*", "/tutorial/*")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
         .antMatchers(HttpMethod.DELETE, "/template/*")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
