@@ -22,7 +22,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -110,18 +109,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // All
         .antMatchers(HttpMethod.POST, "/login", "/register")
         .permitAll()
-        .antMatchers(HttpMethod.GET, "/category", "/template", "/template/*", "/tutorial", "/tutorial/*")
+        .antMatchers(HttpMethod.GET, "/category", "/template", "/template/*", "/tutorial",
+            "/tutorial/*")
         .permitAll()
         // User
-        .antMatchers(HttpMethod.GET, "/rating", "/file", "file/*", "/workspace", "/workspace/*",
+        .antMatchers(HttpMethod.GET, "/rating", "/workspace", "/workspace/*",
             "/raw/**")
         .hasRole(RoleEnum.USER.getName())
-        .antMatchers(HttpMethod.POST, "/rating", "/template", "/file", "/workspace", "/email/send/",
+        .antMatchers(HttpMethod.POST, "/rating", "/template", "/workspace", "/email/send/",
             "/rate", "/raw", "/version")
         .hasRole(RoleEnum.USER.getName())
-        .antMatchers(HttpMethod.PUT, "/rating", "/file/*", "/workspace/*", "/raw/**", "/version/*")
+        .antMatchers(HttpMethod.PUT, "/rating", "/workspace/*", "/raw/**", "/version/*")
         .hasRole(RoleEnum.USER.getName())
-        .antMatchers(HttpMethod.DELETE, "/rating", "/file/*", "/workspace/*", "/raw/*",
+        .antMatchers(HttpMethod.DELETE, "/rating", "/workspace/*", "/raw/*",
             "/version/*")
         .hasRole(RoleEnum.USER.getName())
         // Administrator
@@ -134,7 +134,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.DELETE, "/template/*")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
         // Logged
-        .antMatchers("/user")
+        .antMatchers(HttpMethod.GET, "/user", "/file")
+        .authenticated()
+        .antMatchers(HttpMethod.POST, "/file")
+        .authenticated()
+        .antMatchers(HttpMethod.PUT, "/user")
+        .authenticated()
+        .antMatchers(HttpMethod.DELETE, "/file/*")
         .authenticated()
         .anyRequest()
         .denyAll();

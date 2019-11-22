@@ -117,7 +117,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
       rawTemplate.getCurrentVersion().setThumbnail(request.getThumbnail());
     } else if (request.getThumbnailFile() != null) {
       rawTemplate.getCurrentVersion().setThumbnail(firebaseService
-          .updateRawTemplateThumbnail(request.getThumbnailFile(),
+          .createRawTemplateThumbnail(request.getThumbnailFile(),
               rawTemplate.getCurrentVersion().getId().toString()));
     }
     return rawTemplateRepository.save(rawTemplate);

@@ -1,15 +1,17 @@
 package fpt.capstone.etbs.service.impl;
 
+import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.MediaFile;
-import fpt.capstone.etbs.payload.MediaFileUpdateRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.MediaFileRepository;
 import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.MediaFileService;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,8 +34,10 @@ public class MediaFileServiceImpl implements MediaFileService {
   }
 
   @Override
-  public MediaFile getMediaFileOfAccount(UUID id, UUID accountId) {
-    return mediaFileRepository.getByIdAndAccount_Id(id, accountId).orElse(null);
+  public List<MediaFile> getMediaFilesOfAdministrator() {
+    List<Account> accounts = accountRepository.getByRole_Id(RoleEnum.ADMINISTRATOR.getId());
+    List<UUID> ids = accounts.stream().map(Account::getId).collect(Collectors.toList());
+    return mediaFileRepository.getByAccount_Id(ids);
   }
 
   @Override
@@ -42,32 +46,21 @@ public class MediaFileServiceImpl implements MediaFileService {
   }
 
   @Override
-  public MediaFile createMediaFile(UUID accountId, UUID id, String name, MultipartFile file)
-      throws Exception {
-
+  public List<MediaFile> createMediaFiles(UUID accountId, MultipartFile[] files) throws Exception {
     Account account = accountRepository.findById(accountId).orElse(null);
     if (account == null) {
       throw new BadRequestException("Account doesn't exist");
     }
-
-    String link = firebaseService.createUserImage(file, accountId.toString(), id.toString());
-    MediaFile mediaFile =
-        MediaFile.builder().id(id).name(name).link(link).account(account).active(true).build();
-
-    return mediaFileRepository.save(mediaFile);
-  }
-
-  @Override
-  public MediaFile updateMediaFile(UUID accountId, UUID id, MediaFileUpdateRequest request) {
-
-    MediaFile mediaFile = mediaFileRepository.getByIdAndAccount_Id(accountId, id).orElse(null);
-    if (mediaFile == null) {
-      throw new BadRequestException("File doesn't exist");
+    List<MediaFile> results = new LinkedList<>();
+    for (MultipartFile file : files) {
+      UUID id = UUID.randomUUID();
+      String link = firebaseService.createUserImage(file, accountId.toString(), id.toString());
+      results.add(MediaFile.builder()
+          .id(id).name(file.getOriginalFilename()).link(link).account(account).active(true)
+          .build());
     }
 
-    mediaFile.setName(request.getName());
-    mediaFile.setActive(request.isActive());
-    return mediaFileRepository.save(mediaFile);
+    return mediaFileRepository.saveAll(results);
   }
 
   @Override

@@ -24,10 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class FirebaseServiceImpl implements FirebaseService {
 
-  private static final Logger logger = LoggerFactory.getLogger(FirebaseServiceImpl.class);
   @Autowired
   private Bucket bucket;
-
 
   @Override
   public String createUserImage(MultipartFile file, String path, String name) throws Exception {
@@ -36,14 +34,7 @@ public class FirebaseServiceImpl implements FirebaseService {
   }
 
   @Override
-  public String createTutorialImage(MultipartFile file, String path, String name) throws Exception {
-    String fbPath = AppConstant.TUTORIAL_IMAGES + path + "/" + name;
-    return createImage(fbPath, file);
-  }
-
-
-  @Override
-  public String updateRawTemplateThumbnail(MultipartFile file, String name) throws Exception {
+  public String createRawTemplateThumbnail(MultipartFile file, String name) throws Exception {
     String fbPath = AppConstant.RAW_TEMPLATE_THUMBNAIL + name;
     return createImage(fbPath, file);
   }
@@ -90,17 +81,17 @@ public class FirebaseServiceImpl implements FirebaseService {
   public String createRawThumbnailFromTemplate(Integer templateId, Integer rawTemplateId) {
     String fbPathFrom = AppConstant.TEMPLATE_THUMBNAIL + templateId;
     String fbPathTo = AppConstant.RAW_TEMPLATE_THUMBNAIL + rawTemplateId;
-    return createBlobFromAnotherBlob(fbPathFrom, fbPathTo);
+    return createImageFromBlob(fbPathFrom, fbPathTo);
   }
 
   @Override
   public String createTemplateThumbnailFromRaw(Integer rawTemplateId, Integer templateId) {
     String fbPathFrom = AppConstant.RAW_TEMPLATE_THUMBNAIL + rawTemplateId;
     String fbPathTo = AppConstant.TEMPLATE_THUMBNAIL + templateId;
-    return createBlobFromAnotherBlob(fbPathFrom, fbPathTo);
+    return createImageFromBlob(fbPathFrom, fbPathTo);
   }
 
-  private String createBlobFromAnotherBlob(String fbPathFrom, String fbPathTo) {
+  private String createImageFromBlob(String fbPathFrom, String fbPathTo) {
     BlobId blobId = BlobId.of(bucket.getName(), fbPathFrom);
     Storage storage = bucket.getStorage();
     Blob blob = storage.get(blobId);
