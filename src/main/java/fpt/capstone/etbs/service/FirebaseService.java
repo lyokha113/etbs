@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.service;
 
+import java.io.IOException;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface FirebaseService {
@@ -19,4 +20,7 @@ public interface FirebaseService {
   String createTutorialThumbnail(MultipartFile file, String name) throws Exception;
 
   boolean deleteImage(String fbPath) throws Exception;
+
+  String replaceImageFromUserContent(String html, String order) throws IOException;
+
 }
