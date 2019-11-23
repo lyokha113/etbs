@@ -23,6 +23,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class TemplateServiceImpl implements TemplateService {
@@ -123,9 +124,12 @@ public class TemplateServiceImpl implements TemplateService {
     int count = 1;
     for (Element element : doc.select("img")) {
       String imgSrc = element.absUrl("src");
-      if (!imgSrc.contains(AppConstant.TEMPLATE_IMAGE)) {
-        String order = template.getId() + "-" + count;
-        String replace = firebaseService.replaceImageFromUserContent(imgSrc, order);
+      if (imgSrc.contains(AppConstant.USER_IMAGES)) {
+//       imgSrc = imgSrc.substring(imgSrc.lastIndexOf("/") + 1).substring(0, imgSrc.indexOf("?"));
+        String order = template.getId() + "/" + count;
+//        String replace = firebaseService.replaceImageFromUserContent(imgSrc, order);
+        imgSrc =  imgSrc.substring(0, imgSrc.indexOf("?"));
+        String replace = firebaseService.createTemplateImagesFromUserImage(imgSrc, order);
         content = content.replaceAll(imgSrc, replace);
         count++;
       }
