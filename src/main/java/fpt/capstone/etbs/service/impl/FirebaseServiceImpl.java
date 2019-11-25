@@ -78,6 +78,12 @@ public class FirebaseServiceImpl implements FirebaseService {
   }
 
   @Override
+  public String createTemplateImagesFromUserImage(String url, String id) throws Exception {
+    String fbPathTo = AppConstant.TEMPLATE_IMAGE + id;
+    return createBlobFromAnotherBlob(url, fbPathTo);
+  }
+
+  @Override
   public String createRawThumbnailFromTemplate(Integer templateId, Integer rawTemplateId) {
     String fbPathFrom = AppConstant.TEMPLATE_THUMBNAIL + templateId;
     String fbPathTo = AppConstant.RAW_TEMPLATE_THUMBNAIL + rawTemplateId;

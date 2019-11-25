@@ -21,4 +21,6 @@ public interface FirebaseService {
 
   String replaceImageFromUserContent(String html, String order) throws IOException;
 
+  String createTemplateImagesFromUserImage(String url, String id) throws Exception;
+
 }
