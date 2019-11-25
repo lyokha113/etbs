@@ -80,7 +80,7 @@ public class FirebaseServiceImpl implements FirebaseService {
   @Override
   public String createTemplateImagesFromUserImage(String url, String id) throws Exception {
     String fbPathTo = AppConstant.TEMPLATE_IMAGE + id;
-    return createBlobFromAnotherBlob(url, fbPathTo);
+    return createImageFromBlob(url, fbPathTo);
   }
 
   @Override
@@ -105,7 +105,7 @@ public class FirebaseServiceImpl implements FirebaseService {
     blob.copyTo(blobId);
     blob = storage.get(blobId);
     URL url = blob.signUrl(365, TimeUnit.DAYS);
-    return url.toString();
+    return url.toString().replace("https", "http");
   }
 
   private String createImage(String fbPath, MultipartFile image) throws Exception {
@@ -118,6 +118,6 @@ public class FirebaseServiceImpl implements FirebaseService {
     BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(mime).build();
     Blob blob = storage.create(blobInfo, image.getBytes());
     URL url = blob.signUrl(365, TimeUnit.DAYS);
-    return url.toString();
+    return url.toString().replace("https", "http");
   }
 }

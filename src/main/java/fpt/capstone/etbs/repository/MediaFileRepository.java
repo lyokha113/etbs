@@ -14,7 +14,7 @@ public interface MediaFileRepository extends JpaRepository<MediaFile, UUID> {
 
   List<MediaFile> getByAccount_Id(UUID accountId);
 
-  List<MediaFile> getByAccount_Id(List<UUID> accountIds);
+  List<MediaFile> getByAccount_IdIn(List<UUID> accountIds);
 
   List<MediaFile> getByActiveFalse();
 }

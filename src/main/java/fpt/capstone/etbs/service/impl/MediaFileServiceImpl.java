@@ -37,7 +37,7 @@ public class MediaFileServiceImpl implements MediaFileService {
   public List<MediaFile> getMediaFilesOfAdministrator() {
     List<Account> accounts = accountRepository.getByRole_Id(RoleEnum.ADMINISTRATOR.getId());
     List<UUID> ids = accounts.stream().map(Account::getId).collect(Collectors.toList());
-    return mediaFileRepository.getByAccount_Id(ids);
+    return mediaFileRepository.getByAccount_IdIn(ids);
   }
 
   @Override
@@ -69,13 +69,15 @@ public class MediaFileServiceImpl implements MediaFileService {
   }
 
   @Override
-  public void deactivateMediaFile(UUID accountId, UUID id) {
-    MediaFile mediaFile = mediaFileRepository.getByIdAndAccount_Id(accountId, id).orElse(null);
+  public void changeActiveMediaFile(UUID accountId, UUID id, boolean isActive, boolean isAdmin) {
+    MediaFile mediaFile = isAdmin ?
+        mediaFileRepository.findById(id).orElse(null) :
+        mediaFileRepository.getByIdAndAccount_Id(accountId, id).orElse(null);
     if (mediaFile == null) {
       throw new BadRequestException("File doesn't exist");
     }
 
-    mediaFile.setActive(false);
+    mediaFile.setActive(isActive);
     mediaFileRepository.save(mediaFile);
   }
 }

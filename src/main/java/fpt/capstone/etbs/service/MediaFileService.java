@@ -15,7 +15,7 @@ public interface MediaFileService {
 
   List<MediaFile> createMediaFiles(UUID accountId, MultipartFile[] files) throws Exception;
 
-  void deactivateMediaFile(UUID accountId, UUID id);
+  void changeActiveMediaFile(UUID accountId, UUID id, boolean isActive, boolean isAdmin);
 
   void deleteMediaFile(List<MediaFile> files);
 }

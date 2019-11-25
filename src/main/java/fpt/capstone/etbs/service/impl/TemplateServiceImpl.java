@@ -125,9 +125,7 @@ public class TemplateServiceImpl implements TemplateService {
     for (Element element : doc.select("img")) {
       String imgSrc = element.absUrl("src");
       if (imgSrc.contains(AppConstant.USER_IMAGES)) {
-//       imgSrc = imgSrc.substring(imgSrc.lastIndexOf("/") + 1).substring(0, imgSrc.indexOf("?"));
         String order = template.getId() + "/" + count;
-//        String replace = firebaseService.replaceImageFromUserContent(imgSrc, order);
         imgSrc =  imgSrc.substring(0, imgSrc.indexOf("?"));
         String replace = firebaseService.createTemplateImagesFromUserImage(imgSrc, order);
         content = content.replaceAll(imgSrc, replace);
