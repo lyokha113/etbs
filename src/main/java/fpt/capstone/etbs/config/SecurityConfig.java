@@ -131,6 +131,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
         .antMatchers(HttpMethod.PUT, "/category/*", "/template/*", "/account/*", "/tutorial/*")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
+        .antMatchers(HttpMethod.PATCH, "/tutorial/*")
+        .hasRole(RoleEnum.ADMINISTRATOR.getName())
         .antMatchers(HttpMethod.DELETE, "/template/*", "/editor/file")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
         // Logged

@@ -19,5 +19,7 @@ public interface TutorialService {
 
   Tutorial updateTutorial(Integer id, TutorialRequest tutorial) throws Exception;
 
+  Tutorial updateStatusTutorial(Integer id, boolean status) throws Exception;
+
   Tutorial updateThumbnail(Tutorial tutorial, MultipartFile thumbnail) throws Exception;
 }

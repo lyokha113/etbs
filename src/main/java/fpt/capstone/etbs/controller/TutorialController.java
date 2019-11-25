@@ -14,13 +14,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -76,6 +70,20 @@ public class TutorialController {
       Tutorial response = tutorialService.updateTutorial(id, tutorial);
       return ResponseEntity.ok(
           new ApiResponse<>(true, "Tutorial updated", TutorialResponse.setResponse(response)));
+    } catch (BadRequestException ex) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
+  }
+
+  @PatchMapping("/tutorial/{id}")
+  public ResponseEntity<ApiResponse> updateStatusTutorial(
+          @PathVariable("id") Integer id,
+          @RequestParam("active") boolean active)
+          throws Exception {
+    try {
+      Tutorial response = tutorialService.updateStatusTutorial(id, active);
+      return ResponseEntity.ok(
+              new ApiResponse<>(true, "Tutorial status updated", TutorialResponse.setResponse(response)));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
