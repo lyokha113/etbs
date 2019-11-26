@@ -60,7 +60,9 @@ public class TutorialController {
       throws Exception {
     try {
       Tutorial response = tutorialService.createTutorial(tutorial);
-      response = tutorialService.updateThumbnail(response, tutorial.getThumbnail());
+      if (tutorial.getThumbnail() != null) {
+        response = tutorialService.updateThumbnail(response, tutorial.getThumbnail());
+      }
       return ResponseEntity.ok(
           new ApiResponse<>(true, "Tutorial created", TutorialResponse.setResponse(response)));
     } catch (BadRequestException ex) {
