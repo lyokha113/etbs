@@ -34,6 +34,13 @@ dependencies {
     implementation 'com.sendgrid:sendgrid-java:4.4.1'
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.1.6.RELEASE'
     implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.1.6.RELEASE'
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.0.0-alpha-3'
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-remote-driver', version: '4.0.0-alpha-3'
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: '4.0.0-alpha-3'
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-api', version: '4.0.0-alpha-3'
+    implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
+    implementation group: 'ru.yandex.qatools.ashot', name: 'ashot', version: '1.5.4'
+
     implementation 'com.google.firebase:firebase-admin:6.8.1'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
