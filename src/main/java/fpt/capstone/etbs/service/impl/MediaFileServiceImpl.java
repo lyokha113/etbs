@@ -72,7 +72,7 @@ public class MediaFileServiceImpl implements MediaFileService {
   public void changeActiveMediaFile(UUID accountId, UUID id, boolean isActive, boolean isAdmin) {
     MediaFile mediaFile = isAdmin ?
         mediaFileRepository.findById(id).orElse(null) :
-        mediaFileRepository.getByIdAndAccount_Id(accountId, id).orElse(null);
+        mediaFileRepository.getByIdAndAccount_Id(id, accountId).orElse(null);
     if (mediaFile == null) {
       throw new BadRequestException("File doesn't exist");
     }

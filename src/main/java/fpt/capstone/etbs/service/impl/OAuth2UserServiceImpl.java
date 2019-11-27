@@ -55,7 +55,7 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
       account = userOptional.get();
       if (!account.getProvider().equals(AuthProvider.google)) {
         throw new OAuth2AuthenticationProcessingException(
-            "Looks like you're signed up with "
+            "Looks like you're signed up this email with "
                 + account.getProvider()
                 + " account. Please use your "
                 + account.getProvider()

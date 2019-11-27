@@ -66,7 +66,7 @@ public class MediaFileController {
   }
 
   @PutMapping("/file/{id}")
-  public ResponseEntity<ApiResponse> restoreMediaFile(@PathVariable("id") UUID id,
+  public ResponseEntity<ApiResponse> changeStatusMediaFile(@PathVariable("id") UUID id,
       @RequestParam("active") boolean active) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
