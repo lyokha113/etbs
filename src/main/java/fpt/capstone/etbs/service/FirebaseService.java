@@ -7,7 +7,7 @@ public interface FirebaseService {
 
   String createUserImage(MultipartFile file, String path, String name) throws Exception;
 
-  String createRawThumbnailFromTemplate(Integer templateId, Integer rawTemplateId) throws Exception;
+  String createRawThumbnailFromTemplate(Integer templateId, Integer versionId) throws Exception;
 
   String createTemplateThumbnailFromRaw(Integer rawTemplateId, Integer templateId) throws Exception;
 

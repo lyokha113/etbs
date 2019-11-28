@@ -21,9 +21,20 @@ public class CategoryResponse {
   private int id;
   private String name;
   private List<TemplateOfCategory> templates;
+  private int noOfTemplates;
   private boolean active;
 
   public static CategoryResponse setResponse(Category category) {
+    Set<Template> templates = category.getTemplates();
+    return CategoryResponse.builder()
+        .id(category.getId())
+        .name(category.getName())
+        .noOfTemplates(templates == null ? 0 : templates.size())
+        .active(category.isActive())
+        .build();
+  }
+
+  public static CategoryResponse setResponseWithTemplates(Category category) {
     Set<Template> templates = category.getTemplates();
     List<TemplateOfCategory> templatesOfCategory =
         templates == null

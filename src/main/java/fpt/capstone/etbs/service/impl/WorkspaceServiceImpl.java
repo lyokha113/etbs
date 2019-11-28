@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkspaceServiceImpl implements WorkspaceService {
 
-  private static final String DEFAULT_WORKSPACE_NAME = "Default";
   @Autowired
   private WorkspaceRepository workspaceRepository;
   @Autowired
@@ -94,11 +93,12 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     if (templates.size() > 0) {
       Workspace defaultWorkspace =
           workspaceRepository
-              .getByNameAndAccount_Id(DEFAULT_WORKSPACE_NAME, accountId)
+              .getByNameAndAccount_Id(AppConstant.DEFAULT_WORKSPACE_NAME, accountId)
               .orElseThrow(() -> new BadRequestException("Default workspace doesn't exist"));
 
       templates.forEach(t -> t.setWorkspace(defaultWorkspace));
       rawTemplateRepository.saveAll(templates);
+      workspace.setRawTemplates(null);
     }
 
     workspaceRepository.delete(workspace);

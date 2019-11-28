@@ -41,16 +41,6 @@ public class WorkspaceController {
     return ResponseEntity.ok(new ApiResponse<>(true, "", response));
   }
 
-  @GetMapping("/workspace/{id}")
-  public ResponseEntity<ApiResponse> getWorkspaceOfAccount(@PathVariable("id") Integer id) {
-    Authentication auth = authenticationFacade.getAuthentication();
-    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-    Workspace response = workspaceService.getWorkspaceOfAccount(id, userPrincipal.getId());
-    return response != null
-        ? ResponseEntity.ok(new ApiResponse<>(true, "", WorkspaceResponse.setResponse(response)))
-        : ResponseEntity.badRequest().body(new ApiResponse<>(true, "Not found", null));
-  }
-
   @PostMapping("/workspace")
   public ResponseEntity<ApiResponse> createWorkspace(@Valid @RequestBody WorkspaceRequest request) {
     Authentication auth = authenticationFacade.getAuthentication();

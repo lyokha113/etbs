@@ -113,13 +113,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/tutorial/*")
         .permitAll()
         // User
-        .antMatchers(HttpMethod.GET, "/rating", "/workspace", "/workspace/*",
-            "/raw/**")
+        .antMatchers(HttpMethod.GET, "/rating", "/workspace",   "/raw/*")
         .hasRole(RoleEnum.USER.getName())
         .antMatchers(HttpMethod.POST, "/rating", "/template", "/workspace", "/email/send/",
             "/rate", "/raw", "/version")
         .hasRole(RoleEnum.USER.getName())
-        .antMatchers(HttpMethod.PUT, "/rating", "/workspace/*", "/raw/**", "/version/*")
+        .antMatchers(HttpMethod.PUT, "/rating", "/workspace/*", "/raw/*", "/version/*")
+        .hasRole(RoleEnum.USER.getName())
+        .antMatchers(HttpMethod.PATCH, "/raw/*")
         .hasRole(RoleEnum.USER.getName())
         .antMatchers(HttpMethod.DELETE, "/rating", "/workspace/*", "/raw/*",
             "/version/*")

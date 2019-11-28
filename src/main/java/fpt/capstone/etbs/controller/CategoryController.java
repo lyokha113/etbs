@@ -9,6 +9,7 @@ import fpt.capstone.etbs.payload.CategoryResponse;
 import fpt.capstone.etbs.payload.CategoryUpdateRequest;
 import fpt.capstone.etbs.service.CategoryService;
 import fpt.capstone.etbs.util.RoleUtils;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -35,12 +36,14 @@ public class CategoryController {
   private ResponseEntity<ApiResponse> getCategories() {
 
     Authentication auth = authenticationFacade.getAuthentication();
-    List<Category> categories = RoleUtils.hasAdminRole(auth)
-        ? categoryService.getCategories()
-        : categoryService.getActiveCategories();
-
-    List<CategoryResponse> response =
-        categories.stream().map(CategoryResponse::setResponse).collect(Collectors.toList());
+    List<CategoryResponse> response = new ArrayList<>();
+    if (RoleUtils.hasAdminRole(auth)) {
+      List<Category> categories = categoryService.getCategories();
+      response = categories.stream().map(CategoryResponse::setResponseWithTemplates).collect(Collectors.toList());
+    } else {
+      List<Category> categories = categoryService.getActiveCategories();
+      response = categories.stream().map(CategoryResponse::setResponse).collect(Collectors.toList());
+    }
     return ResponseEntity.ok(new ApiResponse<>(true, "", response));
   }
 

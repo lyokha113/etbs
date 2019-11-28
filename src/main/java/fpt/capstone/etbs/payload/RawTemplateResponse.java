@@ -2,6 +2,7 @@ package fpt.capstone.etbs.payload;
 
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.model.RawTemplateVersion;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,7 @@ public class RawTemplateResponse {
   private String thumbnail;
   private String content;
   private String description;
+  private String date;
   private VersionOfTemplate currentVersion;
   private List<VersionOfTemplate> versions;
 
@@ -28,8 +30,8 @@ public class RawTemplateResponse {
     return RawTemplateResponse.builder()
         .id(rawTemplate.getId())
         .name(rawTemplate.getName())
-        .content(rawTemplate.getCurrentVersion().getContent())
         .thumbnail(rawTemplate.getCurrentVersion().getThumbnail())
+        .date(rawTemplate.getLastModifiedDate().toString())
         .workspaceId(rawTemplate.getWorkspace().getId())
         .description(rawTemplate.getDescription())
         .currentVersion(VersionOfTemplate.setResponse(rawTemplate.getCurrentVersion()))

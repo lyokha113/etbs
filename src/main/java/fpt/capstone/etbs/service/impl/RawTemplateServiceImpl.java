@@ -50,8 +50,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
   }
 
   @Override
-  public RawTemplate createRawTemplate(UUID accountId, RawTemplateCreateRequest request)
-      throws Exception {
+  public RawTemplate createRawTemplate(UUID accountId, RawTemplateCreateRequest request) {
     Account account = accountRepository.findById(accountId).orElse(null);
     if (account == null) {
       throw new BadRequestException("Account doesn't exist");
@@ -76,7 +75,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
 
     RawTemplateVersion currentVersion = RawTemplateVersion.builder()
         .name(AppConstant.DEFAULT_VERSION_NAME)
-        .content("Test Content")
+        .content("<p style=\"text-align: center; font-size: 40px; font-weight: bold\">Blank content</p>")
         .thumbnail(AppConstant.DEFAULT_RAW_TEMPLATE_THUMBNAIL)
         .rawTemplate(rawTemplate)
         .build();
@@ -132,8 +131,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
       throw new BadRequestException("Template doesn't exist");
     }
     String thumbnail = firebaseService
-        .createRawThumbnailFromTemplate(template.getId(),
-            rawTemplate.getCurrentVersion().getId());
+        .createRawThumbnailFromTemplate(template.getId(), rawTemplate.getCurrentVersion().getId());
     RawTemplateUpdateRequest request = RawTemplateUpdateRequest.builder()
         .content(template.getContent())
         .thumbnail(thumbnail)
