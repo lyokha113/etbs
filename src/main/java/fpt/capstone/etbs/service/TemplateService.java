@@ -5,7 +5,6 @@ import fpt.capstone.etbs.payload.TemplateCreateRequest;
 import fpt.capstone.etbs.payload.TemplateListByCategories;
 import fpt.capstone.etbs.payload.TemplateUpdateRequest;
 import java.util.List;
-import java.util.UUID;
 
 public interface TemplateService {
 
@@ -17,11 +16,13 @@ public interface TemplateService {
 
   Template getActiveTemplate(Integer id);
 
-  Template createTemplate(UUID accountId, TemplateCreateRequest request);
+  Template createTemplate(TemplateCreateRequest request);
 
   Template updateTemplate(Integer id, TemplateUpdateRequest request) throws Exception;
 
-  Template updateThumbnail(Template template, Integer rawTemplateId) throws Exception;
+  Template updateThumbnail(Template template) throws Exception;
+
+  Template updateContentImage(Template template) throws Exception;
 
   void deleteTemplate(Integer id);
 

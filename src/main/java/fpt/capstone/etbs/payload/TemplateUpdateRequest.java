@@ -15,8 +15,6 @@ public class TemplateUpdateRequest {
 
   private String name;
   private String description;
-  private String content;
-  private MultipartFile thumbnail;
   private List<Integer> categoryIds;
   private boolean active;
 }

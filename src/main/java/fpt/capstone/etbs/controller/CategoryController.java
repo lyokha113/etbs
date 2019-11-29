@@ -52,7 +52,7 @@ public class CategoryController {
       @Valid @RequestBody CategoryCreateRequest request) {
     try {
       Category category = categoryService.createCategory(request);
-      CategoryResponse response = CategoryResponse.setResponse(category);
+      CategoryResponse response = CategoryResponse.setResponseWithTemplates(category);
       return ResponseEntity.ok(new ApiResponse<>(true, "Category created", response));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
@@ -64,7 +64,7 @@ public class CategoryController {
       @PathVariable("id") int id, @Valid @RequestBody CategoryUpdateRequest request) {
     try {
       Category category = categoryService.updateCategory(id, request);
-      CategoryResponse response = CategoryResponse.setResponse(category);
+      CategoryResponse response = CategoryResponse.setResponseWithTemplates(category);
       return ResponseEntity.ok(new ApiResponse<>(true, "Category updated", response));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));

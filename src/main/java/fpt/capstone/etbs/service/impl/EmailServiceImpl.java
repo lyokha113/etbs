@@ -19,6 +19,7 @@ import com.sendgrid.Request;
 import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
+import com.sendgrid.helpers.mail.objects.Personalization;
 import fpt.capstone.etbs.component.SendGridMail;
 import fpt.capstone.etbs.constant.MailProvider;
 import fpt.capstone.etbs.exception.BadRequestException;
@@ -34,6 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
@@ -43,6 +45,7 @@ import javax.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -66,6 +69,7 @@ public class EmailServiceImpl implements EmailService {
   private RawTemplateService rawTemplateService;
 
   @Override
+  @Async("mailAsyncExecutor")
   public void sendEmail(UUID accountId, SendEmailRequest request)
       throws MessagingException, IOException {
     String provider = request.getProvider();
@@ -152,10 +156,23 @@ public class EmailServiceImpl implements EmailService {
 
   private void sendEmailBySendGrid(SendEmailRequest request, String subject, String content)
       throws IOException {
+
+    SendGridMail mail = new SendGridMail();
+    mail.setSubject(subject);
     Email sender = new Email("etbsonline@gmail.com");
-    Email receiver = new Email(request.getTo());
+    mail.setFrom(sender);
+
+    Personalization personalization = new Personalization();
+    String [] recivers = request.getTo();
+    for (int i = 0; i < recivers.length; i++) {
+      Email receiver = new Email(recivers[i]);
+      personalization.addTo(receiver);
+    }
+    personalization.setSubject(subject);
+    mail.addPersonalization(personalization);
+
     Content body = new Content("text/html", content);
-    SendGridMail mail = new SendGridMail(sender, subject, receiver, body);
+    mail.addContent(body);
 
     Request re = new Request();
     re.setMethod(Method.POST);

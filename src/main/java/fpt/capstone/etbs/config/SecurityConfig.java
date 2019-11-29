@@ -116,7 +116,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.GET, "/rating", "/workspace",   "/raw/*")
         .hasRole(RoleEnum.USER.getName())
         .antMatchers(HttpMethod.POST, "/rating", "/template", "/workspace", "/email/send/",
-            "/rate", "/raw", "/version")
+            "/rate", "/raw", "/version", "/publish")
         .hasRole(RoleEnum.USER.getName())
         .antMatchers(HttpMethod.PUT, "/rating", "/workspace/*", "/raw/*", "/version/*")
         .hasRole(RoleEnum.USER.getName())
@@ -126,11 +126,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/version/*")
         .hasRole(RoleEnum.USER.getName())
         // Administrator
-        .antMatchers(HttpMethod.GET, "/account", "/editor/file")
+        .antMatchers(HttpMethod.GET, "/account", "/editor/file", "/publish")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
         .antMatchers(HttpMethod.POST, "/category", "/account", "/tutorial", "/editor/file")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
-        .antMatchers(HttpMethod.PUT, "/category/*", "/template/*", "/account/*", "/tutorial/*")
+        .antMatchers(HttpMethod.PUT, "/category/*", "/template/*", "/account/*", "/tutorial/*", "/publish/*")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
         .antMatchers(HttpMethod.PATCH, "/tutorial/*")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())

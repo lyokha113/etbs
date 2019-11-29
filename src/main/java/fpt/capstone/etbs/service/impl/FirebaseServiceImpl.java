@@ -9,6 +9,7 @@ import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.service.FirebaseService;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -40,10 +41,18 @@ public class FirebaseServiceImpl implements FirebaseService {
   }
 
   @Override
-  public String createTemplateThumbnail(MultipartFile file, String name)
+  public String createTemplateThumbnail(BufferedImage file, String name)
       throws Exception {
     String fbPath = AppConstant.TEMPLATE_THUMBNAIL + name;
-    return createImage(fbPath, file);
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    ImageIO.write((RenderedImage) file, "png", baos);
+    baos.flush();
+    Storage storage = bucket.getStorage();
+    BlobId blobId = BlobId.of(bucket.getName(), fbPath);
+    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/png").build();
+    Blob blob = storage.create(blobInfo, baos.toByteArray());
+    URL url = blob.signUrl(365, TimeUnit.DAYS);
+    return url.toString();
   }
 
   @Override
@@ -74,6 +83,20 @@ public class FirebaseServiceImpl implements FirebaseService {
     BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/png").build();
     Blob blob = storage.create(blobInfo, baos.toByteArray());
     url = blob.signUrl(365, TimeUnit.DAYS);
+    return url.toString();
+  }
+
+  @Override
+  public String replaceImageFromUserContent(BufferedImage image, String order) throws IOException {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    ImageIO.write((RenderedImage) image, "png", baos);
+    baos.flush();
+    Storage storage = bucket.getStorage();
+    String fbPath = AppConstant.TEMPLATE_IMAGE + order;
+    BlobId blobId = BlobId.of(bucket.getName(), fbPath);
+    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/png").build();
+    Blob blob = storage.create(blobInfo, baos.toByteArray());
+    URL url = blob.signUrl(365, TimeUnit.DAYS);
     return url.toString();
   }
 

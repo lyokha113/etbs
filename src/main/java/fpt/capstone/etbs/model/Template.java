@@ -69,8 +69,8 @@ public class Template extends Auditing {
   @ManyToMany(cascade = CascadeType.ALL)
   @JoinTable(
       name = "category_templates",
-      joinColumns = {@JoinColumn(name = "categories_id")},
-      inverseJoinColumns = {@JoinColumn(name = "templates_id")})
+      joinColumns = {@JoinColumn(name = "templates_id")},
+      inverseJoinColumns = {@JoinColumn(name = "categories_id")})
   private Set<Category> categories;
 
   @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, orphanRemoval = true)

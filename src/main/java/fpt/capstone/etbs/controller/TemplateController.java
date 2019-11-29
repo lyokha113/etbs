@@ -64,21 +64,6 @@ public class TemplateController {
         : ResponseEntity.badRequest().body(new ApiResponse<>(true, "Not found", null));
   }
 
-  @PostMapping("/template")
-  private ResponseEntity<ApiResponse> createTemplate(
-      @Valid @RequestBody TemplateCreateRequest request) throws Exception {
-    Authentication auth = authenticationFacade.getAuthentication();
-    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-    try {
-      Template template = templateService.createTemplate(userPrincipal.getId(), request);
-      template = templateService.updateThumbnail(template, request.getRawTemplateId());
-      TemplateResponse response = TemplateResponse.setResponse(template);
-      return ResponseEntity.ok(new ApiResponse<>(true, "Template created", response));
-    } catch (BadRequestException ex) {
-      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
-    }
-  }
-
   @PutMapping("/template/{id}")
   private ResponseEntity<ApiResponse> updateTemplate(
       @PathVariable("id") Integer id,
