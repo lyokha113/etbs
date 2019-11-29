@@ -66,7 +66,7 @@ public class RawTemplateController {
   @PutMapping("/raw/{id}")
   private ResponseEntity<ApiResponse> updateRawTemplate(
       @PathVariable("id") Integer id,
-      @Valid @ModelAttribute RawTemplateUpdateRequest request)
+      @Valid @RequestBody RawTemplateUpdateRequest request)
       throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
