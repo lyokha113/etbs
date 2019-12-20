@@ -44,6 +44,6 @@ public class Role {
   @Column(columnDefinition = "TINYINT(1) default 1")
   private boolean active;
 
-  @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
   private Set<Account> accounts;
 }

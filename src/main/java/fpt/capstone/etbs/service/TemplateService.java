@@ -1,10 +1,9 @@
 package fpt.capstone.etbs.service;
 
 import fpt.capstone.etbs.model.Template;
-import fpt.capstone.etbs.payload.TemplateCreateRequest;
-import fpt.capstone.etbs.payload.TemplateListByCategories;
-import fpt.capstone.etbs.payload.TemplateUpdateRequest;
+import fpt.capstone.etbs.payload.TemplateRequest;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public interface TemplateService {
 
@@ -16,17 +15,16 @@ public interface TemplateService {
 
   Template getActiveTemplate(Integer id);
 
-  Template createTemplate(TemplateCreateRequest request);
+  Template createTemplate(TemplateRequest request);
 
-  Template updateTemplate(Integer id, TemplateUpdateRequest request) throws Exception;
+  Template updateTemplate(Integer id, TemplateRequest request) throws Exception;
+
+  CompletableFuture<Template> updateThumbnailAsync(Template template) throws Exception;
 
   Template updateThumbnail(Template template) throws Exception;
 
   Template updateContentImage(Template template) throws Exception;
 
-  void deleteTemplate(Integer id);
+  void deleteTemplate(Integer id) throws Exception;
 
-  List<Template> getHighRatingTemplate(int quantity);
-
-  List<Template> getListByCategories(TemplateListByCategories request);
 }

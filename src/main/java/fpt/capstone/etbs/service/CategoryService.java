@@ -1,8 +1,7 @@
 package fpt.capstone.etbs.service;
 
 import fpt.capstone.etbs.model.Category;
-import fpt.capstone.etbs.payload.CategoryCreateRequest;
-import fpt.capstone.etbs.payload.CategoryUpdateRequest;
+import fpt.capstone.etbs.payload.CategoryRequest;
 import java.util.List;
 
 public interface CategoryService {
@@ -11,7 +10,7 @@ public interface CategoryService {
 
   List<Category> getActiveCategories();
 
-  Category createCategory(CategoryCreateRequest request);
+  Category createCategory(CategoryRequest request);
 
-  Category updateCategory(int id, CategoryUpdateRequest request);
+  Category updateCategory(int id, CategoryRequest request);
 }

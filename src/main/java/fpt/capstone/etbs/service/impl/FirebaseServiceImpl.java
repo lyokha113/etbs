@@ -35,31 +35,45 @@ public class FirebaseServiceImpl implements FirebaseService {
   }
 
   @Override
-  public String createRawTemplateThumbnail(MultipartFile file, String name) throws Exception {
+  public String createTutorialThumbnail(MultipartFile file, String name)
+      throws Exception {
+    String fbPath = AppConstant.TUTORIAL_THUMBNAIL + name;
+    return createImage(fbPath, file);
+  }
+
+  @Override
+  public String createRawThumbnailFromTemplate(Integer templateId, Integer versionId) {
+    String fbPathFrom = AppConstant.TEMPLATE_THUMBNAIL + templateId;
+    String fbPathTo = AppConstant.RAW_TEMPLATE_THUMBNAIL + versionId;
+    return createImageFromBlob(fbPathFrom, fbPathTo);
+  }
+
+  @Override
+  public String createRawThumbnail(MultipartFile file, String name) throws Exception {
     String fbPath = AppConstant.RAW_TEMPLATE_THUMBNAIL + name;
     return createImage(fbPath, file);
+  }
+
+  @Override
+  public String createTemplateThumbnail(Integer rawTemplateId, Integer templateId) {
+    String fbPathFrom = AppConstant.RAW_TEMPLATE_THUMBNAIL + rawTemplateId;
+    String fbPathTo = AppConstant.TEMPLATE_THUMBNAIL + templateId;
+    return createImageFromBlob(fbPathFrom, fbPathTo);
   }
 
   @Override
   public String createTemplateThumbnail(BufferedImage file, String name)
       throws Exception {
     String fbPath = AppConstant.TEMPLATE_THUMBNAIL + name;
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    ImageIO.write((RenderedImage) file, "png", baos);
-    baos.flush();
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    ImageIO.write(file, "png", os);
+    os.flush();
     Storage storage = bucket.getStorage();
     BlobId blobId = BlobId.of(bucket.getName(), fbPath);
     BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/png").build();
-    Blob blob = storage.create(blobInfo, baos.toByteArray());
+    Blob blob = storage.create(blobInfo, os.toByteArray());
     URL url = blob.signUrl(365, TimeUnit.DAYS);
     return url.toString();
-  }
-
-  @Override
-  public String createTutorialThumbnail(MultipartFile file, String name)
-      throws Exception {
-    String fbPath = AppConstant.TUTORIAL_THUMBNAIL + name;
-    return createImage(fbPath, file);
   }
 
   @Override
@@ -106,19 +120,9 @@ public class FirebaseServiceImpl implements FirebaseService {
     return createImageFromBlob(url, fbPathTo);
   }
 
-  @Override
-  public String createRawThumbnailFromTemplate(Integer templateId, Integer versionId) {
-    String fbPathFrom = AppConstant.TEMPLATE_THUMBNAIL + templateId;
-    String fbPathTo = AppConstant.RAW_TEMPLATE_THUMBNAIL + versionId;
-    return createImageFromBlob(fbPathFrom, fbPathTo);
-  }
 
-  @Override
-  public String createTemplateThumbnailFromRaw(Integer rawTemplateId, Integer templateId) {
-    String fbPathFrom = AppConstant.RAW_TEMPLATE_THUMBNAIL + rawTemplateId;
-    String fbPathTo = AppConstant.TEMPLATE_THUMBNAIL + templateId;
-    return createImageFromBlob(fbPathFrom, fbPathTo);
-  }
+
+
 
   private String createImageFromBlob(String fbPathFrom, String fbPathTo) {
     BlobId blobId = BlobId.of(bucket.getName(), fbPathFrom);

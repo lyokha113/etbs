@@ -61,5 +61,6 @@ dependencies {
 
     //jsoup
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.12.1'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
 }

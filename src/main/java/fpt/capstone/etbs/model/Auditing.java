@@ -2,6 +2,8 @@ package fpt.capstone.etbs.model;
 
 import static javax.persistence.TemporalType.TIMESTAMP;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
@@ -19,11 +21,9 @@ public abstract class Auditing {
 
   @CreatedDate
   @Column(name = "created_date")
-  @Temporal(TIMESTAMP)
-  protected Date createdDate;
+  protected LocalDateTime createdDate;
 
   @LastModifiedDate
   @Column(name = "last_modified_date")
-  @Temporal(TIMESTAMP)
-  protected Date lastModifiedDate;
+  protected LocalDateTime lastModifiedDate;
 }

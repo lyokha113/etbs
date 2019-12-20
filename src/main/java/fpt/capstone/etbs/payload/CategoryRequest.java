@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryCreateRequest {
+public class CategoryRequest {
 
   private String name;
+  private boolean active;
 }

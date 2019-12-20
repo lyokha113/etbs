@@ -6,19 +6,24 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TemplateCreateRequest {
+public class TemplateRequest {
 
   private String name;
   private String description;
   private String content;
   private UUID authorId;
   private List<Integer> categoryIds;
-  private String status;
 
+  public TemplateRequest(ApprovePublishRequest approveRequest, String content, UUID authorId) {
+      this.name = approveRequest.getName();
+      this.description = approveRequest.getDescription();
+      this.content = content;
+      this.authorId = authorId;
+      this.categoryIds = approveRequest.getCategoryIds();
+  }
 }

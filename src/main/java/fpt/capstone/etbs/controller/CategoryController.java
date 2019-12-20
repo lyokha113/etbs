@@ -4,9 +4,8 @@ import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Category;
 import fpt.capstone.etbs.payload.ApiResponse;
-import fpt.capstone.etbs.payload.CategoryCreateRequest;
+import fpt.capstone.etbs.payload.CategoryRequest;
 import fpt.capstone.etbs.payload.CategoryResponse;
-import fpt.capstone.etbs.payload.CategoryUpdateRequest;
 import fpt.capstone.etbs.service.CategoryService;
 import fpt.capstone.etbs.util.RoleUtils;
 import java.util.ArrayList;
@@ -49,7 +48,7 @@ public class CategoryController {
 
   @PostMapping("/category")
   private ResponseEntity<ApiResponse> createCategory(
-      @Valid @RequestBody CategoryCreateRequest request) {
+      @Valid @RequestBody CategoryRequest request) {
     try {
       Category category = categoryService.createCategory(request);
       CategoryResponse response = CategoryResponse.setResponseWithTemplates(category);
@@ -61,7 +60,7 @@ public class CategoryController {
 
   @PutMapping("/category/{id}")
   private ResponseEntity<ApiResponse> updateCategory(
-      @PathVariable("id") int id, @Valid @RequestBody CategoryUpdateRequest request) {
+      @PathVariable("id") int id, @Valid @RequestBody CategoryRequest request) {
     try {
       Category category = categoryService.updateCategory(id, request);
       CategoryResponse response = CategoryResponse.setResponseWithTemplates(category);

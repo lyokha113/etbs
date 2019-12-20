@@ -5,25 +5,23 @@ import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Category;
 import fpt.capstone.etbs.model.Template;
-import fpt.capstone.etbs.payload.TemplateCreateRequest;
-import fpt.capstone.etbs.payload.TemplateListByCategories;
-import fpt.capstone.etbs.payload.TemplateUpdateRequest;
+import fpt.capstone.etbs.payload.TemplateRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.CategoryRepository;
-import fpt.capstone.etbs.repository.RawTemplateRepository;
 import fpt.capstone.etbs.repository.TemplateRepository;
 import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.ImageGenerator;
 import fpt.capstone.etbs.service.TemplateService;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,9 +32,6 @@ public class TemplateServiceImpl implements TemplateService {
 
   @Autowired
   private AccountRepository accountRepository;
-
-  @Autowired
-  private RawTemplateRepository rawTemplateRepository;
 
   @Autowired
   private CategoryRepository categoryRepository;
@@ -68,7 +63,7 @@ public class TemplateServiceImpl implements TemplateService {
   }
 
   @Override
-  public Template updateTemplate(Integer id, TemplateUpdateRequest request) throws Exception {
+  public Template updateTemplate(Integer id, TemplateRequest request) {
 
     Template template = templateRepository.findById(id).orElse(null);
 
@@ -76,22 +71,29 @@ public class TemplateServiceImpl implements TemplateService {
       throw new BadRequestException("Template doesn't exist");
     }
 
+    if (isDuplicateName(request.getName(), template.getId())) {
+      throw new BadRequestException("Template name is existed");
+    }
+
     Set<Category> categories = new HashSet<>(categoryRepository
         .getAllByActiveTrueAndIdIn(request.getCategoryIds()));
 
     template.setName(request.getName());
     template.setDescription(request.getDescription());
-    template.setActive(request.isActive());
     template.setCategories(categories);
     return templateRepository.save(template);
   }
 
   @Override
-  public Template createTemplate(TemplateCreateRequest request) {
+  public Template createTemplate(TemplateRequest request) {
 
     Account author = accountRepository.findById(request.getAuthorId()).orElse(null);
     if (author == null) {
       throw new BadRequestException("Author isn't existed");
+    }
+
+    if (isDuplicateName(request.getName())) {
+      throw new BadRequestException("Template name is existed");
     }
 
     Set<Category> categories = new HashSet<>(categoryRepository
@@ -130,16 +132,22 @@ public class TemplateServiceImpl implements TemplateService {
   }
 
   @Override
+  @Async("imageGenAsyncExecutor")
+  public CompletableFuture<Template> updateThumbnailAsync(Template template) throws Exception {
+    return CompletableFuture.completedFuture(updateThumbnail(template));
+  }
+
+  @Override
   public Template updateThumbnail(Template template) throws Exception {
     BufferedImage bufferedImage = imageGenerator.generateImageFromHtml(template.getContent());
     String url = firebaseService
         .createTemplateThumbnail(bufferedImage, String.valueOf(template.getId()));
-      template.setThumbnail(url);
+    template.setThumbnail(url);
     return templateRepository.save(template);
   }
 
   @Override
-  public void deleteTemplate(Integer id) {
+  public void deleteTemplate(Integer id) throws Exception {
     Template template = templateRepository.findById(id).orElse(null);
 
     if (template == null) {
@@ -147,19 +155,15 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     template.setCategories(null);
+    firebaseService.deleteImage(AppConstant.TEMPLATE_THUMBNAIL + id);
     templateRepository.delete(template);
   }
 
-  @Override
-  public List<Template> getHighRatingTemplate(int quantity) {
-    return null;
+  private boolean isDuplicateName(String name) {
+    return templateRepository.getByName(name).isPresent();
   }
 
-  @Override
-  public List<Template> getListByCategories(TemplateListByCategories request) {
-    List<Category> categories = new ArrayList<>(categoryRepository
-        .getAllByActiveTrueAndIdIn(request.getCategories()));
-    return templateRepository.findAllByCategoriesInAndActiveTrue(categories);
+  private boolean isDuplicateName(String name, Integer id) {
+    return templateRepository.getByNameAndIdNot(name, id).isPresent();
   }
-
 }

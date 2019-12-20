@@ -13,24 +13,37 @@ public class ThreadConfig {
   @Bean("mailAsyncExecutor")
   public TaskExecutor mailAsyncExecutor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-    executor.setCorePoolSize(5);
-    executor.setMaxPoolSize(5);
-    executor.setQueueCapacity(20);
+    executor.setCorePoolSize(10);
+    executor.setMaxPoolSize(20);
+    executor.setQueueCapacity(50);
     executor.setWaitForTasksToCompleteOnShutdown(true);
-    executor.setThreadNamePrefix("EmailThread-");
+    executor.setThreadNamePrefix("Email-");
     executor.initialize();
     return executor;
   }
 
-//  @Bean("contentAsyncExecutor")
-//  public TaskExecutor contentAsyncExecutor() {
-//    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-//    executor.setCorePoolSize(5);
-//    executor.setMaxPoolSize(5);
-//    executor.setQueueCapacity(20);
-//    executor.setWaitForTasksToCompleteOnShutdown(true);
-//    executor.setThreadNamePrefix("ContentThread-");
-//    executor.initialize();
-//    return executor;
-//  }
+  @Bean("imageGenAsyncExecutor")
+  public TaskExecutor imageGenAsyncExecutor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setCorePoolSize(10);
+    executor.setMaxPoolSize(20);
+    executor.setQueueCapacity(50);
+    executor.setWaitForTasksToCompleteOnShutdown(true);
+    executor.setThreadNamePrefix("ImageGen-");
+    executor.initialize();
+    return executor;
+  }
+
+  @Bean("checkContentAsyncExecutor")
+  public TaskExecutor checkContentAsyncExecutor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setCorePoolSize(5);
+    executor.setMaxPoolSize(5);
+    executor.setQueueCapacity(20);
+    executor.setWaitForTasksToCompleteOnShutdown(true);
+    executor.setThreadNamePrefix("CheckContent-");
+    executor.initialize();
+    return executor;
+  }
+
 }

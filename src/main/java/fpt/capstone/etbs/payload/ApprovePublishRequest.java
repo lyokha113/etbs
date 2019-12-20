@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TemplateListByCategories {
-
-  private List<Integer> categories;
+public class ApprovePublishRequest {
+  private String name;
+  private String description;
+  private List<Integer> categoryIds;
 }

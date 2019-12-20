@@ -7,7 +7,7 @@ import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.model.RawTemplateVersion;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.model.Workspace;
-import fpt.capstone.etbs.payload.RawTemplateCreateRequest;
+import fpt.capstone.etbs.payload.RawTemplateRequest;
 import fpt.capstone.etbs.payload.RawTemplateUpdateRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.RawTemplateRepository;
@@ -50,7 +50,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
   }
 
   @Override
-  public RawTemplate createRawTemplate(UUID accountId, RawTemplateCreateRequest request) {
+  public RawTemplate createRawTemplate(UUID accountId, RawTemplateRequest request) {
     Account account = accountRepository.findById(accountId).orElse(null);
     if (account == null) {
       throw new BadRequestException("Account doesn't exist");
@@ -116,7 +116,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
       rawTemplate.getCurrentVersion().setThumbnail(request.getThumbnail());
     } else if (request.getThumbnailFile() != null) {
       rawTemplate.getCurrentVersion().setThumbnail(firebaseService
-          .createRawTemplateThumbnail(request.getThumbnailFile(),
+          .createRawThumbnail(request.getThumbnailFile(),
               rawTemplate.getCurrentVersion().getId().toString()));
     }
     return rawTemplateRepository.save(rawTemplate);
@@ -132,10 +132,12 @@ public class RawTemplateServiceImpl implements RawTemplateService {
     }
     String thumbnail = firebaseService
         .createRawThumbnailFromTemplate(template.getId(), rawTemplate.getCurrentVersion().getId());
+
     RawTemplateUpdateRequest request = RawTemplateUpdateRequest.builder()
         .content(template.getContent())
         .thumbnail(thumbnail)
         .build();
+
     return updateRawTemplate(rawTemplate.getWorkspace().getAccount().getId(), rawTemplate.getId(),
         request);
 
@@ -165,7 +167,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
   }
 
   @Override
-  public void deleteRawTemplate(UUID accountId, Integer id) {
+  public void deleteRawTemplate(UUID accountId, Integer id) throws Exception {
 
     RawTemplate rawTemplate = rawTemplateRepository.getByIdAndWorkspace_Account_Id(id, accountId)
         .orElse(null);
@@ -174,6 +176,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
       throw new BadRequestException("Template doesn't exist");
     }
 
+    firebaseService.deleteImage(AppConstant.RAW_TEMPLATE_THUMBNAIL + id);
     rawTemplateRepository.delete(rawTemplate);
   }
 

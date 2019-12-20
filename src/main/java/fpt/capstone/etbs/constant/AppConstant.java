@@ -15,5 +15,6 @@ public class AppConstant {
   public static final String RAW_TEMPLATE_THUMBNAIL = "thumbnail/rawTemplate/";
   public static final String TEMPLATE_THUMBNAIL = "thumbnail/template/";
   public static final String TUTORIAL_THUMBNAIL = "thumbnail/tutorial/";
-  public static final Double OVER_POINT_CHECK_DUPLICATED = 0.8;
+  public static final Double MAX_DUPLICATION_RATE = 0.9;
+  public static final Double MIN_DUPLICATION_RATE = 0.2;
 }

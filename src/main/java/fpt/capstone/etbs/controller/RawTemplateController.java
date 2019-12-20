@@ -5,7 +5,7 @@ import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.payload.ApiResponse;
-import fpt.capstone.etbs.payload.RawTemplateCreateRequest;
+import fpt.capstone.etbs.payload.RawTemplateRequest;
 import fpt.capstone.etbs.payload.RawTemplateResponse;
 import fpt.capstone.etbs.payload.RawTemplateUpdateRequest;
 import fpt.capstone.etbs.service.RawTemplateService;
@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,7 +45,7 @@ public class RawTemplateController {
 
   @PostMapping("/raw")
   private ResponseEntity<ApiResponse> createRawTemplate(
-      @Valid @RequestBody RawTemplateCreateRequest request)
+      @Valid @RequestBody RawTemplateRequest request)
       throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
@@ -97,7 +96,7 @@ public class RawTemplateController {
 
   @DeleteMapping("/raw/{id}")
   public ResponseEntity<ApiResponse> deleteRawTemplate(
-      @PathVariable("id") int id) {
+      @PathVariable("id") int id) throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {

@@ -35,7 +35,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.MessagingException;

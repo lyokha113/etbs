@@ -3,8 +3,7 @@ package fpt.capstone.etbs.service.impl;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Category;
 import fpt.capstone.etbs.model.Template;
-import fpt.capstone.etbs.payload.CategoryCreateRequest;
-import fpt.capstone.etbs.payload.CategoryUpdateRequest;
+import fpt.capstone.etbs.payload.CategoryRequest;
 import fpt.capstone.etbs.repository.CategoryRepository;
 import fpt.capstone.etbs.service.CategoryService;
 import java.util.List;
@@ -36,7 +35,7 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public Category createCategory(CategoryCreateRequest request) {
+  public Category createCategory(CategoryRequest request) {
 
     if (isDuplicateName(request.getName())) {
       throw new BadRequestException("Workspace name is existed");
@@ -48,7 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public Category updateCategory(int id, CategoryUpdateRequest request) {
+  public Category updateCategory(int id, CategoryRequest request) {
 
     Category category = categoryRepository.findById(id).orElse(null);
 

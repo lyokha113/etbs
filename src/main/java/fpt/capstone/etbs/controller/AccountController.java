@@ -47,7 +47,7 @@ public class AccountController {
   }
 
   @PutMapping("/account/{uuid}")
-  public ResponseEntity<ApiResponse> updateWorkspace(
+  public ResponseEntity<ApiResponse> updateAccount(
       @PathVariable("uuid") UUID id,
       @Valid @RequestBody AccountUpdateRequest request) {
     try {

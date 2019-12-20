@@ -107,13 +107,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // Swagger
         .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
         // All
+        .antMatchers(HttpMethod.GET, "/category", "/template", "/template/*", "/tutorial",
+            "/tutorial/*", "/ws-publish/*", "/ws-publish/**")
+        .permitAll()
         .antMatchers(HttpMethod.POST, "/login", "/register")
         .permitAll()
-        .antMatchers(HttpMethod.GET, "/category", "/template", "/template/*", "/tutorial",
-            "/tutorial/*")
-        .permitAll()
         // User
-        .antMatchers(HttpMethod.GET, "/rating", "/workspace",   "/raw/*")
+        .antMatchers(HttpMethod.GET, "/rating", "/workspace", "/raw/*")
         .hasRole(RoleEnum.USER.getName())
         .antMatchers(HttpMethod.POST, "/rating", "/template", "/workspace", "/email/send/",
             "/rate", "/raw", "/version", "/publish")
@@ -126,18 +126,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/version/*")
         .hasRole(RoleEnum.USER.getName())
         // Administrator
-        .antMatchers(HttpMethod.GET, "/account", "/editor/file", "/publish")
+        .antMatchers(HttpMethod.GET, "/account", "/editor/file")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
-        .antMatchers(HttpMethod.POST, "/category", "/account", "/tutorial", "/editor/file")
+        .antMatchers(HttpMethod.POST, "/category", "/account", "/tutorial", "/template",
+            "/editor/file")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
-        .antMatchers(HttpMethod.PUT, "/category/*", "/template/*", "/account/*", "/tutorial/*", "/publish/*")
+        .antMatchers(HttpMethod.PUT, "/category/*", "/template/*", "/account/*", "/tutorial/*",
+            "/publish/approve/*", "/publish/deny/*")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
         .antMatchers(HttpMethod.PATCH, "/tutorial/*")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
         .antMatchers(HttpMethod.DELETE, "/template/*", "/editor/file")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
         // Logged
-        .antMatchers(HttpMethod.GET, "/user", "/file")
+        .antMatchers(HttpMethod.GET, "/user", "/file", "/publish")
         .authenticated()
         .antMatchers(HttpMethod.POST, "/file")
         .authenticated()

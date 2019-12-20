@@ -5,8 +5,11 @@ import fpt.capstone.etbs.service.ImageGenerator;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
+import org.apache.commons.text.StringEscapeUtils;
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -17,23 +20,36 @@ public class ImageGeneratorImpl implements ImageGenerator {
 
   @Override
   public BufferedImage generateImageFromHtml(String html) throws Exception {
-//    System.setProperty("webdriver.chrome.driver", "chromedriver");
+
+    System.setProperty("webdriver.chrome.driver", "chromedriver");
     ChromeOptions chromeOptions = new ChromeOptions();
-//    chromeOptions.setBinary("/usr/bin/google-chrome");
+    chromeOptions.setBinary("/usr/bin/google-chrome");
     chromeOptions.setHeadless(true);
 
     ChromeDriverEx driver = new ChromeDriverEx(chromeOptions);
 
-      driver.get("data:text/html;charset=utf-8," + html);
-    ExpectedCondition<Boolean> pageLoadCondition = driver1 -> ((JavascriptExecutor) driver1)
+    driver.get("about:blank");
+    WebElement e = driver.findElement(By.tagName("html"));
+    String script = "arguments[0].innerHTML='" + StringEscapeUtils.escapeEcmaScript(html) + "'";
+    JavascriptExecutor jse = driver;
+    jse.executeScript(script, e);
+
+    ExpectedCondition<Boolean> pageLoadCondition = jsExecutor -> ((JavascriptExecutor) jsExecutor)
         .executeScript("return document.readyState").equals("complete");
     WebDriverWait wait = new WebDriverWait(driver, 30);
     wait.until(pageLoadCondition);
 
-    File screenshot = driver.getFullScreenshotAs(OutputType.FILE);
-    BufferedImage bi = ImageIO.read(screenshot);
-    driver.quit();
+    int imageToLoad = Integer.parseInt(jse.executeScript("return document.images.length").toString());
+    int loaded = 0;
+    while (loaded < imageToLoad) {
+      for (int i = 0; i < imageToLoad; i++) {
+        loaded += (Boolean) jse.executeScript("return document.images[" + i + "].complete;") ? 1 : 0;
+      }
+      Thread.sleep(500);
+    }
 
-    return bi;
+    File screenshot = driver.getFullScreenshotAs(OutputType.FILE);
+    driver.quit();
+    return ImageIO.read(screenshot);
   }
 }

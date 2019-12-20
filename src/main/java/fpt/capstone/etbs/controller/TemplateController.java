@@ -3,15 +3,11 @@ package fpt.capstone.etbs.controller;
 import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Template;
-import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.payload.ApiResponse;
-import fpt.capstone.etbs.payload.TemplateCreateRequest;
-import fpt.capstone.etbs.payload.TemplateListByCategories;
+import fpt.capstone.etbs.payload.TemplateRequest;
 import fpt.capstone.etbs.payload.TemplateResponse;
-import fpt.capstone.etbs.payload.TemplateUpdateRequest;
 import fpt.capstone.etbs.service.TemplateService;
 import fpt.capstone.etbs.util.RoleUtils;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -64,10 +60,22 @@ public class TemplateController {
         : ResponseEntity.badRequest().body(new ApiResponse<>(true, "Not found", null));
   }
 
+  @PostMapping("/template")
+  private ResponseEntity<ApiResponse> createTemplate(@RequestBody TemplateRequest request) throws Exception {
+    try {
+      Template template = templateService.createTemplate(request);
+      template = templateService.updateThumbnail(template);
+      TemplateResponse response = TemplateResponse.setResponse(template);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Template created", response));
+    } catch (BadRequestException ex) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
+  }
+
   @PutMapping("/template/{id}")
   private ResponseEntity<ApiResponse> updateTemplate(
       @PathVariable("id") Integer id,
-      @Valid @RequestBody TemplateUpdateRequest request) throws Exception {
+      @Valid @RequestBody TemplateRequest request) throws Exception {
     try {
       Template template = templateService.updateTemplate(id, request);
       TemplateResponse response = TemplateResponse.setResponse(template);
@@ -78,25 +86,10 @@ public class TemplateController {
   }
 
   @DeleteMapping("/template/{id}")
-  public ResponseEntity<ApiResponse> deleteWorkspace(@PathVariable("id") int id) {
+  public ResponseEntity<ApiResponse> deleteTemplate(@PathVariable("id") int id) throws Exception {
     try {
       templateService.deleteTemplate(id);
       return ResponseEntity.ok(new ApiResponse<>(true, "Template deleted", null));
-    } catch (BadRequestException ex) {
-      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
-    }
-  }
-
-  @GetMapping("/template/list")
-  public ResponseEntity<ApiResponse> getTemplateByCategories(
-      @Valid @RequestBody TemplateListByCategories categories) {
-    try {
-      List<Template> templateList = templateService.getListByCategories(categories);
-      List<TemplateResponse> response = new ArrayList<>();
-      for (Template template : templateList) {
-        response.add(TemplateResponse.setResponseWithContent(template));
-      }
-      return ResponseEntity.ok(new ApiResponse<>(true, "Get template list successful", response));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }

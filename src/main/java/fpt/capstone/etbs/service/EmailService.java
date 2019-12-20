@@ -5,7 +5,6 @@ import fpt.capstone.etbs.payload.SendEmailRequest;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import javax.mail.MessagingException;
 
 public interface EmailService {

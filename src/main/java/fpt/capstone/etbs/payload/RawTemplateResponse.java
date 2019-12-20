@@ -2,7 +2,6 @@ package fpt.capstone.etbs.payload;
 
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.model.RawTemplateVersion;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;

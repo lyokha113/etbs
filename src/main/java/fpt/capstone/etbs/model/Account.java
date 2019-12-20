@@ -75,15 +75,15 @@ public class Account extends Auditing {
   @Enumerated(EnumType.STRING)
   private AuthProvider provider;
 
-  @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
   private Set<MediaFile> files;
 
-  @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
   private Set<Rating> ratings;
 
-  @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
   private Set<Workspace> workspaces;
 
-  @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
   private Set<Publish> publishes;
 }
