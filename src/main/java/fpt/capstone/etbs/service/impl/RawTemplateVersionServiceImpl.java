@@ -133,7 +133,7 @@ public class RawTemplateVersionServiceImpl implements RawTemplateVersionService 
 
 
   @Override
-  public void deleteVersion(UUID accountId, Integer id) {
+  public void deleteVersion(UUID accountId, Integer id) throws Exception {
 
     RawTemplateVersion version = rawTemplateVersionRepository
         .getByIdAndRawTemplate_Workspace_Account_Id(id, accountId)
@@ -155,6 +155,7 @@ public class RawTemplateVersionServiceImpl implements RawTemplateVersionService 
       rawTemplateRepository.save(rawTemplate);
     }
 
+    firebaseService.deleteImage(AppConstant.RAW_TEMPLATE_THUMBNAIL + id);
     rawTemplateVersionRepository.delete(version);
   }
 

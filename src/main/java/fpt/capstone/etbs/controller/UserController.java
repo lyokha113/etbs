@@ -6,7 +6,7 @@ import fpt.capstone.etbs.component.JwtTokenProvider;
 import fpt.capstone.etbs.constant.AuthProvider;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
-import fpt.capstone.etbs.model.UserPrincipal;
+import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.payload.AccountResponse;
 import fpt.capstone.etbs.payload.AccountUpdateRequest;
 import fpt.capstone.etbs.payload.ApiResponse;

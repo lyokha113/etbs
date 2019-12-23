@@ -33,13 +33,11 @@ public class TemplateController {
 
   @GetMapping("/template")
   private ResponseEntity<ApiResponse> getTemplates() {
-
     Authentication auth = authenticationFacade.getAuthentication();
     List<Template> templates =
         RoleUtils.hasAdminRole(auth)
             ? templateService.getTemplates()
-            : templateService.getActiveTemplates();
-
+            : templateService.getTemplatesForUser();
     List<TemplateResponse> response =
         templates.stream().map(TemplateResponse::setResponse).collect(Collectors.toList());
     return ResponseEntity.ok(new ApiResponse<>(true, "", response));
@@ -47,16 +45,10 @@ public class TemplateController {
 
   @GetMapping("/template/{id}")
   private ResponseEntity<ApiResponse> getTemplate(@PathVariable("id") Integer id) {
-
-    Authentication auth = authenticationFacade.getAuthentication();
-    Template response =
-        RoleUtils.hasAdminRole(auth)
-            ? templateService.getTemplate(id)
-            : templateService.getActiveTemplate(id);
-
+    Template response = templateService.getTemplate(id);
     return response != null
-        ? ResponseEntity.ok(
-        new ApiResponse<>(true, "", TemplateResponse.setResponseWithContent(response)))
+        ? ResponseEntity
+        .ok(new ApiResponse<>(true, "", TemplateResponse.setResponseWithContent(response)))
         : ResponseEntity.badRequest().body(new ApiResponse<>(true, "Not found", null));
   }
 

@@ -12,5 +12,5 @@ public interface RawTemplateVersionService {
 
   RawTemplateVersion updateContent(UUID accountId, Integer rawTemplateId, String content) throws Exception;
 
-  void deleteVersion(UUID accountId, Integer id);
+  void deleteVersion(UUID accountId, Integer id) throws Exception;
 }

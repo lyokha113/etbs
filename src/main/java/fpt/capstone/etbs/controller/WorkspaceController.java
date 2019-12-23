@@ -2,7 +2,7 @@ package fpt.capstone.etbs.controller;
 
 import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.exception.BadRequestException;
-import fpt.capstone.etbs.model.UserPrincipal;
+import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.model.Workspace;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.WorkspaceRequest;

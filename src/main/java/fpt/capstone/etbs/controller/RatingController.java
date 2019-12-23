@@ -3,7 +3,7 @@ package fpt.capstone.etbs.controller;
 import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.model.Rating;
 import fpt.capstone.etbs.model.Template;
-import fpt.capstone.etbs.model.UserPrincipal;
+import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.RatingRequest;
 import fpt.capstone.etbs.payload.RatingResponse;

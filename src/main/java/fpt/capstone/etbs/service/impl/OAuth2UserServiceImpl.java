@@ -7,7 +7,7 @@ import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.exception.OAuth2AuthenticationProcessingException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Role;
-import fpt.capstone.etbs.model.UserPrincipal;
+import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.model.Workspace;
 import fpt.capstone.etbs.repository.AccountRepository;
 import java.util.Optional;

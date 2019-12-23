@@ -4,7 +4,7 @@ import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.MediaFile;
-import fpt.capstone.etbs.model.UserPrincipal;
+import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.MediaFileEditorResponse;
 import fpt.capstone.etbs.payload.MediaFileResponse;

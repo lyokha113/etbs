@@ -60,9 +60,6 @@ public class Template extends Auditing {
   @Column(columnDefinition = "text")
   private String description;
 
-  @Column(columnDefinition = "TINYINT(1) default 1")
-  private boolean active;
-
   @Column(columnDefinition = "text")
   private String thumbnail;
 

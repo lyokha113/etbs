@@ -26,7 +26,6 @@ public class TemplateResponse {
   private String thumbnail;
   private int upVote;
   private int downVote;
-  private boolean active;
   private String description;
   private List<CategoryOfTemplate> categories;
 
@@ -35,8 +34,7 @@ public class TemplateResponse {
     List<CategoryOfTemplate> categoryOfTemplates =
         categories == null
             ? new ArrayList<>()
-            : categories.stream().filter(Category::isActive).map(CategoryOfTemplate::setResponse)
-                .collect(Collectors.toList());
+            : categories.stream().map(CategoryOfTemplate::setResponse).collect(Collectors.toList());
     int upVote = 0;
     int downVote = 0;
     if (template.getRatings() != null) {
@@ -52,7 +50,6 @@ public class TemplateResponse {
         .thumbnail(template.getThumbnail())
         .upVote(upVote)
         .downVote(downVote)
-        .active(template.isActive())
         .description(template.getDescription())
         .categories(categoryOfTemplates)
         .build();

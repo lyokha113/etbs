@@ -3,19 +3,21 @@ package fpt.capstone.etbs.service.impl;
 import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
+import fpt.capstone.etbs.model.DeletingMediaFile;
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.model.RawTemplateVersion;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.model.Workspace;
 import fpt.capstone.etbs.payload.RawTemplateRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
+import fpt.capstone.etbs.repository.DeletingMediaFileRepository;
 import fpt.capstone.etbs.repository.RawTemplateRepository;
 import fpt.capstone.etbs.repository.RawTemplateVersionRepository;
 import fpt.capstone.etbs.repository.WorkspaceRepository;
-import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.RawTemplateService;
 import fpt.capstone.etbs.service.RawTemplateVersionService;
 import fpt.capstone.etbs.service.TemplateService;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,7 +41,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
   private AccountRepository accountRepository;
 
   @Autowired
-  private FirebaseService firebaseService;
+  private DeletingMediaFileRepository deletingMediaFileRepository;
 
   @Autowired
   private TemplateService templateService;
@@ -73,7 +75,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
 
     Template template = null;
     if (request.getTemplateId() != null) {
-      template = templateService.getActiveTemplate(request.getTemplateId());
+      template = templateService.getTemplate(request.getTemplateId());
       if (template == null) {
         throw new BadRequestException("Template doesn't exist");
       }
@@ -167,7 +169,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
   }
 
   @Override
-  public void deleteRawTemplate(UUID accountId, Integer id) throws Exception {
+  public void deleteRawTemplate(UUID accountId, Integer id) {
 
     RawTemplate rawTemplate = rawTemplateRepository.getByIdAndWorkspace_Account_Id(id, accountId)
         .orElse(null);
@@ -176,7 +178,12 @@ public class RawTemplateServiceImpl implements RawTemplateService {
       throw new BadRequestException("Template doesn't exist");
     }
 
-    firebaseService.deleteImage(AppConstant.RAW_TEMPLATE_THUMBNAIL + id);
+    List<DeletingMediaFile> thumbnails = rawTemplate.getVersions().stream()
+        .map(v -> DeletingMediaFile.builder().link(AppConstant.RAW_TEMPLATE_THUMBNAIL + v.getId())
+            .build())
+        .collect(Collectors.toList());
+
+    deletingMediaFileRepository.saveAll(thumbnails);
     rawTemplateRepository.delete(rawTemplate);
   }
 

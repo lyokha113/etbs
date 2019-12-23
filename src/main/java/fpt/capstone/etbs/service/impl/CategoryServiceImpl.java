@@ -25,13 +25,7 @@ public class CategoryServiceImpl implements CategoryService {
 
   @Override
   public List<Category> getActiveCategories() {
-    List<Category> categories = categoryRepository.getAllByActiveTrue();
-    categories.forEach(c -> {
-      Set<Template> templates = c.getTemplates();
-      templates = templates.stream().filter(Template::isActive).collect(Collectors.toSet());
-      c.setTemplates(templates);
-    });
-    return categories;
+    return categoryRepository.getAllByActiveTrue();
   }
 
   @Override

@@ -5,7 +5,6 @@ import static fpt.capstone.etbs.component.HttpCookieOAuth2AuthorizationRequest.R
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.exception.BadRequestException;
-import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.payload.AccountResponse;
 import fpt.capstone.etbs.util.CookieUtils;
 import java.io.IOException;

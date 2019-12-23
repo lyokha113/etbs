@@ -63,7 +63,6 @@ class TemplateOfCategory {
   private String description;
   private int upVote;
   private int downVote;
-  private boolean active;
 
   static TemplateOfCategory setResponse(Template template) {
     int upVote = (int) template.getRatings().stream().filter(Rating::isVote).count();

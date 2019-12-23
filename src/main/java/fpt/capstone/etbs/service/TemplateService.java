@@ -9,11 +9,9 @@ public interface TemplateService {
 
   List<Template> getTemplates();
 
-  List<Template> getActiveTemplates();
+  List<Template> getTemplatesForUser();
 
   Template getTemplate(Integer id);
-
-  Template getActiveTemplate(Integer id);
 
   Template createTemplate(TemplateRequest request);
 

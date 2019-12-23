@@ -3,7 +3,7 @@ package fpt.capstone.etbs.controller;
 import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.RawTemplateVersion;
-import fpt.capstone.etbs.model.UserPrincipal;
+import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.RawTemplateVersionRequest;
 import fpt.capstone.etbs.payload.RawTemplateVersionResponse;
@@ -60,7 +60,7 @@ public class RawTemplateVersionController {
 
   @DeleteMapping("/version/{id}")
   public ResponseEntity<ApiResponse> deleteVersion(
-      @PathVariable("id") int id) {
+      @PathVariable("id") int id) throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {

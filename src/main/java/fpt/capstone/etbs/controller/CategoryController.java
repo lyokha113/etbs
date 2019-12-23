@@ -8,9 +8,9 @@ import fpt.capstone.etbs.payload.CategoryRequest;
 import fpt.capstone.etbs.payload.CategoryResponse;
 import fpt.capstone.etbs.service.CategoryService;
 import fpt.capstone.etbs.util.RoleUtils;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -32,20 +33,17 @@ public class CategoryController {
   private AuthenticationFacade authenticationFacade;
 
   @GetMapping("/category")
-  private ResponseEntity<ApiResponse> getCategories() {
+  private ResponseEntity<ApiResponse> getCategories(
+      @RequestParam(defaultValue = "false", value = "withTemplate", required = false) boolean withTemplate) {
 
     Authentication auth = authenticationFacade.getAuthentication();
-    List<CategoryResponse> response = new ArrayList<>();
-    if (RoleUtils.hasAdminRole(auth)) {
-      List<Category> categories = categoryService.getCategories();
-      response = categories.stream().map(CategoryResponse::setResponseWithTemplates)
-          .collect(Collectors.toList());
-    } else {
-      List<Category> categories = categoryService.getActiveCategories();
-      response = categories.stream().map(CategoryResponse::setResponse)
-          .collect(Collectors.toList());
-    }
-    return ResponseEntity.ok(new ApiResponse<>(true, "", response));
+    List<Category> categories = RoleUtils.hasAdminRole(auth)
+        ? categoryService.getCategories()
+        : categoryService.getActiveCategories();
+    Stream<CategoryResponse> response = withTemplate
+        ? categories.stream().map(CategoryResponse::setResponseWithTemplates)
+        : categories.stream().map(CategoryResponse::setResponse);
+    return ResponseEntity.ok(new ApiResponse<>(true, "", response.collect(Collectors.toList())));
   }
 
   @PostMapping("/category")

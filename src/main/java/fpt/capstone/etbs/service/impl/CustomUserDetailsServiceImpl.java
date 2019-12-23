@@ -1,7 +1,7 @@
 package fpt.capstone.etbs.service.impl;
 
 import fpt.capstone.etbs.model.Account;
-import fpt.capstone.etbs.model.UserPrincipal;
+import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;

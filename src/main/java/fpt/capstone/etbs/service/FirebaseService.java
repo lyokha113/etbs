@@ -14,13 +14,8 @@ public interface FirebaseService {
 
   String createTemplateThumbnail(BufferedImage file, String name) throws Exception;
 
+  String createTemplateImages(String file, String name) throws Exception;
+
   boolean deleteImage(String fbPath) throws Exception;
-
-
-  String replaceImageFromUserContent(String html, String order) throws IOException;
-
-  String replaceImageFromUserContent(BufferedImage image, String order) throws IOException;
-
-  String createTemplateImagesFromUserImage(String url, String id) throws Exception;
 
 }

@@ -36,8 +36,7 @@ public class RatingServiceImpl implements RatingService {
       throw new BadRequestException("Account doesn't exist");
     }
 
-    Template template =
-        templateRepository.getByIdAndActiveTrue(request.getTemplateId()).orElse(null);
+    Template template = templateRepository.findById(request.getTemplateId()).orElse(null);
     if (template == null) {
       throw new BadRequestException("Template doesn't exist");
     }

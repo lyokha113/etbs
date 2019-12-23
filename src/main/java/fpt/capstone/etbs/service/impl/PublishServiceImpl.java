@@ -91,7 +91,6 @@ public class PublishServiceImpl implements PublishService {
   @Override
   public Publish checkDuplicate(Publish publish) {
     List<Template> templates = templateRepository.findAll();
-    templates = templates.stream().filter(Template::isActive).collect(Collectors.toList());
     double maxRate = AppConstant.MIN_DUPLICATION_RATE;
     Template duplicate = null;
     for (Template template : templates) {
@@ -144,9 +143,8 @@ public class PublishServiceImpl implements PublishService {
       TemplateRequest request = new TemplateRequest(approveRequest, publish.getContent(),
           publish.getAuthor().getId());
       Template template = templateService.createTemplate(request);
-      templateService.updateContentImage(template);
+      template = templateService.updateContentImage(template);
       templateService.updateThumbnail(template);
-
       publish.setStatus(PublishStatus.PUBLISHED);
       publishRepository.save(publish);
 
