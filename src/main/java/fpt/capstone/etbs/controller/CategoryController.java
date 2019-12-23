@@ -38,10 +38,12 @@ public class CategoryController {
     List<CategoryResponse> response = new ArrayList<>();
     if (RoleUtils.hasAdminRole(auth)) {
       List<Category> categories = categoryService.getCategories();
-      response = categories.stream().map(CategoryResponse::setResponseWithTemplates).collect(Collectors.toList());
+      response = categories.stream().map(CategoryResponse::setResponseWithTemplates)
+          .collect(Collectors.toList());
     } else {
       List<Category> categories = categoryService.getActiveCategories();
-      response = categories.stream().map(CategoryResponse::setResponse).collect(Collectors.toList());
+      response = categories.stream().map(CategoryResponse::setResponse)
+          .collect(Collectors.toList());
     }
     return ResponseEntity.ok(new ApiResponse<>(true, "", response));
   }

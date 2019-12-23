@@ -9,7 +9,11 @@ import fpt.capstone.etbs.payload.RawTemplateVersionRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.RawTemplateRepository;
 import fpt.capstone.etbs.repository.RawTemplateVersionRepository;
+import fpt.capstone.etbs.service.FirebaseService;
+import fpt.capstone.etbs.service.ImageGenerator;
 import fpt.capstone.etbs.service.RawTemplateVersionService;
+import fpt.capstone.etbs.service.TemplateService;
+import java.awt.image.BufferedImage;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,6 +33,15 @@ public class RawTemplateVersionServiceImpl implements RawTemplateVersionService 
 
   @Autowired
   private AccountRepository accountRepository;
+
+  @Autowired
+  private TemplateService templateService;
+
+  @Autowired
+  private FirebaseService firebaseService;
+
+  @Autowired
+  private ImageGenerator imageGenerator;
 
   @Override
   public RawTemplateVersion createVersion(UUID accountId, RawTemplateVersionRequest request) {
@@ -72,28 +85,52 @@ public class RawTemplateVersionServiceImpl implements RawTemplateVersionService 
   }
 
   @Override
-  public RawTemplateVersion updateVersion(UUID accountId, Integer id,
-      RawTemplateVersionRequest request) {
+  public RawTemplateVersion updateVersion(UUID accountId, RawTemplateVersionRequest request) {
 
-    RawTemplateVersion version = rawTemplateVersionRepository
-        .getByIdAndRawTemplate_IdAndRawTemplate_Workspace_Account_Id(id, request.getRawTemplateId(), accountId)
+    RawTemplate rawTemplate = rawTemplateRepository
+        .getByIdAndWorkspace_Account_Id(request.getRawTemplateId(), accountId)
         .orElse(null);
 
-    if (version == null) {
-      throw new BadRequestException("Version doesn't exist");
+    if (rawTemplate == null) {
+      throw new BadRequestException("Raw template doesn't exist");
     }
+
+    RawTemplateVersion version = rawTemplate.getCurrentVersion();
 
     if (version.getName().equals(AppConstant.DEFAULT_VERSION_NAME)) {
       throw new BadRequestException("Can't update default version name");
     }
 
-    if (isDuplicateNameEachTemplate(request.getName(), request.getRawTemplateId(), id)) {
+    if (isDuplicateNameEachTemplate(request.getName(), request.getRawTemplateId(),
+        version.getId())) {
       throw new BadRequestException("Version name is existed in this template");
     }
 
     version.setName(request.getName());
     return rawTemplateVersionRepository.save(version);
   }
+
+  @Override
+  public RawTemplateVersion updateContent(UUID accountId, Integer rawTemplateId, String content)
+      throws Exception {
+
+    RawTemplate rawTemplate = rawTemplateRepository
+        .getByIdAndWorkspace_Account_Id(rawTemplateId, accountId)
+        .orElse(null);
+
+    if (rawTemplate == null) {
+      throw new BadRequestException("Raw template doesn't exist");
+    }
+
+    RawTemplateVersion version = rawTemplate.getCurrentVersion();
+    BufferedImage file = imageGenerator.generateImageFromHtml(content);
+    String thumbnail = firebaseService.createRawThumbnail(file, version.getId().toString());
+
+    version.setThumbnail(thumbnail);
+    version.setContent(content);
+    return rawTemplateVersionRepository.save(version);
+  }
+
 
   @Override
   public void deleteVersion(UUID accountId, Integer id) {

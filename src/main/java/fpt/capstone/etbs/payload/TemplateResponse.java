@@ -35,7 +35,8 @@ public class TemplateResponse {
     List<CategoryOfTemplate> categoryOfTemplates =
         categories == null
             ? new ArrayList<>()
-            : categories.stream().filter(Category::isActive).map(CategoryOfTemplate::setResponse).collect(Collectors.toList());
+            : categories.stream().filter(Category::isActive).map(CategoryOfTemplate::setResponse)
+                .collect(Collectors.toList());
     int upVote = 0;
     int downVote = 0;
     if (template.getRatings() != null) {

@@ -50,8 +50,7 @@ public class RawTemplateVersionController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      RawTemplateVersion version = rawTemplateVersionService
-          .updateVersion(userPrincipal.getId(), id, request);
+      RawTemplateVersion version = rawTemplateVersionService.updateVersion(userPrincipal.getId(), request);
       RawTemplateVersionResponse response = RawTemplateVersionResponse.setResponse(version);
       return ResponseEntity.ok(new ApiResponse<>(true, "Version updated", response));
     } catch (BadRequestException ex) {

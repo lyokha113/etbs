@@ -61,7 +61,8 @@ public class TemplateController {
   }
 
   @PostMapping("/template")
-  private ResponseEntity<ApiResponse> createTemplate(@RequestBody TemplateRequest request) throws Exception {
+  private ResponseEntity<ApiResponse> createTemplate(@RequestBody TemplateRequest request)
+      throws Exception {
     try {
       Template template = templateService.createTemplate(request);
       template = templateService.updateThumbnail(template);

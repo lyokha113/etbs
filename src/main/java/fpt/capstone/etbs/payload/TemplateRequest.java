@@ -20,10 +20,10 @@ public class TemplateRequest {
   private List<Integer> categoryIds;
 
   public TemplateRequest(ApprovePublishRequest approveRequest, String content, UUID authorId) {
-      this.name = approveRequest.getName();
-      this.description = approveRequest.getDescription();
-      this.content = content;
-      this.authorId = authorId;
-      this.categoryIds = approveRequest.getCategoryIds();
+    this.name = approveRequest.getName();
+    this.description = approveRequest.getDescription();
+    this.content = content;
+    this.authorId = authorId;
+    this.categoryIds = approveRequest.getCategoryIds();
   }
 }

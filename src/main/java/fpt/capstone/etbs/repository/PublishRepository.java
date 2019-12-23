@@ -8,5 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PublishRepository extends JpaRepository<Publish, Integer> {
-    List<Publish> getByAuthor_Id(UUID authorId);
+
+  List<Publish> getByAuthor_Id(UUID authorId);
 }

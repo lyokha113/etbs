@@ -10,10 +10,16 @@ import java.util.UUID;
 public interface PublishService {
 
   List<Publish> getPublishes();
+
   List<Publish> getPublishes(UUID authorId);
+
   Publish createPublish(UUID authorId, PublishRequest request);
+
   Publish updatePublishStatus(Integer id, PublishStatus status, String name);
+
   Publish checkDuplicate(Publish publish);
+
   void checkDuplicate();
+
   void approve(ApprovePublishRequest approveRequest, Publish publish) throws Exception;
 }

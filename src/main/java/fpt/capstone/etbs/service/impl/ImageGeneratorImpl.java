@@ -39,11 +39,13 @@ public class ImageGeneratorImpl implements ImageGenerator {
     WebDriverWait wait = new WebDriverWait(driver, 30);
     wait.until(pageLoadCondition);
 
-    int imageToLoad = Integer.parseInt(jse.executeScript("return document.images.length").toString());
+    int imageToLoad = Integer
+        .parseInt(jse.executeScript("return document.images.length").toString());
     int loaded = 0;
     while (loaded < imageToLoad) {
       for (int i = 0; i < imageToLoad; i++) {
-        loaded += (Boolean) jse.executeScript("return document.images[" + i + "].complete;") ? 1 : 0;
+        loaded +=
+            (Boolean) jse.executeScript("return document.images[" + i + "].complete;") ? 1 : 0;
       }
       Thread.sleep(500);
     }

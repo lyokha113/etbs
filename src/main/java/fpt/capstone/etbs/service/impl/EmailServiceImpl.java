@@ -162,7 +162,7 @@ public class EmailServiceImpl implements EmailService {
     mail.setFrom(sender);
 
     Personalization personalization = new Personalization();
-    String [] recivers = request.getTo();
+    String[] recivers = request.getTo();
     for (int i = 0; i < recivers.length; i++) {
       Email receiver = new Email(recivers[i]);
       personalization.addTo(receiver);

@@ -16,8 +16,6 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,38 +40,16 @@ public class FirebaseServiceImpl implements FirebaseService {
   }
 
   @Override
-  public String createRawThumbnailFromTemplate(Integer templateId, Integer versionId) {
-    String fbPathFrom = AppConstant.TEMPLATE_THUMBNAIL + templateId;
-    String fbPathTo = AppConstant.RAW_TEMPLATE_THUMBNAIL + versionId;
-    return createImageFromBlob(fbPathFrom, fbPathTo);
-  }
-
-  @Override
-  public String createRawThumbnail(MultipartFile file, String name) throws Exception {
+  public String createRawThumbnail(BufferedImage file, String name) throws Exception {
     String fbPath = AppConstant.RAW_TEMPLATE_THUMBNAIL + name;
     return createImage(fbPath, file);
-  }
-
-  @Override
-  public String createTemplateThumbnail(Integer rawTemplateId, Integer templateId) {
-    String fbPathFrom = AppConstant.RAW_TEMPLATE_THUMBNAIL + rawTemplateId;
-    String fbPathTo = AppConstant.TEMPLATE_THUMBNAIL + templateId;
-    return createImageFromBlob(fbPathFrom, fbPathTo);
   }
 
   @Override
   public String createTemplateThumbnail(BufferedImage file, String name)
       throws Exception {
     String fbPath = AppConstant.TEMPLATE_THUMBNAIL + name;
-    ByteArrayOutputStream os = new ByteArrayOutputStream();
-    ImageIO.write(file, "png", os);
-    os.flush();
-    Storage storage = bucket.getStorage();
-    BlobId blobId = BlobId.of(bucket.getName(), fbPath);
-    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/png").build();
-    Blob blob = storage.create(blobInfo, os.toByteArray());
-    URL url = blob.signUrl(365, TimeUnit.DAYS);
-    return url.toString();
+    return createImage(fbPath, file);
   }
 
   @Override
@@ -103,7 +79,7 @@ public class FirebaseServiceImpl implements FirebaseService {
   @Override
   public String replaceImageFromUserContent(BufferedImage image, String order) throws IOException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    ImageIO.write((RenderedImage) image, "png", baos);
+    ImageIO.write(image, "png", baos);
     baos.flush();
     Storage storage = bucket.getStorage();
     String fbPath = AppConstant.TEMPLATE_IMAGE + order;
@@ -117,18 +93,27 @@ public class FirebaseServiceImpl implements FirebaseService {
   @Override
   public String createTemplateImagesFromUserImage(String url, String id) {
     String fbPathTo = AppConstant.TEMPLATE_IMAGE + id;
-    return createImageFromBlob(url, fbPathTo);
+    return createImage(url, fbPathTo);
   }
 
 
+  private String createImage(String fbPath, BufferedImage image) throws IOException {
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    ImageIO.write(image, "png", os);
+    os.flush();
+    Storage storage = bucket.getStorage();
+    BlobId blobId = BlobId.of(bucket.getName(), fbPath);
+    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/png").build();
+    Blob blob = storage.create(blobInfo, os.toByteArray());
+    URL url = blob.signUrl(365, TimeUnit.DAYS);
+    return url.toString().replace("https", "http");
+  }
 
-
-
-  private String createImageFromBlob(String fbPathFrom, String fbPathTo) {
-    BlobId blobId = BlobId.of(bucket.getName(), fbPathFrom);
+  private String createImage(String fbPath, String image) {
+    BlobId blobId = BlobId.of(bucket.getName(), fbPath);
     Storage storage = bucket.getStorage();
     Blob blob = storage.get(blobId);
-    blobId = BlobId.of(bucket.getName(), fbPathTo);
+    blobId = BlobId.of(bucket.getName(), image);
     blob.copyTo(blobId);
     blob = storage.get(blobId);
     URL url = blob.signUrl(365, TimeUnit.DAYS);

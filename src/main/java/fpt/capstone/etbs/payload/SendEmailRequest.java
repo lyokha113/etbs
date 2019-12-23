@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class SendEmailRequest {
 
   private int rawTemplateId;
-  private String [] to;
+  private String[] to;
   private String provider;
 }

@@ -7,7 +7,6 @@ import fpt.capstone.etbs.model.UserPrincipal;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.RawTemplateRequest;
 import fpt.capstone.etbs.payload.RawTemplateResponse;
-import fpt.capstone.etbs.payload.RawTemplateUpdateRequest;
 import fpt.capstone.etbs.service.RawTemplateService;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +28,7 @@ public class RawTemplateController {
   @Autowired
   private RawTemplateService rawTemplateService;
 
+
   @Autowired
   private AuthenticationFacade authenticationFacade;
 
@@ -45,17 +45,12 @@ public class RawTemplateController {
 
   @PostMapping("/raw")
   private ResponseEntity<ApiResponse> createRawTemplate(
-      @Valid @RequestBody RawTemplateRequest request)
-      throws Exception {
+      @Valid @RequestBody RawTemplateRequest request) throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      RawTemplate template = rawTemplateService.createRawTemplate(userPrincipal.getId(), request);
-      if (request.getTemplateId() != null) {
-        template = rawTemplateService
-            .updateRawTemplate(request.getTemplateId(), template);
-      }
-      RawTemplateResponse response = RawTemplateResponse.setResponse(template);
+      RawTemplate raw = rawTemplateService.createRawTemplate(userPrincipal.getId(), request);
+      RawTemplateResponse response = RawTemplateResponse.setResponse(raw);
       return ResponseEntity.ok(new ApiResponse<>(true, "Raw template created", response));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
@@ -65,8 +60,7 @@ public class RawTemplateController {
   @PutMapping("/raw/{id}")
   private ResponseEntity<ApiResponse> updateRawTemplate(
       @PathVariable("id") Integer id,
-      @Valid @RequestBody RawTemplateUpdateRequest request)
-      throws Exception {
+      @Valid @RequestBody RawTemplateRequest request) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {

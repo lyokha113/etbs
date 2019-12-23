@@ -1,14 +1,9 @@
 package fpt.capstone.etbs.model;
 
-import static javax.persistence.TemporalType.TIMESTAMP;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.Temporal;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;

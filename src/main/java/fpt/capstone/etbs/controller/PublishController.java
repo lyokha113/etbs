@@ -16,10 +16,6 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -62,7 +58,9 @@ public class PublishController {
       PublishResponse response = PublishResponse.setResponse(publish);
 
       if (publish.getStatus().equals(PublishStatus.DENIED)) {
-        return ResponseEntity.badRequest().body(new ApiResponse<>(false, "Your publish request was denied because of content is quiet similar to other", response));
+        return ResponseEntity.badRequest().body(new ApiResponse<>(false,
+            "Your publish request was denied because of content is quiet similar to other",
+            response));
       } else {
         return ResponseEntity.ok(new ApiResponse<>(true, "Request sent", response));
       }
@@ -77,7 +75,8 @@ public class PublishController {
       @PathVariable("id") Integer id,
       @RequestBody ApprovePublishRequest request) throws Exception {
     try {
-      Publish publish = publishService.updatePublishStatus(id, PublishStatus.PROCESSING, request.getName());
+      Publish publish = publishService
+          .updatePublishStatus(id, PublishStatus.PROCESSING, request.getName());
       PublishResponse response = PublishResponse.setResponse(publish);
       publishService.approve(request, publish);
       return ResponseEntity.ok(new ApiResponse<>(true, "Request sent", response));

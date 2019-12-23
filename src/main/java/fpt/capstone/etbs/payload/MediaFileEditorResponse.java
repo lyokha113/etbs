@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MediaFileEditorResponse {
+
   private UUID id;
   private String name;
   private String url;

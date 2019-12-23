@@ -1,1 +1,20 @@
-{"web":{"client_id":"619328236748-2kdidr5nctq9qgq1guec30aas7cdubl3.apps.googleusercontent.com","project_id":"northern-syntax-255410","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"0HKoh91ZUqDPiYLCfrf2Wi8J","redirect_uris":["http://localhost:5000/oauth2/callback/google","http://localhost:8888/Callback","http://etbs.ml/oauth2/callback/google"],"javascript_origins":["http://localhost:5000","http://18.140.138.198","http://etbs.ml"]}}
+{
+  "web": {
+    "client_id": "619328236748-2kdidr5nctq9qgq1guec30aas7cdubl3.apps.googleusercontent.com",
+    "project_id": "northern-syntax-255410",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_secret": "0HKoh91ZUqDPiYLCfrf2Wi8J",
+    "redirect_uris": [
+      "http://localhost:5000/oauth2/callback/google",
+      "http://localhost:8888/Callback",
+      "http://etbs.ml/oauth2/callback/google"
+    ],
+    "javascript_origins": [
+      "http://localhost:5000",
+      "http://18.140.138.198",
+      "http://etbs.ml"
+    ]
+  }
+}
