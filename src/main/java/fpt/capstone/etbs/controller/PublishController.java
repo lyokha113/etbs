@@ -54,17 +54,9 @@ public class PublishController {
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       Publish publish = publishService.createPublish(userPrincipal.getId(), request);
-      publish = publishService.checkDuplicate(publish);
       PublishResponse response = PublishResponse.setResponse(publish);
-
-      if (publish.getStatus().equals(PublishStatus.DENIED)) {
-        return ResponseEntity.badRequest().body(new ApiResponse<>(false,
-            "Your publish request was denied because of content is quiet similar to other",
-            response));
-      } else {
-        return ResponseEntity.ok(new ApiResponse<>(true, "Request sent", response));
-      }
-
+      publishService.checkDuplicate(publish);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Request sent", response));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }

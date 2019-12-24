@@ -34,14 +34,26 @@ public class ThreadConfig {
     return executor;
   }
 
-  @Bean("checkContentAsyncExecutor")
-  public TaskExecutor checkContentAsyncExecutor() {
+  @Bean("checkDuplicateAsyncExecutor")
+  public TaskExecutor checkDuplicateAsyncExecutor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
     executor.setCorePoolSize(5);
     executor.setMaxPoolSize(5);
     executor.setQueueCapacity(20);
     executor.setWaitForTasksToCompleteOnShutdown(true);
-    executor.setThreadNamePrefix("CheckContent-");
+    executor.setThreadNamePrefix("CheckDuplicate-");
+    executor.initialize();
+    return executor;
+  }
+
+  @Bean("approvePublishAsyncExecutor")
+  public TaskExecutor approvePublishAsyncExecutor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setCorePoolSize(5);
+    executor.setMaxPoolSize(5);
+    executor.setQueueCapacity(20);
+    executor.setWaitForTasksToCompleteOnShutdown(true);
+    executor.setThreadNamePrefix("ApprovePublish-");
     executor.initialize();
     return executor;
   }

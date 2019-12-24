@@ -6,6 +6,7 @@ import fpt.capstone.etbs.payload.ApprovePublishRequest;
 import fpt.capstone.etbs.payload.PublishRequest;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public interface PublishService {
 
@@ -17,7 +18,9 @@ public interface PublishService {
 
   Publish updatePublishStatus(Integer id, PublishStatus status, String name);
 
-  Publish checkDuplicate(Publish publish);
+  void checkDuplicate(Publish publish);
+
+  void checkDuplicateAsync(Publish publish);
 
   void checkDuplicate();
 

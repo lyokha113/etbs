@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -23,9 +24,10 @@ import org.springframework.stereotype.Component;
 @Component
 @Configuration
 @EnableScheduling
-public class MediaFileSchedule {
+public class FileSchedule {
 
-  private final Logger logger = LoggerFactory.getLogger(MediaFileSchedule.class);
+  private final Logger logger = LoggerFactory.getLogger(FileSchedule.class);
+  private final int THREAD_POOL = 5;
 
   @Autowired
   private FirebaseService firebaseService;
@@ -37,13 +39,13 @@ public class MediaFileSchedule {
   private DeletingMediaFileRepository deletingMediaFileRepository;
 
   @Bean
-  public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
-    ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-    threadPoolTaskScheduler.setPoolSize(5);
-    return threadPoolTaskScheduler;
+  public TaskScheduler taskScheduler() {
+    final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+    scheduler.setPoolSize(THREAD_POOL);
+    return scheduler;
   }
 
-  @Scheduled(initialDelay = 1000 * 60, fixedDelay = 1000 * 60 * 5)
+  @Scheduled(initialDelay = 1000 * 60 * 5, fixedDelay = 1000 * 60 * 5)
   public void deleteInactiveUserFile() {
     logger.info("Start to delete inactive user file");
     List<MediaFile> files = mediaFileService.getInactiveMediaFiles();
@@ -65,7 +67,7 @@ public class MediaFileSchedule {
     logger.info("Finished delete inactive user file - " + deletedFiles.size() + " files deleted");
   }
 
-  @Scheduled(initialDelay = 1000 * 60, fixedDelay = 1000 * 60 * 5)
+  @Scheduled(initialDelay = 1000 * 60 * 5, fixedDelay = 1000 * 60 * 5)
   public void deleteDeletingMediaFile() {
     logger.info("Start to delete DeletingMediaFile");
     List<DeletingMediaFile> files = deletingMediaFileRepository.findAll();

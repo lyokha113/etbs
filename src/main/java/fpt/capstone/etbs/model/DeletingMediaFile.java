@@ -32,7 +32,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
     value = {"createdDate", "lastModifiedDate"},
     allowGetters = true)
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id")
-public class DeletingMediaFile {
+public class DeletingMediaFile extends Auditing {
 
   @Id
   @Column

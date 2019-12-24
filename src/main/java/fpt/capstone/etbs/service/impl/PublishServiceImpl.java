@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import org.apache.commons.text.StringEscapeUtils;
@@ -89,7 +90,7 @@ public class PublishServiceImpl implements PublishService {
   }
 
   @Override
-  public Publish checkDuplicate(Publish publish) {
+  public void checkDuplicate(Publish publish) {
     List<Template> templates = templateRepository.findAll();
     double maxRate = AppConstant.MIN_DUPLICATION_RATE;
     Template duplicate = null;
@@ -102,7 +103,7 @@ public class PublishServiceImpl implements PublishService {
         publish.setStatus(PublishStatus.DENIED);
         publish.setDuplicateTemplate(duplicate);
         publish.setDuplicateRate(rate.doubleValue());
-        return publishRepository.save(publish);
+        publishRepository.save(publish);
       }
 
       if (duplicationRate > maxRate) {
@@ -119,8 +120,13 @@ public class PublishServiceImpl implements PublishService {
     }
 
     publish.setDuplicateTemplate(duplicate);
-    publish = publishRepository.save(publish);
-    return publish;
+    publishRepository.save(publish);
+  }
+
+  @Override
+  @Async("checkDuplicateAsyncExecutor")
+  public void checkDuplicateAsync(Publish publish) {
+    checkDuplicate(publish);
   }
 
   @Override
@@ -135,7 +141,7 @@ public class PublishServiceImpl implements PublishService {
   }
 
   @Override
-  @Async("checkContentAsyncExecutor")
+  @Async("approvePublishAsyncExecutor")
   @Transactional
   public void approve(ApprovePublishRequest approveRequest, Publish publish) {
     try {
