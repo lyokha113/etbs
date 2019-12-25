@@ -18,4 +18,5 @@ public interface FirebaseService {
 
   boolean deleteImage(String fbPath) throws Exception;
 
+  String updateUserImage(BufferedImage image, String id) throws IOException;
 }

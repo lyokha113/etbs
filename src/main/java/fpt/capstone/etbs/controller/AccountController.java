@@ -7,6 +7,7 @@ import fpt.capstone.etbs.payload.AccountResponse;
 import fpt.capstone.etbs.payload.AccountUpdateRequest;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.service.AccountService;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -54,7 +55,7 @@ public class AccountController {
       Account account = accountService.updateAccount(id, request);
       AccountResponse response = AccountResponse.setResponse(account);
       return ResponseEntity.ok(new ApiResponse<>(true, "Account updated", response));
-    } catch (BadRequestException ex) {
+    } catch (BadRequestException | IOException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
   }

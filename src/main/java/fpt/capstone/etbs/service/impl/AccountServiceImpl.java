@@ -13,10 +13,16 @@ import fpt.capstone.etbs.payload.RegisterRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.RoleRepository;
 import fpt.capstone.etbs.service.AccountService;
+import fpt.capstone.etbs.service.FirebaseService;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.imageio.ImageIO;
+import javax.xml.bind.DatatypeConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -34,6 +40,9 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
 
   @Autowired
   private PasswordEncoder passwordEncoder;
+
+  @Autowired
+  private FirebaseService firebaseService;
 
   @Override
   public List<Account> getAccounts() {
@@ -85,7 +94,7 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
   }
 
   @Override
-  public Account updateAccount(UUID uuid, AccountUpdateRequest request) {
+  public Account updateAccount(UUID uuid, AccountUpdateRequest request) throws IOException {
 
     Account account = getAccount(uuid);
     if (account == null) {
@@ -95,11 +104,21 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
     if (account.getProvider().equals(AuthProvider.google)) {
       throw new BadRequestException("Google account can't be updated");
     }
-
-    account.setFullName(request.getFullName());
-    account.setActive(request.isActive());
+    if (request.getFullName() != null) {
+      account.setFullName(request.getFullName());
+    }
+    if (request.getActive() != null) {
+      account.setActive(request.getActive());
+    }
     if (!StringUtils.isEmpty(request.getPassword())) {
       account.setPassword(passwordEncoder.encode(request.getPassword()));
+    }
+    if (request.getImageUrl() != null) {
+      String base64Image = request.getImageUrl().split(",")[1];
+      byte[] imageBytes = DatatypeConverter.parseBase64Binary(base64Image);
+      BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(imageBytes));
+      account
+          .setImageUrl(firebaseService.updateUserImage(bufferedImage, account.getId().toString()));
     }
     return accountRepository.save(account);
   }

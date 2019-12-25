@@ -4,6 +4,7 @@ import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.payload.AccountCreateRequest;
 import fpt.capstone.etbs.payload.AccountUpdateRequest;
 import fpt.capstone.etbs.payload.RegisterRequest;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,5 +20,5 @@ public interface AccountService {
 
   Account createAccount(AccountCreateRequest request);
 
-  Account updateAccount(UUID uuid, AccountUpdateRequest request);
+  Account updateAccount(UUID uuid, AccountUpdateRequest request) throws IOException;
 }

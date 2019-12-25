@@ -58,7 +58,7 @@ public class Account extends Auditing {
   @Column
   private String password;
 
-  @Column
+  @Column(columnDefinition = "text")
   private String imageUrl;
 
   @Column(columnDefinition = "TINYINT(1) default 1")
@@ -86,4 +86,8 @@ public class Account extends Auditing {
 
   @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
   private Set<Publish> publishes;
+
+  @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<UserEmail> userEmails;
+
 }
