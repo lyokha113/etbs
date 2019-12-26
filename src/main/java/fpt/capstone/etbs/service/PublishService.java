@@ -14,6 +14,8 @@ public interface PublishService {
 
   List<Publish> getPublishes(UUID authorId);
 
+  boolean checkPublishPolicy(UUID authorId);
+
   Publish createPublish(UUID authorId, PublishRequest request);
 
   Publish updatePublishStatus(Integer id, PublishStatus status, String name);

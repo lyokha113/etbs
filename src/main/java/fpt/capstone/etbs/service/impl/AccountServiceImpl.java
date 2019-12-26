@@ -93,14 +93,23 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
     }
 
     if (account.getProvider().equals(AuthProvider.google)) {
-      throw new BadRequestException("Google account can't be updated");
+      throw new BadRequestException("Google account can't be update");
     }
 
     account.setFullName(request.getFullName());
-    account.setActive(request.isActive());
     if (!StringUtils.isEmpty(request.getPassword())) {
       account.setPassword(passwordEncoder.encode(request.getPassword()));
     }
+    return accountRepository.save(account);
+  }
+
+  @Override
+  public Account updateAccount(UUID uuid, Boolean active) {
+    Account account = getAccount(uuid);
+    if (account == null) {
+      throw new BadRequestException("Account doesn't existed");
+    }
+    account.setActive(active);
     return accountRepository.save(account);
   }
 

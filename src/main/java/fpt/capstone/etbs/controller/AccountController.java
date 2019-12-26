@@ -14,10 +14,12 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -54,6 +56,19 @@ public class AccountController {
       Account account = accountService.updateAccount(id, request);
       AccountResponse response = AccountResponse.setResponse(account);
       return ResponseEntity.ok(new ApiResponse<>(true, "Account updated", response));
+    } catch (BadRequestException ex) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
+  }
+
+  @PatchMapping("/account/{uuid}")
+  public ResponseEntity<ApiResponse> updateAccountStatus(
+      @PathVariable("uuid") UUID id,
+      @RequestParam("active") boolean active) {
+    try {
+      Account account = accountService.updateAccount(id, active);
+      AccountResponse response = AccountResponse.setResponse(account);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Account status updated", response));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }

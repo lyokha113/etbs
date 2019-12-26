@@ -55,7 +55,7 @@ public class PublishController {
     try {
       Publish publish = publishService.createPublish(userPrincipal.getId(), request);
       PublishResponse response = PublishResponse.setResponse(publish);
-      publishService.checkDuplicate(publish);
+      publishService.checkDuplicateAsync(publish);
       return ResponseEntity.ok(new ApiResponse<>(true, "Request sent", response));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));

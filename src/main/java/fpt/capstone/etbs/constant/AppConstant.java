@@ -16,5 +16,7 @@ public class AppConstant {
   public static final String TEMPLATE_THUMBNAIL = "thumbnail/template/";
   public static final String TUTORIAL_THUMBNAIL = "thumbnail/tutorial/";
   public static final Double MAX_DUPLICATION_RATE = 0.9;
-  public static final Double MIN_DUPLICATION_RATE = 0.2;
+  public static final Double MIN_DUPLICATION_RATE = 0.0;
+  public static final int MAX_VERSION_EACH_TEMPLATE = 5;
+  public static final int MAX_PENDING_PUBLISH = 3;
 }

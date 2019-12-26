@@ -20,4 +20,6 @@ public interface AccountService {
   Account createAccount(AccountCreateRequest request);
 
   Account updateAccount(UUID uuid, AccountUpdateRequest request);
+
+  Account updateAccount(UUID uuid, Boolean active);
 }

@@ -134,7 +134,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.PUT, "/category/*", "/template/*", "/account/*", "/tutorial/*",
             "/publish/approve/*", "/publish/deny/*")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
-        .antMatchers(HttpMethod.PATCH, "/tutorial/*")
+        .antMatchers(HttpMethod.PATCH, "/account/*", "/tutorial/*")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())
         .antMatchers(HttpMethod.DELETE, "/template/*", "/editor/file")
         .hasRole(RoleEnum.ADMINISTRATOR.getName())

@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RawTemplateVersionServiceImpl implements RawTemplateVersionService {
 
-  private static final int MAX_VERSION_EACH_TEMPLATE = 5;
+
 
   @Autowired
   private RawTemplateRepository rawTemplateRepository;
@@ -59,7 +59,7 @@ public class RawTemplateVersionServiceImpl implements RawTemplateVersionService 
       throw new BadRequestException("Raw template doesn't exist");
     }
 
-    if (rawTemplate.getVersions().size() == MAX_VERSION_EACH_TEMPLATE) {
+    if (rawTemplate.getVersions().size() == AppConstant.MAX_VERSION_EACH_TEMPLATE) {
       throw new BadRequestException("Maximum version");
     }
 

@@ -17,6 +17,10 @@ import fpt.capstone.etbs.service.PublishService;
 import fpt.capstone.etbs.service.TemplateService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -58,9 +62,28 @@ public class PublishServiceImpl implements PublishService {
   }
 
   @Override
+  public boolean checkPublishPolicy(UUID authorId) {
+    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime startDay = now.toLocalDate().atTime(LocalTime.MIN);
+    LocalDateTime endDay = now.toLocalDate().atTime(LocalTime.MAX);
+    List<PublishStatus> statuses = Arrays.asList(PublishStatus.PENDING, PublishStatus.PROCESSING, PublishStatus.DENIED);
+    long count = publishRepository.countByAuthor_IdAndStatusInAndCreatedDateBetween(
+        authorId, statuses, startDay, endDay);
+    return count < AppConstant.MAX_PENDING_PUBLISH;
+  }
+
+  @Override
   public Publish createPublish(UUID authorId, PublishRequest request) {
 
     Account author = accountRepository.findById(authorId).orElse(null);
+    if (author == null) {
+      throw new BadRequestException("Account doesn't exited");
+    }
+
+    if(!checkPublishPolicy(authorId)){
+      throw new BadRequestException("Publish request was reached limitation. Please wait for processing and request later.");
+    }
+
     Publish publish = Publish.builder()
         .content(StringEscapeUtils.escapeEcmaScript(request.getContent()))
         .author(author)
@@ -86,7 +109,14 @@ public class PublishServiceImpl implements PublishService {
     }
 
     publish.setStatus(status);
-    return publishRepository.save(publish);
+    publish = publishRepository.save(publish);
+
+    List<Publish> publishes = getPublishes();
+    List<PublishResponse> responses = publishes.stream().map(PublishResponse::setResponse)
+        .collect(Collectors.toList());
+    messagingTemplate.convertAndSend("/topic/get-publish", responses);
+
+    return publish;
   }
 
   @Override
@@ -127,6 +157,10 @@ public class PublishServiceImpl implements PublishService {
   @Async("checkDuplicateAsyncExecutor")
   public void checkDuplicateAsync(Publish publish) {
     checkDuplicate(publish);
+    List<Publish> publishes = getPublishes();
+    List<PublishResponse> responses = publishes.stream().map(PublishResponse::setResponse)
+        .collect(Collectors.toList());
+    messagingTemplate.convertAndSend("/topic/get-publish", responses);
   }
 
   @Override
@@ -155,7 +189,6 @@ public class PublishServiceImpl implements PublishService {
       publishRepository.save(publish);
 
       checkDuplicate();
-
       List<Publish> publishes = getPublishes();
       List<PublishResponse> responses = publishes.stream().map(PublishResponse::setResponse)
           .collect(Collectors.toList());

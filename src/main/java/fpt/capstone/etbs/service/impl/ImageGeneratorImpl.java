@@ -21,9 +21,7 @@ public class ImageGeneratorImpl implements ImageGenerator {
   @Override
   public BufferedImage generateImageFromHtml(String html) throws Exception {
 
-    System.setProperty("webdriver.chrome.driver", "chromedriver");
     ChromeOptions chromeOptions = new ChromeOptions();
-    chromeOptions.setBinary("/usr/bin/google-chrome");
     chromeOptions.setHeadless(true);
 
     ChromeDriverEx driver = new ChromeDriverEx(chromeOptions);
@@ -31,8 +29,7 @@ public class ImageGeneratorImpl implements ImageGenerator {
     driver.get("about:blank");
     WebElement e = driver.findElement(By.tagName("html"));
     String script = "arguments[0].innerHTML='" + StringEscapeUtils.escapeEcmaScript(html) + "'";
-    JavascriptExecutor jse = driver;
-    jse.executeScript(script, e);
+    ((JavascriptExecutor) driver).executeScript(script, e);
 
     ExpectedCondition<Boolean> pageLoadCondition = jsExecutor -> ((JavascriptExecutor) jsExecutor)
         .executeScript("return document.readyState").equals("complete");
@@ -40,12 +37,12 @@ public class ImageGeneratorImpl implements ImageGenerator {
     wait.until(pageLoadCondition);
 
     int imageToLoad = Integer
-        .parseInt(jse.executeScript("return document.images.length").toString());
+        .parseInt(((JavascriptExecutor) driver).executeScript("return document.images.length").toString());
     int loaded = 0;
     while (loaded < imageToLoad) {
       for (int i = 0; i < imageToLoad; i++) {
         loaded +=
-            (Boolean) jse.executeScript("return document.images[" + i + "].complete;") ? 1 : 0;
+            (Boolean) ((JavascriptExecutor) driver).executeScript("return document.images[" + i + "].complete;") ? 1 : 0;
       }
       Thread.sleep(500);
     }
