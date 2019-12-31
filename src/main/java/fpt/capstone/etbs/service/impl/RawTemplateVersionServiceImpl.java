@@ -85,10 +85,10 @@ public class RawTemplateVersionServiceImpl implements RawTemplateVersionService 
   }
 
   @Override
-  public RawTemplateVersion updateVersion(UUID accountId, RawTemplateVersionRequest request) {
+  public RawTemplateVersion updateVersion(UUID accountId, Integer rawId, String name) {
 
     RawTemplate rawTemplate = rawTemplateRepository
-        .getByIdAndWorkspace_Account_Id(request.getRawTemplateId(), accountId)
+        .getByIdAndWorkspace_Account_Id(rawId, accountId)
         .orElse(null);
 
     if (rawTemplate == null) {
@@ -101,21 +101,20 @@ public class RawTemplateVersionServiceImpl implements RawTemplateVersionService 
       throw new BadRequestException("Can't update default version name");
     }
 
-    if (isDuplicateNameEachTemplate(request.getName(), request.getRawTemplateId(),
-        version.getId())) {
+    if (isDuplicateNameEachTemplate(name, rawId, version.getId())) {
       throw new BadRequestException("Version name is existed in this template");
     }
 
-    version.setName(request.getName());
+    version.setName(name);
     return rawTemplateVersionRepository.save(version);
   }
 
   @Override
-  public RawTemplateVersion updateContent(UUID accountId, Integer rawTemplateId, String content)
+  public RawTemplateVersion updateContent(UUID accountId, Integer rawId, String content)
       throws Exception {
 
     RawTemplate rawTemplate = rawTemplateRepository
-        .getByIdAndWorkspace_Account_Id(rawTemplateId, accountId)
+        .getByIdAndWorkspace_Account_Id(rawId, accountId)
         .orElse(null);
 
     if (rawTemplate == null) {

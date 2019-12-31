@@ -13,5 +13,6 @@ public class RawTemplateVersionRequest {
 
   private Integer rawTemplateId;
   private String name;
+  private String content;
 
 }

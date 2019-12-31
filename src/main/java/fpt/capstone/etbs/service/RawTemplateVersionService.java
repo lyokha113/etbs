@@ -8,9 +8,9 @@ public interface RawTemplateVersionService {
 
   RawTemplateVersion createVersion(UUID accountId, RawTemplateVersionRequest request);
 
-  RawTemplateVersion updateVersion(UUID accountId, RawTemplateVersionRequest request);
+  RawTemplateVersion updateVersion(UUID accountId, Integer rawId, String name);
 
-  RawTemplateVersion updateContent(UUID accountId, Integer rawTemplateId, String content) throws Exception;
+  RawTemplateVersion updateContent(UUID accountId, Integer rawId, String content) throws Exception;
 
   void deleteVersion(UUID accountId, Integer id) throws Exception;
 }

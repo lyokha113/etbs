@@ -5,9 +5,9 @@ import fpt.capstone.etbs.constant.PublishStatus;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Publish;
+import fpt.capstone.etbs.payload.StringWrapperRequest;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.ApprovePublishRequest;
-import fpt.capstone.etbs.payload.PublishRequest;
 import fpt.capstone.etbs.payload.PublishResponse;
 import fpt.capstone.etbs.payload.TemplateRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
@@ -17,13 +17,11 @@ import fpt.capstone.etbs.service.PublishService;
 import fpt.capstone.etbs.service.TemplateService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import org.apache.commons.text.StringEscapeUtils;
@@ -73,7 +71,7 @@ public class PublishServiceImpl implements PublishService {
   }
 
   @Override
-  public Publish createPublish(UUID authorId, PublishRequest request) {
+  public Publish createPublish(UUID authorId, String content) {
 
     Account author = accountRepository.findById(authorId).orElse(null);
     if (author == null) {
@@ -85,7 +83,7 @@ public class PublishServiceImpl implements PublishService {
     }
 
     Publish publish = Publish.builder()
-        .content(StringEscapeUtils.escapeEcmaScript(request.getContent()))
+        .content(StringEscapeUtils.escapeEcmaScript(content))
         .author(author)
         .status(PublishStatus.PENDING)
         .build();

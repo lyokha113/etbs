@@ -5,9 +5,9 @@ import fpt.capstone.etbs.constant.PublishStatus;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Publish;
 import fpt.capstone.etbs.component.UserPrincipal;
+import fpt.capstone.etbs.payload.StringWrapperRequest;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.ApprovePublishRequest;
-import fpt.capstone.etbs.payload.PublishRequest;
 import fpt.capstone.etbs.payload.PublishResponse;
 import fpt.capstone.etbs.service.PublishService;
 import fpt.capstone.etbs.util.RoleUtils;
@@ -49,11 +49,11 @@ public class PublishController {
 
   @PostMapping("/publish")
   public ResponseEntity<ApiResponse> createPublish(
-      @Valid @RequestBody PublishRequest request) {
+      @Valid @RequestBody StringWrapperRequest wrapper) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      Publish publish = publishService.createPublish(userPrincipal.getId(), request);
+      Publish publish = publishService.createPublish(userPrincipal.getId(), wrapper.getString());
       PublishResponse response = PublishResponse.setResponse(publish);
       publishService.checkDuplicateAsync(publish);
       return ResponseEntity.ok(new ApiResponse<>(true, "Request sent", response));

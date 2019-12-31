@@ -136,11 +136,6 @@ public class TemplateServiceImpl implements TemplateService {
     return templateRepository.save(template);
   }
 
-  @Override
-  @Async("imageGenAsyncExecutor")
-  public CompletableFuture<Template> updateThumbnailAsync(Template template) throws Exception {
-    return CompletableFuture.completedFuture(updateThumbnail(template));
-  }
 
   @Override
   public Template updateThumbnail(Template template) throws Exception {

@@ -1,4 +1,4 @@
-package fpt.capstone.etbs.model;
+package fpt.capstone.etbs.payload;
 
 
 import lombok.AllArgsConstructor;
@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StringWrapperRequest {
 
-  private String content;
+  private String string;
 }

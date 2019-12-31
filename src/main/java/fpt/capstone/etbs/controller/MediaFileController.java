@@ -90,13 +90,12 @@ public class MediaFileController {
   }
 
   @PostMapping("/editor/file")
-  public ResponseEntity<?> createImageFromEditor(@RequestPart MultipartFile file)
+  public ResponseEntity<?> createImageFromEditor(@RequestPart MultipartFile [] files)
       throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      List<MediaFile> result = mediaFileService
-          .createMediaFiles(userPrincipal.getId(), new MultipartFile[]{file});
+      List<MediaFile> result = mediaFileService.createMediaFiles(userPrincipal.getId(), files);
       Map<String, String> response = new HashMap<>();
       response.put("link", result.get(0).getLink());
       return ResponseEntity.ok(response);

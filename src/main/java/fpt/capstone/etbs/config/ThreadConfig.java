@@ -21,18 +21,7 @@ public class ThreadConfig {
     executor.initialize();
     return executor;
   }
-
-  @Bean("imageGenAsyncExecutor")
-  public TaskExecutor imageGenAsyncExecutor() {
-    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-    executor.setCorePoolSize(10);
-    executor.setMaxPoolSize(20);
-    executor.setQueueCapacity(50);
-    executor.setWaitForTasksToCompleteOnShutdown(true);
-    executor.setThreadNamePrefix("ImageGen-");
-    executor.initialize();
-    return executor;
-  }
+  
 
   @Bean("checkDuplicateAsyncExecutor")
   public TaskExecutor checkDuplicateAsyncExecutor() {

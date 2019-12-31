@@ -17,8 +17,6 @@ public interface TemplateService {
 
   Template updateTemplate(Integer id, TemplateRequest request) throws Exception;
 
-  CompletableFuture<Template> updateThumbnailAsync(Template template) throws Exception;
-
   Template updateThumbnail(Template template) throws Exception;
 
   Template updateContentImage(Template template) throws Exception;

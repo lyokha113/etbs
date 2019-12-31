@@ -2,11 +2,10 @@ package fpt.capstone.etbs.service;
 
 import fpt.capstone.etbs.constant.PublishStatus;
 import fpt.capstone.etbs.model.Publish;
+import fpt.capstone.etbs.payload.StringWrapperRequest;
 import fpt.capstone.etbs.payload.ApprovePublishRequest;
-import fpt.capstone.etbs.payload.PublishRequest;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 public interface PublishService {
 
@@ -16,7 +15,7 @@ public interface PublishService {
 
   boolean checkPublishPolicy(UUID authorId);
 
-  Publish createPublish(UUID authorId, PublishRequest request);
+  Publish createPublish(UUID authorId, String content);
 
   Publish updatePublishStatus(Integer id, PublishStatus status, String name);
 
