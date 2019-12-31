@@ -1,4 +1,5 @@
-package fpt.capstone.etbs.payload;
+package fpt.capstone.etbs.model;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PublishRequest {
+public class StringWrapperRequest {
 
   private String content;
 }
