@@ -38,7 +38,7 @@ public class MediaFileController {
   private AuthenticationFacade authenticationFacade;
 
   @GetMapping("/file")
-  public ResponseEntity<ApiResponse> getMediaFilesOfAccount() {
+  public ResponseEntity<?> getMediaFilesOfAccount() {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     List<MediaFile> files = RoleUtils.hasAdminRole(auth) ?
@@ -50,7 +50,7 @@ public class MediaFileController {
   }
 
   @PostMapping("/file")
-  public ResponseEntity<ApiResponse> createMediaFile(@RequestPart MultipartFile[] files)
+  public ResponseEntity<?> createMediaFile(@RequestPart MultipartFile[] files)
       throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
@@ -66,7 +66,7 @@ public class MediaFileController {
   }
 
   @PutMapping("/file/{id}")
-  public ResponseEntity<ApiResponse> changeStatusMediaFile(@PathVariable("id") UUID id,
+  public ResponseEntity<?> changeStatusMediaFile(@PathVariable("id") UUID id,
       @RequestParam("active") boolean active) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();

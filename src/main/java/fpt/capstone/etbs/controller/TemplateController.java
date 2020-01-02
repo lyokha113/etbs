@@ -32,7 +32,7 @@ public class TemplateController {
   private AuthenticationFacade authenticationFacade;
 
   @GetMapping("/template")
-  private ResponseEntity<ApiResponse> getTemplates() {
+  private ResponseEntity<?> getTemplates() {
     Authentication auth = authenticationFacade.getAuthentication();
     List<Template> templates =
         RoleUtils.hasAdminRole(auth)
@@ -44,7 +44,7 @@ public class TemplateController {
   }
 
   @GetMapping("/template/{id}")
-  private ResponseEntity<ApiResponse> getTemplate(@PathVariable("id") Integer id) {
+  private ResponseEntity<?> getTemplate(@PathVariable("id") Integer id) {
     Template response = templateService.getTemplate(id);
     return response != null
         ? ResponseEntity
@@ -53,7 +53,7 @@ public class TemplateController {
   }
 
   @PostMapping("/template")
-  private ResponseEntity<ApiResponse> createTemplate(@RequestBody TemplateRequest request)
+  private ResponseEntity<?> createTemplate(@RequestBody TemplateRequest request)
       throws Exception {
     try {
       Template template = templateService.createTemplate(request);
@@ -66,7 +66,7 @@ public class TemplateController {
   }
 
   @PutMapping("/template/{id}")
-  private ResponseEntity<ApiResponse> updateTemplate(
+  private ResponseEntity<?> updateTemplate(
       @PathVariable("id") Integer id,
       @Valid @RequestBody TemplateRequest request) throws Exception {
     try {
@@ -79,7 +79,7 @@ public class TemplateController {
   }
 
   @DeleteMapping("/template/{id}")
-  public ResponseEntity<ApiResponse> deleteTemplate(@PathVariable("id") int id) throws Exception {
+  public ResponseEntity<?> deleteTemplate(@PathVariable("id") int id) throws Exception {
     try {
       templateService.deleteTemplate(id);
       return ResponseEntity.ok(new ApiResponse<>(true, "Template deleted", null));

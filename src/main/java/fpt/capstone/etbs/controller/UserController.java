@@ -45,7 +45,7 @@ public class UserController {
   private JwtTokenProvider tokenProvider;
 
   @GetMapping("/user")
-  public ResponseEntity<ApiResponse> getUserDetail() {
+  public ResponseEntity<?> getUserDetail() {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     Account account = accountService.getAccount(userPrincipal.getId());
@@ -54,7 +54,7 @@ public class UserController {
   }
 
   @PutMapping("/user")
-  public ResponseEntity<ApiResponse> updateUser(
+  public ResponseEntity<?> updateUser(
       @Valid @RequestBody AccountUpdateRequest request) {
     try {
       Authentication auth = authenticationFacade.getAuthentication();
@@ -68,7 +68,7 @@ public class UserController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<ApiResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest)
+  public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest)
       throws Exception {
     try {
       Authentication authentication = authenticationManager.authenticate(
@@ -97,7 +97,7 @@ public class UserController {
   }
 
   @PostMapping("/register")
-  public ResponseEntity<ApiResponse> registerAccount(@Valid @RequestBody RegisterRequest request) {
+  public ResponseEntity<?> registerAccount(@Valid @RequestBody RegisterRequest request) {
     try {
       Account account = accountService.registerAccount(request);
       return ResponseEntity.ok(

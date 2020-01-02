@@ -29,7 +29,7 @@ public class AccountController {
   private AccountService accountService;
 
   @GetMapping("/account")
-  public ResponseEntity<ApiResponse> getAccounts() {
+  public ResponseEntity<?> getAccounts() {
     List<Account> accounts = accountService.getAccounts();
     List<AccountResponse> response =
         accounts.stream().map(AccountResponse::setResponse).collect(Collectors.toList());
@@ -37,7 +37,7 @@ public class AccountController {
   }
 
   @PostMapping("/account")
-  public ResponseEntity<ApiResponse> createAccount(
+  public ResponseEntity<?> createAccount(
       @Valid @RequestBody AccountCreateRequest request) {
     try {
       Account account = accountService.createAccount(request);
@@ -49,7 +49,7 @@ public class AccountController {
   }
 
   @PutMapping("/account/{uuid}")
-  public ResponseEntity<ApiResponse> updateAccount(
+  public ResponseEntity<?> updateAccount(
       @PathVariable("uuid") UUID id,
       @Valid @RequestBody AccountUpdateRequest request) {
     try {
@@ -62,7 +62,7 @@ public class AccountController {
   }
 
   @PatchMapping("/account/{uuid}")
-  public ResponseEntity<ApiResponse> updateAccountStatus(
+  public ResponseEntity<?> updateAccountStatus(
       @PathVariable("uuid") UUID id,
       @RequestParam("active") boolean active) {
     try {

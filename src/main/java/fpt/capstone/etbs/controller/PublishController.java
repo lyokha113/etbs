@@ -34,7 +34,7 @@ public class PublishController {
   private AuthenticationFacade authenticationFacade;
 
   @GetMapping("/publish")
-  public ResponseEntity<ApiResponse> getPublishes() {
+  public ResponseEntity<?> getPublishes() {
 
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
@@ -48,7 +48,7 @@ public class PublishController {
   }
 
   @PostMapping("/publish")
-  public ResponseEntity<ApiResponse> createPublish(
+  public ResponseEntity<?> createPublish(
       @Valid @RequestBody StringWrapperRequest wrapper) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
@@ -63,7 +63,7 @@ public class PublishController {
   }
 
   @PutMapping("/publish/approve/{id}")
-  public ResponseEntity<ApiResponse> approvePublish(
+  public ResponseEntity<?> approvePublish(
       @PathVariable("id") Integer id,
       @RequestBody ApprovePublishRequest request) throws Exception {
     try {
@@ -78,7 +78,7 @@ public class PublishController {
   }
 
   @PutMapping("/publish/deny/{id}")
-  public ResponseEntity<ApiResponse> denyPublish(@PathVariable("id") Integer id) {
+  public ResponseEntity<?> denyPublish(@PathVariable("id") Integer id) {
     try {
       Publish publish = publishService.updatePublishStatus(id, PublishStatus.DENIED, null);
       PublishResponse response = PublishResponse.setResponse(publish);

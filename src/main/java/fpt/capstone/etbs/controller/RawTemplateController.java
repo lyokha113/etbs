@@ -33,7 +33,7 @@ public class RawTemplateController {
   private AuthenticationFacade authenticationFacade;
 
   @GetMapping("/raw/{id}")
-  public ResponseEntity<ApiResponse> getRawTemplate(@PathVariable("id") Integer id) {
+  public ResponseEntity<?> getRawTemplate(@PathVariable("id") Integer id) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     RawTemplate response = rawTemplateService.getRawTemplate(id, userPrincipal.getId());
@@ -44,7 +44,7 @@ public class RawTemplateController {
   }
 
   @PostMapping("/raw")
-  private ResponseEntity<ApiResponse> createRawTemplate(
+  private ResponseEntity<?> createRawTemplate(
       @Valid @RequestBody RawTemplateRequest request) throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
@@ -58,7 +58,7 @@ public class RawTemplateController {
   }
 
   @PutMapping("/raw/{id}")
-  private ResponseEntity<ApiResponse> updateRawTemplate(
+  private ResponseEntity<?> updateRawTemplate(
       @PathVariable("id") Integer id,
       @Valid @RequestBody RawTemplateRequest request) {
     Authentication auth = authenticationFacade.getAuthentication();
@@ -74,7 +74,7 @@ public class RawTemplateController {
   }
 
   @PatchMapping("/raw/{id}}")
-  private ResponseEntity<ApiResponse> changeVersion(
+  private ResponseEntity<?> changeVersion(
       @PathVariable("id") Integer id,
       @RequestParam("versionId") Integer versionId) {
     Authentication auth = authenticationFacade.getAuthentication();
@@ -89,7 +89,7 @@ public class RawTemplateController {
   }
 
   @DeleteMapping("/raw/{id}")
-  public ResponseEntity<ApiResponse> deleteRawTemplate(
+  public ResponseEntity<?> deleteRawTemplate(
       @PathVariable("id") int id) throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();

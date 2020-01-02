@@ -26,7 +26,7 @@ public class EmailController {
   private AuthenticationFacade authenticationFacade;
 
   @PostMapping("/email/draft")
-  public ResponseEntity<ApiResponse> makeDraftEmail(@Valid @RequestBody DraftEmailRequest request)
+  public ResponseEntity<?> makeDraftEmail(@Valid @RequestBody DraftEmailRequest request)
       throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
@@ -42,7 +42,7 @@ public class EmailController {
   }
 
   @PostMapping("/email/send/")
-  public ResponseEntity<ApiResponse> sendEmail(
+  public ResponseEntity<?> sendEmail(
       @Valid @RequestBody SendEmailRequest request) throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();

@@ -32,7 +32,7 @@ public class WorkspaceController {
   private AuthenticationFacade authenticationFacade;
 
   @GetMapping("/workspace")
-  public ResponseEntity<ApiResponse> getWorkspacesOfAccount() {
+  public ResponseEntity<?> getWorkspacesOfAccount() {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     List<Workspace> workspaces = workspaceService.getWorkspacesOfAccount(userPrincipal.getId());
@@ -42,7 +42,7 @@ public class WorkspaceController {
   }
 
   @PostMapping("/workspace")
-  public ResponseEntity<ApiResponse> createWorkspace(@Valid @RequestBody WorkspaceRequest request) {
+  public ResponseEntity<?> createWorkspace(@Valid @RequestBody WorkspaceRequest request) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
@@ -55,7 +55,7 @@ public class WorkspaceController {
   }
 
   @PutMapping("/workspace/{id}")
-  public ResponseEntity<ApiResponse> updateWorkspace(
+  public ResponseEntity<?> updateWorkspace(
       @PathVariable("id") int id,
       @Valid @RequestBody WorkspaceRequest request) {
     Authentication auth = authenticationFacade.getAuthentication();
@@ -70,7 +70,7 @@ public class WorkspaceController {
   }
 
   @DeleteMapping("/workspace/{id}")
-  public ResponseEntity<ApiResponse> deleteWorkspace(
+  public ResponseEntity<?> deleteWorkspace(
       @PathVariable("id") int id) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();

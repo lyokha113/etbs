@@ -33,7 +33,7 @@ public class CategoryController {
   private AuthenticationFacade authenticationFacade;
 
   @GetMapping("/category")
-  private ResponseEntity<ApiResponse> getCategories(
+  private ResponseEntity<?> getCategories(
       @RequestParam(defaultValue = "false", value = "withTemplate", required = false) boolean withTemplate) {
 
     Authentication auth = authenticationFacade.getAuthentication();
@@ -47,7 +47,7 @@ public class CategoryController {
   }
 
   @PostMapping("/category")
-  private ResponseEntity<ApiResponse> createCategory(
+  private ResponseEntity<?> createCategory(
       @Valid @RequestBody CategoryRequest request) {
     try {
       Category category = categoryService.createCategory(request);
@@ -59,7 +59,7 @@ public class CategoryController {
   }
 
   @PutMapping("/category/{id}")
-  private ResponseEntity<ApiResponse> updateCategory(
+  private ResponseEntity<?> updateCategory(
       @PathVariable("id") int id, @Valid @RequestBody CategoryRequest request) {
     try {
       Category category = categoryService.updateCategory(id, request);

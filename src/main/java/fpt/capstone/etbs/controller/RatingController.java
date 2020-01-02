@@ -30,7 +30,7 @@ public class RatingController {
   private AuthenticationFacade authenticationFacade;
 
   @PostMapping("/rating")
-  private ResponseEntity<ApiResponse> rate(
+  private ResponseEntity<?> rate(
       @Valid @RequestBody RatingRequest request) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();

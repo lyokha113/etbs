@@ -33,7 +33,7 @@ public class TutorialController {
   private AuthenticationFacade authenticationFacade;
 
   @GetMapping("/tutorial")
-  public ResponseEntity<ApiResponse> getTutorials() {
+  public ResponseEntity<?> getTutorials() {
     Authentication auth = authenticationFacade.getAuthentication();
     List<Tutorial> tutorials = RoleUtils.hasAdminRole(auth)
         ? tutorialService.getTutorials()
@@ -44,7 +44,7 @@ public class TutorialController {
   }
 
   @GetMapping("/tutorial/{id}")
-  public ResponseEntity<ApiResponse> getTutorial(@PathVariable("id") Integer id) {
+  public ResponseEntity<?> getTutorial(@PathVariable("id") Integer id) {
     Authentication auth = authenticationFacade.getAuthentication();
     Tutorial response = RoleUtils.hasAdminRole(auth)
         ? tutorialService.getTutorial(id)
@@ -56,7 +56,7 @@ public class TutorialController {
   }
 
   @PostMapping("/tutorial")
-  public ResponseEntity<ApiResponse> createTutorial(@Valid @ModelAttribute TutorialRequest tutorial)
+  public ResponseEntity<?> createTutorial(@Valid @ModelAttribute TutorialRequest tutorial)
       throws Exception {
     try {
       Tutorial response = tutorialService.createTutorial(tutorial);
@@ -71,7 +71,7 @@ public class TutorialController {
   }
 
   @PutMapping("/tutorial/{id}")
-  public ResponseEntity<ApiResponse> updateTutorial(
+  public ResponseEntity<?> updateTutorial(
       @PathVariable("id") Integer id, @Valid @ModelAttribute TutorialRequest tutorial)
       throws Exception {
     try {
@@ -84,7 +84,7 @@ public class TutorialController {
   }
 
   @PatchMapping("/tutorial/{id}")
-  public ResponseEntity<ApiResponse> updateStatusTutorial(
+  public ResponseEntity<?> updateStatusTutorial(
       @PathVariable("id") Integer id,
       @RequestParam("active") boolean active)
       throws Exception {

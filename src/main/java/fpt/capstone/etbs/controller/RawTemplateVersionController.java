@@ -31,7 +31,7 @@ public class RawTemplateVersionController {
   private AuthenticationFacade authenticationFacade;
 
   @PostMapping("/version")
-  private ResponseEntity<ApiResponse> createVersion(
+  private ResponseEntity<?> createVersion(
       @Valid @RequestBody RawTemplateVersionRequest request) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
@@ -46,7 +46,7 @@ public class RawTemplateVersionController {
   }
 
   @PutMapping("/version/{rawId}")
-  private ResponseEntity<ApiResponse> updateVersion(
+  private ResponseEntity<?> updateVersion(
       @PathVariable("rawId") Integer rawId,
       @Valid @RequestBody StringWrapperRequest wrapper) {
     Authentication auth = authenticationFacade.getAuthentication();
@@ -61,7 +61,7 @@ public class RawTemplateVersionController {
   }
 
   @PatchMapping("/version/{rawId}")
-  private ResponseEntity<ApiResponse> updateVersionContent(
+  private ResponseEntity<?> updateVersionContent(
       @PathVariable("rawId") Integer rawId,
       @Valid @RequestBody StringWrapperRequest wrapper) throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
@@ -76,7 +76,7 @@ public class RawTemplateVersionController {
   }
 
   @DeleteMapping("/version/{id}")
-  public ResponseEntity<ApiResponse> deleteVersion(
+  public ResponseEntity<?> deleteVersion(
       @PathVariable("id") int id) throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
