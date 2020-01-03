@@ -33,8 +33,10 @@ public class PublishResponse {
         .content(publish.getContent())
         .status(publish.getStatus())
         .duplicateRate(publish.getDuplicateRate() == null ? 0.0 : publish.getDuplicateRate())
-        .duplicateName(publish.getDuplicateTemplate() == null ? "" : publish.getDuplicateTemplate().getName())
-        .duplicateContent(publish.getDuplicateTemplate() == null ? "" : publish.getDuplicateTemplate().getContent())
+        .duplicateName(
+            publish.getDuplicateTemplate() == null ? "" : publish.getDuplicateTemplate().getName())
+        .duplicateContent(publish.getDuplicateTemplate() == null ? ""
+            : publish.getDuplicateTemplate().getContent())
         .requestDate(publish.getCreatedDate())
         .build();
   }

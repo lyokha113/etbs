@@ -1,9 +1,9 @@
 package fpt.capstone.etbs.controller;
 
 import fpt.capstone.etbs.component.AuthenticationFacade;
+import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.RawTemplateVersion;
-import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.RawTemplateVersionRequest;
 import fpt.capstone.etbs.payload.RawTemplateVersionResponse;
@@ -52,7 +52,8 @@ public class RawTemplateVersionController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      RawTemplateVersion version = rawTemplateVersionService.updateVersion(userPrincipal.getId(), rawId, wrapper.getString());
+      RawTemplateVersion version = rawTemplateVersionService
+          .updateVersion(userPrincipal.getId(), rawId, wrapper.getString());
       RawTemplateVersionResponse response = RawTemplateVersionResponse.setResponse(version);
       return ResponseEntity.ok(new ApiResponse<>(true, "Version updated", response));
     } catch (BadRequestException ex) {
@@ -67,7 +68,8 @@ public class RawTemplateVersionController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      RawTemplateVersion version = rawTemplateVersionService.updateContent(userPrincipal.getId(), rawId, wrapper.getString());
+      RawTemplateVersion version = rawTemplateVersionService
+          .updateContent(userPrincipal.getId(), rawId, wrapper.getString());
       RawTemplateVersionResponse response = RawTemplateVersionResponse.setResponse(version);
       return ResponseEntity.ok(new ApiResponse<>(true, "Version content updated", response));
     } catch (BadRequestException ex) {

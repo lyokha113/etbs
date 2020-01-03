@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.constant;
 
+import fpt.capstone.etbs.exception.BadRequestException;
 import java.util.Properties;
 
 public enum MailProvider {
@@ -15,10 +16,7 @@ public enum MailProvider {
     if (provider.equals(OUTLOOK.name())) {
       props.setProperty("host", "outlook.office365.com");
       props.setProperty("draft", "Drafts");
-      return props;
-    }
-
-    if (provider.equals(YAHOO.name())) {
+    } else if (provider.equals(YAHOO.name())) {
       props.setProperty("mail.imap.ssl.enable", "true");
       props.setProperty("mail.smtp.host", "smtp.mail.yahoo.com");
       props.setProperty("mail.smtp.auth", "true");
@@ -26,9 +24,10 @@ public enum MailProvider {
       props.put("mail.smtp.port", 456);
       props.setProperty("host", "imap.mail.yahoo.com");
       props.setProperty("draft", "Draft");
-      return props;
+    } else {
+      throw new BadRequestException("Mail provider isn't existed");
     }
 
-    return null;
+    return props;
   }
 }

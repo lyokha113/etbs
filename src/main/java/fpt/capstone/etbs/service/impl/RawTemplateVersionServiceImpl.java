@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 public class RawTemplateVersionServiceImpl implements RawTemplateVersionService {
 
 
-
   @Autowired
   private RawTemplateRepository rawTemplateRepository;
 

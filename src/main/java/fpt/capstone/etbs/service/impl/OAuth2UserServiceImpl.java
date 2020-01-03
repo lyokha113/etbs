@@ -1,13 +1,13 @@
 package fpt.capstone.etbs.service.impl;
 
 import fpt.capstone.etbs.component.GoogleOAuth2UserInfo;
+import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.constant.AuthProvider;
 import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.exception.OAuth2AuthenticationProcessingException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Role;
-import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.model.Workspace;
 import fpt.capstone.etbs.repository.AccountRepository;
 import java.util.Optional;

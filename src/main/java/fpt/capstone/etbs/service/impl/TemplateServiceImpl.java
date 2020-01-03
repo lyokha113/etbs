@@ -19,13 +19,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -124,7 +122,8 @@ public class TemplateServiceImpl implements TemplateService {
     int count = 1;
     for (Element element : doc.select("img")) {
       String imgSrc = element.absUrl("src");
-      if (imgSrc.startsWith("http://storage.googleapis.com/") && imgSrc.contains(AppConstant.USER_IMAGES)) {
+      if (imgSrc.startsWith("http://storage.googleapis.com/") && imgSrc
+          .contains(AppConstant.USER_IMAGES)) {
         String order = template.getId() + "/" + count;
         imgSrc = imgSrc.substring(0, imgSrc.indexOf("?"));
         String replace = firebaseService.createTemplateImages(imgSrc, order);
@@ -158,8 +157,10 @@ public class TemplateServiceImpl implements TemplateService {
     Document doc = Jsoup.parse(template.getContent(), "UTF-8");
     for (Element element : doc.select("img")) {
       String imgSrc = element.absUrl("src");
-      if (imgSrc.startsWith("http://storage.googleapis.com/") && imgSrc.contains(AppConstant.TEMPLATE_IMAGE)) {
-        String link = imgSrc.substring(imgSrc.indexOf(AppConstant.TEMPLATE_IMAGE), imgSrc.indexOf("?"));
+      if (imgSrc.startsWith("http://storage.googleapis.com/") && imgSrc
+          .contains(AppConstant.TEMPLATE_IMAGE)) {
+        String link = imgSrc
+            .substring(imgSrc.indexOf(AppConstant.TEMPLATE_IMAGE), imgSrc.indexOf("?"));
         files.add(DeletingMediaFile.builder().link(link).build());
       }
     }

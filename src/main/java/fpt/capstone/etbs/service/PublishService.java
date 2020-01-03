@@ -2,7 +2,6 @@ package fpt.capstone.etbs.service;
 
 import fpt.capstone.etbs.constant.PublishStatus;
 import fpt.capstone.etbs.model.Publish;
-import fpt.capstone.etbs.payload.StringWrapperRequest;
 import fpt.capstone.etbs.payload.ApprovePublishRequest;
 import java.util.List;
 import java.util.UUID;

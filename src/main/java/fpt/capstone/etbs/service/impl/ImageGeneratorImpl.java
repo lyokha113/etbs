@@ -37,12 +37,14 @@ public class ImageGeneratorImpl implements ImageGenerator {
     wait.until(pageLoadCondition);
 
     int imageToLoad = Integer
-        .parseInt(((JavascriptExecutor) driver).executeScript("return document.images.length").toString());
+        .parseInt(((JavascriptExecutor) driver).executeScript("return document.images.length")
+            .toString());
     int loaded = 0;
     while (loaded < imageToLoad) {
       for (int i = 0; i < imageToLoad; i++) {
         loaded +=
-            (Boolean) ((JavascriptExecutor) driver).executeScript("return document.images[" + i + "].complete;") ? 1 : 0;
+            (Boolean) ((JavascriptExecutor) driver)
+                .executeScript("return document.images[" + i + "].complete;") ? 1 : 0;
       }
       Thread.sleep(500);
     }

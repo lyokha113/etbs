@@ -42,6 +42,7 @@ import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -52,7 +53,6 @@ public class EmailServiceImpl implements EmailService {
 
   private static final List<String> SCOPES =
       Arrays.asList(GmailScopes.GMAIL_INSERT, GmailScopes.MAIL_GOOGLE_COM);
-  private static final String APPLICATION_NAME = "ETBS";
   private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
   @Autowired
@@ -67,20 +67,25 @@ public class EmailServiceImpl implements EmailService {
   @Autowired
   private RawTemplateService rawTemplateService;
 
+  @Value("${app.client.port}")
+  private int clientPort;
+
   @Override
   @Async("mailAsyncExecutor")
   public void sendEmail(UUID accountId, SendEmailRequest request)
       throws MessagingException, IOException {
-    String provider = request.getProvider();
+
     RawTemplate template = rawTemplateService.getRawTemplate(request.getRawTemplateId(), accountId);
     if (template == null) {
       throw new BadRequestException("Template doesn't existed");
     }
+
+    String provider = request.getProvider();
     String subject = template.getName().toUpperCase();
     String content = template.getCurrentVersion().getContent();
 
     if (provider.equalsIgnoreCase(MailProvider.GMAIL.name())) {
-      javaMailSender.send(createMessage(request, subject, content));
+      javaMailSender.send(createMessage(request.getTo()[0], subject, content));
     } else if (provider.equalsIgnoreCase(MailProvider.SENDGRID.name())) {
       sendEmailBySendGrid(request, subject, content);
     }
@@ -89,18 +94,20 @@ public class EmailServiceImpl implements EmailService {
   @Override
   public void makeDraftEmail(UUID accountId, DraftEmailRequest request)
       throws MessagingException, IOException, GeneralSecurityException {
-    String provider = request.getProvider();
+
     RawTemplate template = rawTemplateService.getRawTemplate(request.getRawTemplateId(), accountId);
     if (template == null) {
       throw new BadRequestException("Template doesn't existed");
     }
+
+    String provider = request.getProvider();
     String subject = template.getName().toUpperCase();
     String content = template.getCurrentVersion().getContent();
 
     if (provider.equalsIgnoreCase(MailProvider.GMAIL.name())) {
-      createDraftGMail(
-          createMessage(request, subject, content, Session.getInstance(System.getProperties())),
-          request.getEmail());
+      Session session = Session.getInstance(System.getProperties());
+      MimeMessage mimeMessage = createMessage(subject, content, session);
+      createDraftGMail(mimeMessage, request.getEmail());
     } else if (provider.equalsIgnoreCase(MailProvider.YAHOO.name())) {
       createDraft(request, subject, content);
     } else if (provider.equalsIgnoreCase(MailProvider.OUTLOOK.name())) {
@@ -108,18 +115,17 @@ public class EmailServiceImpl implements EmailService {
     }
   }
 
-  private MimeMessage createMessage(SendEmailRequest request, String subject, String content)
+  private MimeMessage createMessage(String receiver, String subject, String content)
       throws MessagingException {
     MimeMessage message = javaMailSender.createMimeMessage();
     MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-    helper.setTo(request.getTo());
+    helper.setTo(receiver);
     helper.setSubject(subject);
     helper.setText(content, true);
     return message;
   }
 
-  private MimeMessage createMessage(DraftEmailRequest request, String subject, String content,
-      Session session)
+  private MimeMessage createMessage(String subject, String content, Session session)
       throws MessagingException {
     MimeMessage message = new MimeMessage(session);
     message.setFlag(Flags.Flag.DRAFT, true);
@@ -127,30 +133,6 @@ public class EmailServiceImpl implements EmailService {
     helper.setSubject(subject);
     helper.setText(content, true);
     return message;
-  }
-
-  private void createDraft(DraftEmailRequest request, String subject, String content)
-      throws MessagingException {
-    Properties props = MailProvider.getMailConfig(request.getProvider());
-    Session session = Session.getInstance(props);
-    Store mailStore = session.getStore("imap");
-    mailStore.connect(props.getProperty("host"), request.getEmail(), request.getPassword());
-    Folder draftsMailBoxFolder = mailStore.getFolder(props.getProperty("draft"));
-    draftsMailBoxFolder.open(Folder.READ_WRITE);
-    javax.mail.Message[] draftMessages = {createMessage(request, subject, content, session)};
-    draftsMailBoxFolder.appendMessages(draftMessages);
-  }
-
-  private void createDraftGMail(MimeMessage mm, String email)
-      throws MessagingException, IOException, GeneralSecurityException {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    mm.writeTo(baos);
-    String encodedEmail = Base64.encodeBase64URLSafeString(baos.toByteArray());
-    Message message = new Message();
-    message.setRaw(encodedEmail);
-    Draft draft = new Draft();
-    draft.setMessage(message);
-    this.getGMailInstance().users().drafts().create(email, draft).execute();
   }
 
   private void sendEmailBySendGrid(SendEmailRequest request, String subject, String content)
@@ -162,10 +144,10 @@ public class EmailServiceImpl implements EmailService {
     mail.setFrom(sender);
 
     Personalization personalization = new Personalization();
-    String[] recivers = request.getTo();
-    for (int i = 0; i < recivers.length; i++) {
-      Email receiver = new Email(recivers[i]);
-      personalization.addTo(receiver);
+    String[] receivers = request.getTo();
+    for (String receiver : receivers) {
+      Email email = new Email(receiver);
+      personalization.addTo(email);
     }
     personalization.setSubject(subject);
     mail.addPersonalization(personalization);
@@ -180,6 +162,30 @@ public class EmailServiceImpl implements EmailService {
     sendGrid.api(re);
   }
 
+  private void createDraft(DraftEmailRequest request, String subject, String content)
+      throws MessagingException {
+    Properties props = MailProvider.getMailConfig(request.getProvider());
+    Session session = Session.getInstance(props);
+    Store mailStore = session.getStore("imap");
+    mailStore.connect(props.getProperty("host"), request.getEmail(), request.getPassword());
+    Folder draftsMailBoxFolder = mailStore.getFolder(props.getProperty("draft"));
+    draftsMailBoxFolder.open(Folder.READ_WRITE);
+    javax.mail.Message[] draftMessages = {createMessage("ETBS-" + subject, content, session)};
+    draftsMailBoxFolder.appendMessages(draftMessages);
+  }
+
+  private void createDraftGMail(MimeMessage mimeMessage, String email)
+      throws MessagingException, IOException, GeneralSecurityException {
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    mimeMessage.writeTo(out);
+    String encodedEmail = Base64.encodeBase64URLSafeString(out.toByteArray());
+    Message message = new Message();
+    message.setRaw(encodedEmail);
+    Draft draft = new Draft();
+    draft.setMessage(message);
+    this.getGMailInstance().users().drafts().create(email, draft).execute();
+  }
+
   private Gmail getGMailInstance() throws GeneralSecurityException, IOException {
     NetHttpTransport netHttpTransport = GoogleNetHttpTransport.newTrustedTransport();
     GoogleAuthorizationCodeFlow flow =
@@ -187,11 +193,11 @@ public class EmailServiceImpl implements EmailService {
             netHttpTransport, JSON_FACTORY, googleClientSecrets, SCOPES)
             .setAccessType("offline")
             .build();
-    LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
+    LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(clientPort).build();
     Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
 
     return new Gmail.Builder(netHttpTransport, JSON_FACTORY, credential)
-        .setApplicationName(APPLICATION_NAME)
+        .setApplicationName("ETBS")
         .build();
   }
 }

@@ -21,7 +21,7 @@ public class ThreadConfig {
     executor.initialize();
     return executor;
   }
-  
+
 
   @Bean("checkDuplicateAsyncExecutor")
   public TaskExecutor checkDuplicateAsyncExecutor() {

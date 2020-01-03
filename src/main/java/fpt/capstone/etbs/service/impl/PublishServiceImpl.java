@@ -5,7 +5,6 @@ import fpt.capstone.etbs.constant.PublishStatus;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Publish;
-import fpt.capstone.etbs.payload.StringWrapperRequest;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.ApprovePublishRequest;
 import fpt.capstone.etbs.payload.PublishResponse;
@@ -64,7 +63,8 @@ public class PublishServiceImpl implements PublishService {
     LocalDateTime now = LocalDateTime.now();
     LocalDateTime startDay = now.toLocalDate().atTime(LocalTime.MIN);
     LocalDateTime endDay = now.toLocalDate().atTime(LocalTime.MAX);
-    List<PublishStatus> statuses = Arrays.asList(PublishStatus.PENDING, PublishStatus.PROCESSING, PublishStatus.DENIED);
+    List<PublishStatus> statuses = Arrays
+        .asList(PublishStatus.PENDING, PublishStatus.PROCESSING, PublishStatus.DENIED);
     long count = publishRepository.countByAuthor_IdAndStatusInAndCreatedDateBetween(
         authorId, statuses, startDay, endDay);
     return count < AppConstant.MAX_PENDING_PUBLISH;
@@ -78,8 +78,9 @@ public class PublishServiceImpl implements PublishService {
       throw new BadRequestException("Account doesn't exited");
     }
 
-    if(!checkPublishPolicy(authorId)){
-      throw new BadRequestException("Publish request was reached limitation. Please wait for processing and request later.");
+    if (!checkPublishPolicy(authorId)) {
+      throw new BadRequestException(
+          "Publish request was reached limitation. Please wait for processing and request later.");
     }
 
     Publish publish = Publish.builder()

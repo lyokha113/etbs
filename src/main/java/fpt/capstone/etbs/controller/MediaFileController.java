@@ -1,10 +1,10 @@
 package fpt.capstone.etbs.controller;
 
 import fpt.capstone.etbs.component.AuthenticationFacade;
+import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.MediaFile;
-import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.MediaFileEditorResponse;
 import fpt.capstone.etbs.payload.MediaFileResponse;
@@ -90,7 +90,7 @@ public class MediaFileController {
   }
 
   @PostMapping("/editor/file")
-  public ResponseEntity<?> createImageFromEditor(@RequestPart MultipartFile [] files)
+  public ResponseEntity<?> createImageFromEditor(@RequestPart MultipartFile[] files)
       throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
