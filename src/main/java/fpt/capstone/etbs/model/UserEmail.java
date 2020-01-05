@@ -18,6 +18,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.ToString;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
@@ -46,4 +47,16 @@ public class UserEmail extends Auditing {
   @ManyToOne
   @NonNull
   private Account account;
+
+  @Column
+  private String name;
+
+  @Column
+  private String status;
+
+  @Column
+  private String provider;
+
+  @Column(columnDefinition = "text")
+  private String token;
 }

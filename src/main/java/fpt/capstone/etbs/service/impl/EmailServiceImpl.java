@@ -20,11 +20,15 @@ import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.objects.Personalization;
+import fpt.capstone.etbs.component.JwtTokenProvider;
 import fpt.capstone.etbs.component.SendGridMail;
+import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.constant.MailProvider;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.payload.DraftEmailRequest;
+import fpt.capstone.etbs.payload.GenerateTokenParam;
+import fpt.capstone.etbs.payload.SendConfirmEmailRequest;
 import fpt.capstone.etbs.payload.SendEmailRequest;
 import fpt.capstone.etbs.service.EmailService;
 import fpt.capstone.etbs.service.RawTemplateService;
@@ -105,6 +109,26 @@ public class EmailServiceImpl implements EmailService {
       createDraft(request, subject, content);
     } else if (provider.equalsIgnoreCase(MailProvider.OUTLOOK.name())) {
       createDraft(request, subject, content);
+    }
+  }
+
+  @Override
+  public void sendConfirmEmail(SendConfirmEmailRequest request)
+      throws MessagingException, IOException {
+
+    String content =
+        AppConstant.EMAIL_CONFIRM_CONTENT_1 + request.getToken()
+            + AppConstant.EMAIL_CONFIRM_CONTENT_2;
+    SendEmailRequest sendEmailRequest = SendEmailRequest.builder()
+        .provider(request.getProvider())
+        .to(new String[]{request.getEmail()})
+        .build();
+    if (sendEmailRequest.getProvider().equalsIgnoreCase(MailProvider.GMAIL.name())) {
+      javaMailSender.send(createMessage(sendEmailRequest, AppConstant.EMAIL_CONFIRM_SUBJECT,
+          content));
+    } else {
+      sendEmailBySendGrid(sendEmailRequest, AppConstant.EMAIL_CONFIRM_SUBJECT,
+          content);
     }
   }
 

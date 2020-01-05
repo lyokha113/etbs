@@ -105,7 +105,9 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
       throw new BadRequestException("Google account can't be updated");
     }
     if (request.getFullName() != null) {
-      account.setFullName(request.getFullName());
+      if (!request.getFullName().equals(account.getFullName())) {
+        account.setFullName(request.getFullName());
+      }
     }
     if (request.getActive() != null) {
       account.setActive(request.getActive());
@@ -114,11 +116,14 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
       account.setPassword(passwordEncoder.encode(request.getPassword()));
     }
     if (request.getImageUrl() != null) {
-      String base64Image = request.getImageUrl().split(",")[1];
-      byte[] imageBytes = DatatypeConverter.parseBase64Binary(base64Image);
-      BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(imageBytes));
-      account
-          .setImageUrl(firebaseService.updateUserImage(bufferedImage, account.getId().toString()));
+      if (!request.getImageUrl().equals(account.getImageUrl())) {
+        String base64Image = request.getImageUrl().split(",")[1];
+        byte[] imageBytes = DatatypeConverter.parseBase64Binary(base64Image);
+        BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(imageBytes));
+        account
+            .setImageUrl(
+                firebaseService.updateUserImage(bufferedImage, account.getId().toString()));
+      }
     }
     return accountRepository.save(account);
   }
