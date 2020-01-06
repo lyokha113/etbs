@@ -47,8 +47,6 @@ public class UserEmailServiceImpl implements UserEmailService {
     if (userEmail == null) {
       throw new BadRequestException("User email doesn't exist");
     }
-    userEmail.setEmail(request.getEmail());
-    userEmail.setProvider(request.getProvider());
     userEmail.setName(request.getName());
     return userEmailRepository.save(userEmail);
   }

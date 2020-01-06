@@ -17,5 +17,5 @@ public interface EmailService {
       throws MessagingException, IOException, GeneralSecurityException;
 
   void sendConfirmEmail(SendConfirmEmailRequest request)
-      throws MessagingException, IOException;
+      throws MessagingException;
 }

@@ -6,6 +6,7 @@ import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Role;
+import fpt.capstone.etbs.model.UserEmail;
 import fpt.capstone.etbs.model.Workspace;
 import fpt.capstone.etbs.payload.AccountCreateRequest;
 import fpt.capstone.etbs.payload.AccountUpdateRequest;
@@ -143,7 +144,14 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
             .account(account)
             .build())
             .collect(Collectors.toSet()));
-
+    account.setUserEmails(
+        Stream.of(UserEmail.builder()
+            .account(account)
+            .name(request.getFullName())
+            .provider("Gmail")
+            .status("Default")
+            .build())
+            .collect(Collectors.toSet()));
     return accountRepository.save(account);
   }
 }

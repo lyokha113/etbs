@@ -5,6 +5,7 @@ import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Category;
 import fpt.capstone.etbs.model.DeletingMediaFile;
+import fpt.capstone.etbs.model.Rating;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.TemplateRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
@@ -15,6 +16,9 @@ import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.ImageGenerator;
 import fpt.capstone.etbs.service.TemplateService;
 import java.awt.image.BufferedImage;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -52,6 +56,18 @@ public class TemplateServiceImpl implements TemplateService {
   @Override
   public List<Template> getTemplates() {
     return templateRepository.findAll();
+  }
+
+  public double getTemplatepoint(Template template) {
+    double scores;
+    double upvote = template.getRatings().stream().filter(Rating::isVote).count();
+    double downvote = template.getRatings().stream().filter(rating -> !rating.isVote()).count();
+    double gravity = 1.81;
+//    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    LocalDateTime now = LocalDateTime.now();
+    Duration duration = Duration.between(template.getCreatedDate(), now);
+    scores = (upvote - downvote) / Math.pow(duration.toHours(), gravity);
+    return scores;
   }
 
   @Override
@@ -124,7 +140,8 @@ public class TemplateServiceImpl implements TemplateService {
     int count = 1;
     for (Element element : doc.select("img")) {
       String imgSrc = element.absUrl("src");
-      if (imgSrc.startsWith("http://storage.googleapis.com/") && imgSrc.contains(AppConstant.USER_IMAGES)) {
+      if (imgSrc.startsWith("http://storage.googleapis.com/") && imgSrc
+          .contains(AppConstant.USER_IMAGES)) {
         String order = template.getId() + "/" + count;
         imgSrc = imgSrc.substring(0, imgSrc.indexOf("?"));
         String replace = firebaseService.createTemplateImages(imgSrc, order);
@@ -163,8 +180,10 @@ public class TemplateServiceImpl implements TemplateService {
     Document doc = Jsoup.parse(template.getContent(), "UTF-8");
     for (Element element : doc.select("img")) {
       String imgSrc = element.absUrl("src");
-      if (imgSrc.startsWith("http://storage.googleapis.com/") && imgSrc.contains(AppConstant.TEMPLATE_IMAGE)) {
-        String link = imgSrc.substring(imgSrc.indexOf(AppConstant.TEMPLATE_IMAGE), imgSrc.indexOf("?"));
+      if (imgSrc.startsWith("http://storage.googleapis.com/") && imgSrc
+          .contains(AppConstant.TEMPLATE_IMAGE)) {
+        String link = imgSrc
+            .substring(imgSrc.indexOf(AppConstant.TEMPLATE_IMAGE), imgSrc.indexOf("?"));
         files.add(DeletingMediaFile.builder().link(link).build());
       }
     }

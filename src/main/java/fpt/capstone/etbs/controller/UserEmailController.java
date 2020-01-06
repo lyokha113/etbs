@@ -1,18 +1,16 @@
 package fpt.capstone.etbs.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fpt.capstone.etbs.component.AuthenticationFacade;
-import fpt.capstone.etbs.component.JwtTokenProvider;
 import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.UserEmail;
 import fpt.capstone.etbs.payload.ApiResponse;
-import fpt.capstone.etbs.payload.GenerateTokenParam;
 import fpt.capstone.etbs.payload.SendConfirmEmailRequest;
 import fpt.capstone.etbs.payload.UserEmailRequest;
 import fpt.capstone.etbs.payload.UserEmailResponse;
 import fpt.capstone.etbs.service.EmailService;
 import fpt.capstone.etbs.service.UserEmailService;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.mail.MessagingException;
@@ -66,8 +64,8 @@ public class UserEmailController {
       emailService.sendConfirmEmail(emailRequest);
       UserEmailResponse response = UserEmailResponse.setResponse(userEmail);
       return ResponseEntity.ok(new ApiResponse<>(true, "", response));
-    } catch (BadRequestException | MessagingException | IOException e) {
-      return ResponseEntity.badRequest().build();
+    } catch (BadRequestException | MessagingException | JsonProcessingException e) {
+      return ResponseEntity.ok(new ApiResponse<>(false, "Can not send email", null));
     }
   }
 

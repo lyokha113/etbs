@@ -20,14 +20,12 @@ import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.objects.Personalization;
-import fpt.capstone.etbs.component.JwtTokenProvider;
 import fpt.capstone.etbs.component.SendGridMail;
 import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.constant.MailProvider;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.payload.DraftEmailRequest;
-import fpt.capstone.etbs.payload.GenerateTokenParam;
 import fpt.capstone.etbs.payload.SendConfirmEmailRequest;
 import fpt.capstone.etbs.payload.SendEmailRequest;
 import fpt.capstone.etbs.service.EmailService;
@@ -114,7 +112,7 @@ public class EmailServiceImpl implements EmailService {
 
   @Override
   public void sendConfirmEmail(SendConfirmEmailRequest request)
-      throws MessagingException, IOException {
+      throws MessagingException {
 
     String content =
         AppConstant.EMAIL_CONFIRM_CONTENT_1 + request.getToken()
@@ -126,9 +124,6 @@ public class EmailServiceImpl implements EmailService {
     if (sendEmailRequest.getProvider().equalsIgnoreCase(MailProvider.GMAIL.name())) {
       javaMailSender.send(createMessage(sendEmailRequest, AppConstant.EMAIL_CONFIRM_SUBJECT,
           content));
-    } else {
-      sendEmailBySendGrid(sendEmailRequest, AppConstant.EMAIL_CONFIRM_SUBJECT,
-          content);
     }
   }
 
