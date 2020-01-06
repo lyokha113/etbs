@@ -147,6 +147,7 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
     account.setUserEmails(
         Stream.of(UserEmail.builder()
             .account(account)
+            .email(request.getEmail())
             .name(request.getFullName())
             .provider("Gmail")
             .status("Default")

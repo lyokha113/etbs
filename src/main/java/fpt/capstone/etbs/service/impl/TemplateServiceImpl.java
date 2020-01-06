@@ -58,18 +58,6 @@ public class TemplateServiceImpl implements TemplateService {
     return templateRepository.findAll();
   }
 
-  public double getTemplatepoint(Template template) {
-    double scores;
-    double upvote = template.getRatings().stream().filter(Rating::isVote).count();
-    double downvote = template.getRatings().stream().filter(rating -> !rating.isVote()).count();
-    double gravity = 1.81;
-//    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    LocalDateTime now = LocalDateTime.now();
-    Duration duration = Duration.between(template.getCreatedDate(), now);
-    scores = (upvote - downvote) / Math.pow(duration.toHours(), gravity);
-    return scores;
-  }
-
   @Override
   public List<Template> getTemplatesForUser() {
     List<Template> templates = templateRepository.findAll();
@@ -77,7 +65,6 @@ public class TemplateServiceImpl implements TemplateService {
         .filter(t -> t.getCategories().stream().anyMatch(Category::isActive))
         .collect(Collectors.toList());
   }
-
 
   @Override
   public Template getTemplate(Integer id) {
