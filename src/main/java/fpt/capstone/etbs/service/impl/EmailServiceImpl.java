@@ -111,7 +111,7 @@ public class EmailServiceImpl implements EmailService {
   }
 
   @Override
-  public void sendConfirmEmail(SendConfirmEmailRequest request)
+  public void sendConfirmUserEmail(SendConfirmEmailRequest request)
       throws MessagingException {
 
     String content =
@@ -123,6 +123,21 @@ public class EmailServiceImpl implements EmailService {
         .build();
     if (sendEmailRequest.getProvider().equalsIgnoreCase(MailProvider.GMAIL.name())) {
       javaMailSender.send(createMessage(sendEmailRequest, AppConstant.EMAIL_CONFIRM_SUBJECT,
+          content));
+    }
+  }
+
+  @Override
+  public void sendConfirmAccount(SendConfirmEmailRequest request) throws MessagingException {
+    String content =
+        AppConstant.ACCOUNT_CONFIRM_CONTENT_1 + request.getToken()
+            + AppConstant.ACCOUNT_CONFIRM_CONTENT_2;
+    SendEmailRequest sendEmailRequest = SendEmailRequest.builder()
+        .provider(request.getProvider())
+        .to(new String[]{request.getEmail()})
+        .build();
+    if (sendEmailRequest.getProvider().equalsIgnoreCase(MailProvider.GMAIL.name())) {
+      javaMailSender.send(createMessage(sendEmailRequest, AppConstant.ACCOUNT_CONFIRM_SUBJECT,
           content));
     }
   }

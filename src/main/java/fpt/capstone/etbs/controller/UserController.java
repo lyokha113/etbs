@@ -105,6 +105,7 @@ public class UserController {
   public ResponseEntity<ApiResponse> registerAccount(@Valid @RequestBody RegisterRequest request) {
     try {
       Account account = accountService.registerAccount(request);
+
       return ResponseEntity.ok(
           new ApiResponse<>(true, "Account created", AccountResponse.setResponse(account)));
     } catch (BadRequestException ex) {

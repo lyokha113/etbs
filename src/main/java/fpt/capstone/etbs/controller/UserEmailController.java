@@ -61,7 +61,7 @@ public class UserEmailController {
           .provider(userEmail.getProvider())
           .token(userEmail.getToken())
           .build();
-      emailService.sendConfirmEmail(emailRequest);
+      emailService.sendConfirmUserEmail(emailRequest);
       UserEmailResponse response = UserEmailResponse.setResponse(userEmail);
       return ResponseEntity.ok(new ApiResponse<>(true, "", response));
     } catch (BadRequestException | MessagingException | JsonProcessingException e) {

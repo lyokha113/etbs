@@ -16,6 +16,9 @@ public interface EmailService {
   void makeDraftEmail(UUID accountId, DraftEmailRequest request)
       throws MessagingException, IOException, GeneralSecurityException;
 
-  void sendConfirmEmail(SendConfirmEmailRequest request)
+  void sendConfirmUserEmail(SendConfirmEmailRequest request)
+      throws MessagingException;
+
+  void sendConfirmAccount(SendConfirmEmailRequest request)
       throws MessagingException;
 }

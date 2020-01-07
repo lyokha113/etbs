@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.controller;
 
+import fpt.capstone.etbs.component.JwtTokenProvider;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.payload.AccountCreateRequest;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -26,6 +28,9 @@ public class AccountController {
 
   @Autowired
   private AccountService accountService;
+
+  @Autowired
+  JwtTokenProvider tokenProvider;
 
   @GetMapping("/account")
   public ResponseEntity<ApiResponse> getAccounts() {
@@ -44,6 +49,16 @@ public class AccountController {
       return ResponseEntity.ok(new ApiResponse<>(true, "Account created", response));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
+  }
+
+  @PutMapping("/account/confirm")
+  public ResponseEntity<ApiResponse> confirmAccount(@Valid @RequestParam("token") String token) {
+    try {
+      AccountResponse accountResponse = tokenProvider.getTokenValue(token);
+      return ResponseEntity.ok(new ApiResponse<>(true, "", accountResponse));
+    } catch (BadRequestException | IOException bre) {
+      return ResponseEntity.badRequest().build();
     }
   }
 
