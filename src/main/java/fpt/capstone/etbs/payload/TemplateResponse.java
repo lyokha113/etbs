@@ -22,6 +22,7 @@ public class TemplateResponse {
   private String name;
   private String authorName;
   private String authorId;
+  private String authorAvatar;
   private String content;
   private String thumbnail;
   private int upVote;
@@ -47,6 +48,7 @@ public class TemplateResponse {
         .name(template.getName())
         .authorName(template.getAuthor().getFullName())
         .authorId(template.getAuthor().getId().toString())
+        .authorAvatar(template.getAuthor().getImageUrl())
         .thumbnail(template.getThumbnail())
         .upVote(upVote)
         .downVote(downVote)

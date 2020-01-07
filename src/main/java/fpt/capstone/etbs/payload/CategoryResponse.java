@@ -59,6 +59,7 @@ class TemplateOfCategory {
   private String name;
   private String authorName;
   private String authorId;
+  private String authorAvatar;
   private String thumbnail;
   private String description;
   private int upVote;
@@ -73,6 +74,7 @@ class TemplateOfCategory {
         .name(template.getName())
         .authorName(template.getAuthor().getFullName())
         .authorId(template.getAuthor().getId().toString())
+        .authorAvatar(template.getAuthor().getImageUrl())
         .thumbnail(template.getThumbnail())
         .description(template.getDescription())
         .upVote(upVote)

@@ -28,37 +28,31 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    implementation 'io.jsonwebtoken:jjwt:0.9.0'
-    implementation "io.springfox:springfox-swagger2:2.9.2"
-    implementation "io.springfox:springfox-swagger-ui:2.9.2"
-    implementation "io.springfox:springfox-bean-validators:2.9.2"
-    implementation 'com.sendgrid:sendgrid-java:4.4.1'
-    implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.1.6.RELEASE'
-    implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.1.6.RELEASE'
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.0.0-alpha-3'
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-remote-driver', version: '4.0.0-alpha-3'
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: '4.0.0-alpha-3'
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-api', version: '4.0.0-alpha-3'
-    implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
-    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.8'
-
     implementation group: 'com.google.api-client', name: 'google-api-client', version: '1.30.4'
-    implementation 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
-    implementation 'com.google.apis:google-api-services-gmail:v1-rev83-1.23.0'
-    implementation 'com.google.apis:google-api-services-people:v1-rev277-1.23.0'
+    implementation group: 'com.google.oauth-client', name: 'google-oauth-client-jetty', version: '1.23.0'
+    implementation group: 'com.google.apis', name: 'google-api-services-gmail', version: 'v1-rev83-1.23.0'
+    implementation group: 'com.google.apis', name: 'google-api-services-people', version: 'v1-rev277-1.23.0'
+    implementation group: 'com.google.api-client', name: 'google-api-client', version: '1.30.5'
+    implementation group: 'com.google.firebase', name: 'firebase-admin', version: '6.8.1'
     implementation group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
-
+    implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.4.1'
+    implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.12.1'
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.8'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.0'
+    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+    implementation group: 'io.springfox', name: 'springfox-bean-validators', version: '2.9.2'
 
-    implementation 'com.google.firebase:firebase-admin:6.8.1'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'mysql:mysql-connector-java'
     annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
 
 
 }

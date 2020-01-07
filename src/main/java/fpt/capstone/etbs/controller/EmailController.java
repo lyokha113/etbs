@@ -35,7 +35,6 @@ public class EmailController {
       emailSenderService.makeDraftEmail(userPrincipal.getId(), request);
       return ResponseEntity.ok(new ApiResponse<>(true, "Draft was made", null));
     } catch (GeneralSecurityException | MessagingException e) {
-      e.printStackTrace();
       return ResponseEntity.badRequest()
           .body(new ApiResponse<>(false, "Invalid login/security information", null));
     } catch (BadRequestException ex) {

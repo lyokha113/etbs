@@ -9,6 +9,7 @@ import fpt.capstone.etbs.model.Role;
 import fpt.capstone.etbs.model.Workspace;
 import fpt.capstone.etbs.payload.AccountCreateRequest;
 import fpt.capstone.etbs.payload.AccountUpdateRequest;
+import fpt.capstone.etbs.payload.AuthResponse;
 import fpt.capstone.etbs.payload.RegisterRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.RoleRepository;
@@ -19,12 +20,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 @Service
-public class AccountServiceImpl extends DefaultOAuth2UserService implements AccountService {
+public class AccountServiceImpl implements AccountService {
 
   @Autowired
   private AccountRepository accountRepository;
@@ -57,10 +57,12 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
       throw new BadRequestException("Email is existed");
     }
 
-    return setNewAccount(request, Role.builder()
+    Role role = Role.builder()
         .id(RoleEnum.USER.getId())
         .name(RoleEnum.USER.toString())
-        .build());
+        .build();
+
+    return setNewAccount(request, AuthProvider.local,null, role);
   }
 
   @Override
@@ -75,13 +77,28 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
       throw new BadRequestException("Role doesn't exist");
     }
 
-    return setNewAccount(
-        RegisterRequest.builder()
-            .email(request.getEmail())
-            .fullName(request.getFullName())
-            .password(request.getPassword())
-            .build(),
-        role);
+    RegisterRequest rr = RegisterRequest.builder()
+        .email(request.getEmail())
+        .fullName(request.getFullName())
+        .password(request.getPassword())
+        .build();
+
+    return setNewAccount(rr, AuthProvider.local,null, role);
+  }
+
+  @Override
+  public Account createGoogleAccount(String email, String name, String avatarURL) {
+    RegisterRequest rr = RegisterRequest.builder()
+        .email(email)
+        .fullName(name)
+        .build();
+
+    Role role = Role.builder()
+        .id(RoleEnum.USER.getId())
+        .name(RoleEnum.USER.toString())
+        .build();
+
+    return setNewAccount(rr, AuthProvider.google,avatarURL, role);
   }
 
   @Override
@@ -113,21 +130,37 @@ public class AccountServiceImpl extends DefaultOAuth2UserService implements Acco
     return accountRepository.save(account);
   }
 
-  private Account setNewAccount(RegisterRequest request, Role role) {
+  @Override
+  public Account updateGoogleAccount(Account acccount, String name, String avatarURL) {
+    acccount.setFullName(name);
+    acccount.setImageUrl(avatarURL);
+    return accountRepository.save(acccount);
+  }
+
+  private Account setNewAccount(RegisterRequest request, AuthProvider provider, String avatarURL, Role role) {
     Account account = new Account();
     account.setEmail(request.getEmail());
     account.setFullName(request.getFullName());
-    account.setPassword(passwordEncoder.encode(request.getPassword()));
-    account.setImageUrl(AppConstant.DEFAULT_AVATAR_URL);
+    account.setProvider(provider);
     account.setActive(true);
     account.setRole(role);
-    account.setProvider(AuthProvider.local);
-    account.setWorkspaces(
-        Stream.of(Workspace.builder()
-            .name(AppConstant.DEFAULT_WORKSPACE_NAME)
-            .account(account)
-            .build())
-            .collect(Collectors.toSet()));
+
+    if (!StringUtils.isEmpty(request.getPassword())) {
+      account.setPassword(passwordEncoder.encode(request.getPassword()));
+    }
+
+    if (!StringUtils.isEmpty(avatarURL)) {
+      account.setImageUrl(AppConstant.DEFAULT_AVATAR_URL);
+    }
+
+    if (role.getId() == RoleEnum.USER.getId()) {
+      account.setWorkspaces(
+          Stream.of(Workspace.builder()
+              .name(AppConstant.DEFAULT_WORKSPACE_NAME)
+              .account(account)
+              .build())
+              .collect(Collectors.toSet()));
+    }
 
     return accountRepository.save(account);
   }

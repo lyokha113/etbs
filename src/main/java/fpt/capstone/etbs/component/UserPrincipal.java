@@ -10,10 +10,9 @@ import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @Data
-public class UserPrincipal implements UserDetails, OAuth2User {
+public class UserPrincipal implements UserDetails {
 
   private UUID id;
   private String fullName;
@@ -52,12 +51,6 @@ public class UserPrincipal implements UserDetails, OAuth2User {
         account.getPassword(),
         account.getImageUrl(),
         grantedAuthorities);
-  }
-
-  public static UserPrincipal create(Account account, Map<String, Object> attributes) {
-    UserPrincipal userPrincipal = UserPrincipal.create(account);
-    userPrincipal.setAttributes(attributes);
-    return userPrincipal;
   }
 
   public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -112,8 +105,4 @@ public class UserPrincipal implements UserDetails, OAuth2User {
     return Objects.hash(id);
   }
 
-  @Override
-  public String getName() {
-    return String.valueOf(id);
-  }
 }

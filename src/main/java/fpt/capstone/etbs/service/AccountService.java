@@ -19,7 +19,11 @@ public interface AccountService {
 
   Account createAccount(AccountCreateRequest request);
 
+  Account createGoogleAccount(String email, String name, String avatarURL);
+
   Account updateAccount(UUID uuid, AccountUpdateRequest request);
 
   Account updateAccount(UUID uuid, Boolean active);
+
+  Account updateGoogleAccount(Account account, String name, String avatarURL);
 }
