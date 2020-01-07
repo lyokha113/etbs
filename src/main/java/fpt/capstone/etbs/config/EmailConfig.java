@@ -15,9 +15,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class EmailConfig {
 
-  private static final String CREDENTIALS_GOOGLE = "/etbs_gmail.json";
-  private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-
   @Value("${app.sendgrid.apiKey}")
   private String SENDGRID_API_KEY;
 
@@ -26,9 +23,5 @@ public class EmailConfig {
     return new SendGrid(SENDGRID_API_KEY);
   }
 
-  @Bean
-  public GoogleClientSecrets googleClientSecrets() throws IOException {
-    InputStream toLoad = EtbsApplication.class.getResourceAsStream(CREDENTIALS_GOOGLE);
-    return GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(toLoad));
-  }
+
 }

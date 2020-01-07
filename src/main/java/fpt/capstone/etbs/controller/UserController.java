@@ -51,9 +51,6 @@ public class UserController {
   @Autowired
   private JwtTokenProvider tokenProvider;
 
-  @Autowired
-  private GoogleIdTokenVerifier googleIdTokenVerifier;
-
   @GetMapping("/user")
   public ResponseEntity<?> getUserDetail() {
     Authentication auth = authenticationFacade.getAuthentication();
@@ -105,46 +102,6 @@ public class UserController {
           .body((new ApiResponse<>(false, "Account was locked", null)));
     } catch (JsonProcessingException e) {
       throw new Exception("Json parsing error");
-    }
-  }
-
-  @PostMapping("/google-login")
-  public ResponseEntity<?> loginByGoogle(@Valid @RequestBody StringWrapperRequest wrapper) {
-    try {
-
-      String token = wrapper.getString();
-      if (StringUtils.isEmpty(token)) {
-        throw new BadCredentialsException("Invalid login information");
-      }
-
-      GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(token);
-      if (googleIdToken == null) {
-        throw new BadRequestException(
-            "Google token error");
-      }
-      
-      Payload payload = googleIdToken.getPayload();
-      String email = payload.getEmail();
-
-      Account account = accountService.getAccountByEmail(email);
-      String name = (String) payload.get("name");
-      String avatar = (String) payload.get("picture");
-      if (account == null) {
-        account = accountService.createGoogleAccount(email, name, avatar);
-      } else if (account.getProvider().equals(AuthProvider.google)) {
-        account = accountService.updateGoogleAccount(account, name, avatar);
-      } else if (account.getProvider().equals(AuthProvider.local)) {
-        throw new BadRequestException(
-            "This email was registered in system. Please use email and password to login");
-      }
-
-      AccountResponse response = AccountResponse.setResponse(account);
-      String jwt = tokenProvider.generateToken(response);
-      return ResponseEntity.ok(
-          new ApiResponse<>(true, "Logged successfully", new JwtAuthenticationResponse(jwt)));
-
-    } catch (BadRequestException | GeneralSecurityException | IOException ex) {
-      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
   }
 

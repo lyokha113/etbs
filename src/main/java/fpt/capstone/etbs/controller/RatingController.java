@@ -35,10 +35,6 @@ public class RatingController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     Rating rate = ratingService.rate(userPrincipal.getId(), request);
-    if (rate == null) {
-      Template template = templateService.getTemplate(request.getTemplateId());
-      rate = Rating.builder().template(template).build();
-    }
     return ResponseEntity.ok(new ApiResponse<>(
         true, "Rate successful", RatingResponse.setResponse(rate)));
   }

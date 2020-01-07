@@ -53,16 +53,13 @@ public class EmailServiceImpl implements EmailService {
 
   private static final List<String> SCOPES =
       Arrays.asList(GmailScopes.GMAIL_INSERT, GmailScopes.MAIL_GOOGLE_COM);
-  private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+  private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
   @Autowired
   private JavaMailSender javaMailSender;
 
   @Autowired
   private SendGrid sendGrid;
-
-  @Autowired
-  private GoogleClientSecrets googleClientSecrets;
 
   @Autowired
   private RawTemplateService rawTemplateService;
@@ -107,7 +104,7 @@ public class EmailServiceImpl implements EmailService {
     if (provider.equalsIgnoreCase(MailProvider.GMAIL.name())) {
       Session session = Session.getInstance(System.getProperties());
       MimeMessage mimeMessage = createMessage(subject, content, session);
-      createDraftGMail(mimeMessage, request.getEmail());
+      createDraftGMail(null, mimeMessage, request.getEmail());
     } else if (provider.equalsIgnoreCase(MailProvider.YAHOO.name())) {
       createDraft(request, subject, content);
     } else if (provider.equalsIgnoreCase(MailProvider.OUTLOOK.name())) {
@@ -174,8 +171,8 @@ public class EmailServiceImpl implements EmailService {
     draftsMailBoxFolder.appendMessages(draftMessages);
   }
 
-  private void createDraftGMail(MimeMessage mimeMessage, String email)
-      throws MessagingException, IOException, GeneralSecurityException {
+  private void createDraftGMail(Gmail gmail, MimeMessage mimeMessage, String email)
+      throws MessagingException, IOException {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     mimeMessage.writeTo(out);
     String encodedEmail = Base64.encodeBase64URLSafeString(out.toByteArray());
@@ -183,21 +180,6 @@ public class EmailServiceImpl implements EmailService {
     message.setRaw(encodedEmail);
     Draft draft = new Draft();
     draft.setMessage(message);
-    this.getGMailInstance().users().drafts().create(email, draft).execute();
-  }
-
-  private Gmail getGMailInstance() throws GeneralSecurityException, IOException {
-    NetHttpTransport netHttpTransport = GoogleNetHttpTransport.newTrustedTransport();
-    GoogleAuthorizationCodeFlow flow =
-        new GoogleAuthorizationCodeFlow.Builder(
-            netHttpTransport, JSON_FACTORY, googleClientSecrets, SCOPES)
-            .setAccessType("offline")
-            .build();
-    LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(clientPort).build();
-    Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
-
-    return new Gmail.Builder(netHttpTransport, JSON_FACTORY, credential)
-        .setApplicationName("ETBS")
-        .build();
+    gmail.users().drafts().create(email, draft).execute();
   }
 }

@@ -72,7 +72,7 @@ public class FirebaseServiceImpl implements FirebaseService {
     BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/png").build();
     Blob blob = storage.create(blobInfo, os.toByteArray());
     URL url = blob.signUrl(365, TimeUnit.DAYS);
-    return url.toString().replace("https", "http");
+    return url.toString();
   }
 
   private String createImage(String fbPath, String image) {
@@ -83,7 +83,7 @@ public class FirebaseServiceImpl implements FirebaseService {
     blob.copyTo(blobId);
     blob = storage.get(blobId);
     URL url = blob.signUrl(365, TimeUnit.DAYS);
-    return url.toString().replace("https", "http");
+    return url.toString();
   }
 
   private String createImage(String fbPath, MultipartFile image) throws Exception {
@@ -96,6 +96,6 @@ public class FirebaseServiceImpl implements FirebaseService {
     BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(mime).build();
     Blob blob = storage.create(blobInfo, image.getBytes());
     URL url = blob.signUrl(365, TimeUnit.DAYS);
-    return url.toString().replace("https", "http");
+    return url.toString();
   }
 }

@@ -44,31 +44,22 @@ public class RatingServiceImpl implements RatingService {
     Rating rating =
         template.getRatings().stream()
             .filter(r -> r.getId().getAccountId().equals(accountId))
-            .findFirst()
+            .findAny()
             .orElse(null);
 
     if (rating == null) {
       rating = Rating.builder()
           .id(RatingIdentity.builder().accountId(accountId).templateId(template.getId()).build())
           .account(account).template(template).vote(request.isVote()).build();
-
-      rating = ratingRepository.save(rating);
-      template.setRatings(Stream.of(rating).collect(Collectors.toSet()));
-      return rating;
+      template.getRatings().add(rating);
+    } else if (rating.isVote() != request.isVote()) {
+      rating.setVote(request.isVote());
+    } else if (rating.isVote() == request.isVote()) {
+      template.getRatings().remove(rating);
+      ratingRepository.delete(rating);
     }
 
-    if (!rating.getAccount().getId().equals(accountId)) {
-      throw new BadRequestException("Invalid permission rating");
-    }
-
-    if (rating.isVote() == request.isVote()) {
-      Rating finalRating = rating;
-      template.getRatings().removeIf(r -> r.equals(finalRating));
-      templateRepository.save(template);
-      return null;
-    }
-
-    rating.setVote(request.isVote());
-    return ratingRepository.save(rating);
+    templateRepository.save(template);
+    return rating;
   }
 }
