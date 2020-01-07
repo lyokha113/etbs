@@ -11,6 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AccountUpdateRequest {
 
+  private String email;
   private String fullName;
   private String password;
+  private String imageUrl;
+  private Boolean active;
 }

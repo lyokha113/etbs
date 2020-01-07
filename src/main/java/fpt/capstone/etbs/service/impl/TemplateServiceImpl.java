@@ -5,6 +5,7 @@ import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Category;
 import fpt.capstone.etbs.model.DeletingMediaFile;
+import fpt.capstone.etbs.model.Rating;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.TemplateRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
@@ -15,6 +16,9 @@ import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.ImageGenerator;
 import fpt.capstone.etbs.service.TemplateService;
 import java.awt.image.BufferedImage;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -59,7 +63,6 @@ public class TemplateServiceImpl implements TemplateService {
         .filter(t -> t.getCategories().stream().anyMatch(Category::isActive))
         .collect(Collectors.toList());
   }
-
 
   @Override
   public Template getTemplate(Integer id) {

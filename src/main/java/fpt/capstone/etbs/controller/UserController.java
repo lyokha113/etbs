@@ -53,11 +53,15 @@ public class UserController {
 
   @GetMapping("/user")
   public ResponseEntity<?> getUserDetail() {
-    Authentication auth = authenticationFacade.getAuthentication();
-    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-    Account account = accountService.getAccount(userPrincipal.getId());
-    AccountResponse response = AccountResponse.setResponse(account);
-    return ResponseEntity.ok(new ApiResponse<>(true, "", response));
+    try {
+      Authentication auth = authenticationFacade.getAuthentication();
+      UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+      Account account = accountService.getAccount(userPrincipal.getId());
+      AccountResponse response = AccountResponse.setResponse(account);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Account details get successful", response));
+    } catch (BadRequestException ex) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
   }
 
   @PutMapping("/user")
@@ -69,7 +73,7 @@ public class UserController {
       Account account = accountService.updateAccount(userPrincipal.getId(), request);
       AccountResponse response = AccountResponse.setResponse(account);
       return ResponseEntity.ok(new ApiResponse<>(true, "Account updated", response));
-    } catch (BadRequestException ex) {
+    } catch (BadRequestException | IOException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
   }
@@ -109,6 +113,7 @@ public class UserController {
   public ResponseEntity<?> registerAccount(@Valid @RequestBody RegisterRequest request) {
     try {
       Account account = accountService.registerAccount(request);
+
       return ResponseEntity.ok(
           new ApiResponse<>(true, "Account created", AccountResponse.setResponse(account)));
     } catch (BadRequestException ex) {

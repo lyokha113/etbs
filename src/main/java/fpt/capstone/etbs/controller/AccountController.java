@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.controller;
 
+import fpt.capstone.etbs.component.JwtTokenProvider;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.payload.AccountCreateRequest;
@@ -7,6 +8,7 @@ import fpt.capstone.etbs.payload.AccountResponse;
 import fpt.capstone.etbs.payload.AccountUpdateRequest;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.service.AccountService;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -28,6 +30,9 @@ public class AccountController {
   @Autowired
   private AccountService accountService;
 
+  @Autowired
+  JwtTokenProvider tokenProvider;
+
   @GetMapping("/account")
   public ResponseEntity<?> getAccounts() {
     List<Account> accounts = accountService.getAccounts();
@@ -48,6 +53,16 @@ public class AccountController {
     }
   }
 
+  @PutMapping("/account/confirm")
+  public ResponseEntity<ApiResponse> confirmAccount(@Valid @RequestParam("token") String token) {
+    try {
+      AccountResponse accountResponse = tokenProvider.getTokenValue(token);
+      return ResponseEntity.ok(new ApiResponse<>(true, "", accountResponse));
+    } catch (BadRequestException | IOException bre) {
+      return ResponseEntity.badRequest().build();
+    }
+  }
+
   @PutMapping("/account/{uuid}")
   public ResponseEntity<?> updateAccount(
       @PathVariable("uuid") UUID id,
@@ -56,7 +71,7 @@ public class AccountController {
       Account account = accountService.updateAccount(id, request);
       AccountResponse response = AccountResponse.setResponse(account);
       return ResponseEntity.ok(new ApiResponse<>(true, "Account updated", response));
-    } catch (BadRequestException ex) {
+    } catch (BadRequestException | IOException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
   }

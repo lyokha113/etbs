@@ -3,6 +3,8 @@ package fpt.capstone.etbs.component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fpt.capstone.etbs.payload.AccountResponse;
+import fpt.capstone.etbs.payload.GenerateTokenParam;
+import fpt.capstone.etbs.payload.SendConfirmEmailRequest;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -36,6 +38,20 @@ public class JwtTokenProvider {
 
     return Jwts.builder()
         .setSubject(om.writeValueAsString(response))
+        .setIssuedAt(new Date())
+        .setExpiration(expiryDate)
+        .signWith(SignatureAlgorithm.HS512, jwtSecret)
+        .compact();
+  }
+
+  public String generateToken(GenerateTokenParam request) throws JsonProcessingException {
+
+    ObjectMapper om = new ObjectMapper();
+    Date now = new Date();
+    Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
+
+    return Jwts.builder()
+        .setSubject(om.writeValueAsString(request))
         .setIssuedAt(new Date())
         .setExpiration(expiryDate)
         .signWith(SignatureAlgorithm.HS512, jwtSecret)
