@@ -1,25 +1,18 @@
 package fpt.capstone.etbs.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.component.JwtTokenProvider;
 import fpt.capstone.etbs.component.UserPrincipal;
-import fpt.capstone.etbs.constant.AuthProvider;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
+import fpt.capstone.etbs.payload.AccountRequest;
 import fpt.capstone.etbs.payload.AccountResponse;
-import fpt.capstone.etbs.payload.AccountUpdateRequest;
 import fpt.capstone.etbs.payload.ApiResponse;
-import fpt.capstone.etbs.payload.JwtAuthenticationResponse;
+import fpt.capstone.etbs.payload.LoginResponse;
 import fpt.capstone.etbs.payload.LoginRequest;
-import fpt.capstone.etbs.payload.RegisterRequest;
-import fpt.capstone.etbs.payload.StringWrapperRequest;
 import fpt.capstone.etbs.service.AccountService;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -66,11 +59,11 @@ public class UserController {
 
   @PutMapping("/user")
   public ResponseEntity<?> updateUser(
-      @Valid @RequestBody AccountUpdateRequest request) {
+      @Valid @RequestBody AccountRequest request) {
     try {
       Authentication auth = authenticationFacade.getAuthentication();
       UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-      Account account = accountService.updateAccount(userPrincipal.getId(), request);
+      Account account = accountService.updateProfile(userPrincipal.getId(), request);
       AccountResponse response = AccountResponse.setResponse(account);
       return ResponseEntity.ok(new ApiResponse<>(true, "Account updated", response));
     } catch (BadRequestException | IOException ex) {
@@ -97,7 +90,7 @@ public class UserController {
       AccountResponse response = AccountResponse.setResponse(account);
       String jwt = tokenProvider.generateToken(response);
       return ResponseEntity.ok(
-          new ApiResponse<>(true, "Logged successfully", new JwtAuthenticationResponse(jwt)));
+          new ApiResponse<>(true, "Logged successfully", new LoginResponse(jwt)));
     } catch (BadCredentialsException ex) {
       return ResponseEntity.badRequest()
           .body(new ApiResponse<>(false, "Incorrect login information", null));
@@ -110,10 +103,9 @@ public class UserController {
   }
 
   @PostMapping("/register")
-  public ResponseEntity<?> registerAccount(@Valid @RequestBody RegisterRequest request) {
+  public ResponseEntity<?> registerAccount(@Valid @RequestBody AccountRequest request) {
     try {
       Account account = accountService.registerAccount(request);
-
       return ResponseEntity.ok(
           new ApiResponse<>(true, "Account created", AccountResponse.setResponse(account)));
     } catch (BadRequestException ex) {

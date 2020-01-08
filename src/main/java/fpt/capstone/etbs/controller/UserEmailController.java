@@ -40,7 +40,7 @@ public class UserEmailController {
   private AuthenticationFacade authenticationFacade;
 
   @GetMapping("/useremail")
-  private ResponseEntity<ApiResponse> getUserEmails() {
+  private ResponseEntity<?> getUserEmails() {
     List<UserEmail> userEmails = userEmailService.getUserEmailList();
     List<UserEmailResponse> responses = userEmails.stream().map(UserEmailResponse::setResponse)
         .collect(
@@ -49,7 +49,7 @@ public class UserEmailController {
   }
 
   @PostMapping("/useremail")
-  private ResponseEntity<ApiResponse> addUserEmail(
+  private ResponseEntity<?> addUserEmail(
       @Valid @RequestBody UserEmailRequest request) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
@@ -70,7 +70,7 @@ public class UserEmailController {
   }
 
   @PutMapping("/useremail/{id}")
-  private ResponseEntity<ApiResponse> updateUserEmail(
+  private ResponseEntity<?> updateUserEmail(
       @PathVariable("id") Integer id,
       @Valid @RequestBody UserEmailRequest request) {
     try {
@@ -83,7 +83,7 @@ public class UserEmailController {
   }
 
   @DeleteMapping("/useremail/{id}")
-  private ResponseEntity<ApiResponse> deleteUserEmail(
+  private ResponseEntity<?> deleteUserEmail(
           @PathVariable("id") Integer id) {
     try {
       userEmailService.deleteUserEmail(id);
@@ -94,7 +94,7 @@ public class UserEmailController {
   }
 
   @GetMapping("/useremail/confirm")
-  private ResponseEntity<ApiResponse> confirmUserEmail(
+  private ResponseEntity<?> confirmUserEmail(
       @RequestParam("token") String token) {
     try {
       UserEmail userEmail = userEmailService.confirmUserEmail(token);

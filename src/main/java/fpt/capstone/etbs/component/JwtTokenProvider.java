@@ -2,9 +2,6 @@ package fpt.capstone.etbs.component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fpt.capstone.etbs.payload.AccountResponse;
-import fpt.capstone.etbs.payload.GenerateTokenParam;
-import fpt.capstone.etbs.payload.SendConfirmEmailRequest;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -30,37 +27,23 @@ public class JwtTokenProvider {
   @Value("${app.jwtExpirationInMs}")
   private int jwtExpirationInMs;
 
-  public String generateToken(AccountResponse response) throws JsonProcessingException {
+  public String generateToken(Object object) throws JsonProcessingException {
 
     ObjectMapper om = new ObjectMapper();
     Date now = new Date();
     Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
     return Jwts.builder()
-        .setSubject(om.writeValueAsString(response))
+        .setSubject(om.writeValueAsString(object))
         .setIssuedAt(new Date())
         .setExpiration(expiryDate)
         .signWith(SignatureAlgorithm.HS512, jwtSecret)
         .compact();
   }
 
-  public String generateToken(GenerateTokenParam request) throws JsonProcessingException {
-
-    ObjectMapper om = new ObjectMapper();
-    Date now = new Date();
-    Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
-
-    return Jwts.builder()
-        .setSubject(om.writeValueAsString(request))
-        .setIssuedAt(new Date())
-        .setExpiration(expiryDate)
-        .signWith(SignatureAlgorithm.HS512, jwtSecret)
-        .compact();
-  }
-
-  public AccountResponse getTokenValue(String token) throws IOException {
+  public <T> T getTokenValue(String token, Class<T> cls) throws IOException {
     Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
-    return new ObjectMapper().readValue(claims.getSubject(), AccountResponse.class);
+    return new ObjectMapper().readValue(claims.getSubject(), cls);
   }
 
   public boolean validateToken(String authToken) {

@@ -7,10 +7,12 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class AuthResponse {
+@AllArgsConstructor
+public class AccountRequest {
 
-  private static final String tokenType = "Bearer";
-  private String accessToken;
+  private String fullName;
+  private String email;
+  private String password;
+  private String avatar;
 }

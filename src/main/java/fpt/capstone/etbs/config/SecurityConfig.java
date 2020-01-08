@@ -74,12 +74,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .permitAll();
 
     // User
-    http.authorizeRequests().antMatchers(HttpMethod.GET, "/rating", "/workspace", "/raw/*", "/useremail")
+    http.authorizeRequests().antMatchers(HttpMethod.GET, "/rating", "/workspace", "/raw/*", "/user", "/useremail")
         .hasRole(RoleEnum.USER.getName())
         .antMatchers(HttpMethod.POST, "/rating", "/template", "/workspace", "/rate", "/raw",
             "/email/send", "/email/draft", "/version", "/publish", "/useremail")
             .hasRole(RoleEnum.USER.getName())
-        .antMatchers(HttpMethod.PUT, "/rating", "/workspace/*", "/raw/*", "/version/*", "/useremail/*")
+        .antMatchers(HttpMethod.PUT, "/rating", "/workspace/*", "/raw/*", "/version/*", "/user", "/useremail/*")
         .hasRole(RoleEnum.USER.getName())
         .antMatchers(HttpMethod.PATCH, "/raw/*", "/version/*")
         .hasRole(RoleEnum.USER.getName())

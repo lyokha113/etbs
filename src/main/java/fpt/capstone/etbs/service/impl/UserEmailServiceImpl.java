@@ -5,7 +5,6 @@ import fpt.capstone.etbs.component.JwtTokenProvider;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.UserEmail;
-import fpt.capstone.etbs.payload.GenerateTokenParam;
 import fpt.capstone.etbs.payload.UserEmailRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.UserEmailRepository;
@@ -37,7 +36,7 @@ public class UserEmailServiceImpl implements UserEmailService {
     UserEmail userEmail = UserEmail.builder().account(account).status("Requested")
         .provider(request.getProvider()).email(request.getEmail())
         .name(request.getName()).build();
-    userEmail.setToken(tokenProvider.generateToken(new GenerateTokenParam<>(userEmail.getId())));
+    userEmail.setToken(tokenProvider.generateToken(userEmail.getId()));
     return userEmailRepository.save(userEmail);
   }
 

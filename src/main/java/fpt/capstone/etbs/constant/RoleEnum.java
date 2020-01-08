@@ -15,13 +15,6 @@ public enum RoleEnum {
     this.name = name;
   }
 
-  public static RoleEnum getRole(int roleId) {
-    return Arrays.stream(RoleEnum.values())
-        .filter(role -> role.getId() == roleId)
-        .findFirst()
-        .orElse(null);
-  }
-
   public int getId() {
     return id;
   }

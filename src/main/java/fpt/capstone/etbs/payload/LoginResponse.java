@@ -1,15 +1,18 @@
 package fpt.capstone.etbs.payload;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-public class JwtAuthenticationResponse {
+@NoArgsConstructor
+public class LoginResponse {
 
   private String accessToken;
 
-  public JwtAuthenticationResponse(String accessToken) {
+  public LoginResponse(String accessToken) {
     this.accessToken = "Bearer " + accessToken;
   }
 }

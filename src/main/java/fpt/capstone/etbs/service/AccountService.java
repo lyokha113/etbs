@@ -1,9 +1,7 @@
 package fpt.capstone.etbs.service;
 
 import fpt.capstone.etbs.model.Account;
-import fpt.capstone.etbs.payload.AccountCreateRequest;
-import fpt.capstone.etbs.payload.AccountUpdateRequest;
-import fpt.capstone.etbs.payload.RegisterRequest;
+import fpt.capstone.etbs.payload.AccountRequest;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -16,15 +14,16 @@ public interface AccountService {
 
   Account getAccountByEmail(String email);
 
-  Account registerAccount(RegisterRequest request);
+  Account registerAccount(AccountRequest request);
 
-  Account createAccount(AccountCreateRequest request);
+  Account createAccount(AccountRequest request);
 
-  Account createGoogleAccount(String email, String name, String avatarURL);
+  Account updateAccount(UUID uuid, AccountRequest request) throws IOException;
 
-  Account updateAccount(UUID uuid, AccountUpdateRequest request) throws IOException;
+  Account updateProfile(UUID uuid, AccountRequest request) throws IOException;
 
-  Account updateAccount(UUID uuid, Boolean active);
+  Account updateAccountStatus(UUID uuid, Boolean active);
 
-  Account updateGoogleAccount(Account account, String name, String avatarURL);
+  Account setGoogleAccount(String email, String name, String avatar);
+
 }

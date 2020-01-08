@@ -3,9 +3,8 @@ package fpt.capstone.etbs.controller;
 import fpt.capstone.etbs.component.JwtTokenProvider;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
-import fpt.capstone.etbs.payload.AccountCreateRequest;
+import fpt.capstone.etbs.payload.AccountRequest;
 import fpt.capstone.etbs.payload.AccountResponse;
-import fpt.capstone.etbs.payload.AccountUpdateRequest;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.service.AccountService;
 import java.io.IOException;
@@ -43,7 +42,7 @@ public class AccountController {
 
   @PostMapping("/account")
   public ResponseEntity<?> createAccount(
-      @Valid @RequestBody AccountCreateRequest request) {
+      @Valid @RequestBody AccountRequest request) {
     try {
       Account account = accountService.createAccount(request);
       AccountResponse response = AccountResponse.setResponse(account);
@@ -54,9 +53,9 @@ public class AccountController {
   }
 
   @PutMapping("/account/confirm")
-  public ResponseEntity<ApiResponse> confirmAccount(@Valid @RequestParam("token") String token) {
+  public ResponseEntity<?> confirmAccount(@Valid @RequestParam("token") String token) {
     try {
-      AccountResponse accountResponse = tokenProvider.getTokenValue(token);
+      AccountResponse accountResponse = tokenProvider.getTokenValue(token, AccountResponse.class);
       return ResponseEntity.ok(new ApiResponse<>(true, "", accountResponse));
     } catch (BadRequestException | IOException bre) {
       return ResponseEntity.badRequest().build();
@@ -66,7 +65,7 @@ public class AccountController {
   @PutMapping("/account/{uuid}")
   public ResponseEntity<?> updateAccount(
       @PathVariable("uuid") UUID id,
-      @Valid @RequestBody AccountUpdateRequest request) {
+      @Valid @RequestBody AccountRequest request) {
     try {
       Account account = accountService.updateAccount(id, request);
       AccountResponse response = AccountResponse.setResponse(account);
@@ -81,9 +80,9 @@ public class AccountController {
       @PathVariable("uuid") UUID id,
       @RequestParam("active") boolean active) {
     try {
-      Account account = accountService.updateAccount(id, active);
+      Account account = accountService.updateAccountStatus(id, active);
       AccountResponse response = AccountResponse.setResponse(account);
-      return ResponseEntity.ok(new ApiResponse<>(true, "Account status updated", response));
+      return ResponseEntity.ok(new ApiResponse<>(true, "Account updated", response));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }

@@ -9,6 +9,8 @@ public interface FirebaseService {
 
   String createUserImage(MultipartFile file, String path, String name) throws Exception;
 
+  String createUserAvatar(BufferedImage file, String id) throws IOException;
+
   String createTutorialThumbnail(MultipartFile file, String name) throws Exception;
 
   String createRawThumbnail(BufferedImage file, String name) throws Exception;
@@ -19,5 +21,5 @@ public interface FirebaseService {
 
   boolean deleteImage(String fbPath) throws Exception;
 
-  String updateUserImage(BufferedImage image, String id) throws IOException;
+
 }

@@ -23,5 +23,4 @@ public class EmailConfig {
     return new SendGrid(SENDGRID_API_KEY);
   }
 
-
 }

@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       String jwt = getJwtFromRequest(request);
 
       if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-        AccountResponse json = tokenProvider.getTokenValue(jwt);
+        AccountResponse json = tokenProvider.getTokenValue(jwt, AccountResponse.class);
         Role role = Role.builder().id(json.getRoleId()).name(json.getRoleName()).build();
         Account account =
             Account.builder()

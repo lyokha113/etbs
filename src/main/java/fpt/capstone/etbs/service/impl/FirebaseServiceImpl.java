@@ -31,9 +31,9 @@ public class FirebaseServiceImpl implements FirebaseService {
   }
 
   @Override
-  public String updateUserImage(BufferedImage image, String id) throws IOException {
+  public String createUserAvatar(BufferedImage file, String id) throws IOException {
     String fbPath = AppConstant.USER_IMAGES + id + "/" + "Avatar";
-    return createImage(fbPath, image);
+    return createImage(fbPath, file);
   }
 
   @Override

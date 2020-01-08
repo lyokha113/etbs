@@ -26,8 +26,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Import(springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration.class)
 public class SpringFoxConfig {
 
-  private final Logger log = LoggerFactory.getLogger(SpringFoxConfig.class);
-
   @Bean
   public Docket apiDocket() {
     return new Docket(DocumentationType.SWAGGER_2)
@@ -38,7 +36,7 @@ public class SpringFoxConfig {
         .useDefaultResponseMessages(false)
         .forCodeGeneration(true)
         .apiInfo(getApiInfo())
-        .securitySchemes(Arrays.asList(apiKey()))
+        .securitySchemes(Collections.singletonList(apiKey()))
         .securityContexts(Collections.singletonList(securityContext()));
   }
 

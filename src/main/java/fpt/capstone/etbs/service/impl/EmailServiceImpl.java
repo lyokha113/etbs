@@ -55,10 +55,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailServiceImpl implements EmailService {
 
-    private static final List<String> SCOPES =
-            Arrays.asList(GmailScopes.GMAIL_INSERT, GmailScopes.MAIL_GOOGLE_COM);
-    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-
     @Autowired
     private JavaMailSender javaMailSender;
 
@@ -67,9 +63,6 @@ public class EmailServiceImpl implements EmailService {
 
     @Autowired
     private RawTemplateService rawTemplateService;
-
-    @Value("${app.client.port}")
-    private int clientPort;
 
     @Override
     @Async("mailAsyncExecutor")
@@ -184,10 +177,10 @@ public class EmailServiceImpl implements EmailService {
         Session session = Session.getInstance(props);
         Store mailStore = session.getStore("imap");
         mailStore.connect(props.getProperty("host"), request.getEmail(), request.getPassword());
-        Folder draftsMailBoxFolder = mailStore.getFolder(props.getProperty("draft"));
-        draftsMailBoxFolder.open(Folder.READ_WRITE);
-        javax.mail.Message[] draftMessages = {createMessage("ETBS-" + subject, content, session)};
-        draftsMailBoxFolder.appendMessages(draftMessages);
+        Folder folder = mailStore.getFolder(props.getProperty("draft"));
+        folder.open(Folder.READ_WRITE);
+        javax.mail.Message[] draft = {createMessage("ETBS-" + subject, content, session)};
+        folder.appendMessages(draft);
     }
 
     private void createDraftGMail(Gmail gmail, MimeMessage mimeMessage, String email)
