@@ -43,14 +43,15 @@ public class GoogleController {
   private GoogleAuthenticator googleAuthenticator;
 
   @GetMapping("/google/authorize")
-  public ResponseEntity<?> getAuthorizedURL() throws Exception {
-    String authorize = googleAuthenticator.authorize();
+  public ResponseEntity<?> getAuthorizedURL(@RequestParam String redirect) throws Exception {
+    String authorize = googleAuthenticator.authorize(redirect);
     return ResponseEntity.ok(new ApiResponse<>(true, "Authorized url", authorize));
   }
 
   @GetMapping("/google/authorize/verify")
   public ResponseEntity<?> verifyAuthorizeURL(@RequestParam String code)
       throws GeneralSecurityException, IOException {
+
     Gmail gmail = googleAuthenticator.getGMailInstance(code);
     return ResponseEntity.ok(new ApiResponse<>(true, "Code", null));
   }

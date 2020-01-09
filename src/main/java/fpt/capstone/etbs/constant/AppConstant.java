@@ -6,6 +6,8 @@ public class AppConstant {
   public static final String DEFAULT_VERSION_NAME = "Default version";
   public static final String DEFAULT_AVATAR_URL =
       "https://firebasestorage.googleapis.com/v0/b/etbs-441a1.appspot.com/o/default%2Fdefault_avatar.png?alt=media&token=ebb2ae07-77c1-4dd3-b5b3-985f4fb9eb99";
+  public static final String DEFAULT_AVATAR_ADMIN_URL =
+      "https://firebasestorage.googleapis.com/v0/b/etbs-441a1.appspot.com/o/default%2Fdefault_avatar_admin.png?alt=media&token=aa1a4bad-4d74-4edc-b7c7-c2017697afc7";
   public static final String DEFAULT_TUTORIAL_THUMBNAIL =
       "https://firebasestorage.googleapis.com/v0/b/etbs-441a1.appspot.com/o/default%2Fdefault_template.png?alt=media&token=b5126bf4-d80e-470a-8931-a0b09a98badd";
   public static final String DEFAULT_RAW_TEMPLATE_THUMBNAIL =

@@ -14,5 +14,4 @@ public class DraftEmailRequest {
   private int rawTemplateId;
   private String email;
   private String password;
-  private String provider;
 }

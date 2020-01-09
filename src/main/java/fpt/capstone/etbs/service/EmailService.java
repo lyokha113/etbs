@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.service;
 
+import com.google.api.services.gmail.Gmail;
 import fpt.capstone.etbs.payload.DraftEmailRequest;
 import fpt.capstone.etbs.payload.SendConfirmEmailRequest;
 import fpt.capstone.etbs.payload.SendEmailRequest;
@@ -13,8 +14,12 @@ public interface EmailService {
   void sendEmail(UUID accountId, SendEmailRequest request)
       throws MessagingException, IOException;
 
-  void makeDraftEmail(UUID accountId, DraftEmailRequest request)
-      throws MessagingException, IOException, GeneralSecurityException;
+  void makeDraftYahoo(UUID accountId, DraftEmailRequest request) throws MessagingException;
+
+  void makeDraftOutlook(UUID accountId, DraftEmailRequest request) throws MessagingException;
+
+  void makeDraftGMail(UUID accountId, Integer rawId, Gmail gmail)
+      throws MessagingException, IOException;
 
   void sendConfirmUserEmail(SendConfirmEmailRequest request)
       throws MessagingException;

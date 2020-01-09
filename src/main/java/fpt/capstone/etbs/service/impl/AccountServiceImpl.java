@@ -152,6 +152,10 @@ public class AccountServiceImpl implements AccountService {
 
     }
 
+    if (!account.isActive()) {
+      throw new BadRequestException("This account was locked");
+    }
+
     if (account.getProvider().equals(AuthProvider.google)) {
       account.setFullName(name);
       account.setImageUrl(avatar);
@@ -174,11 +178,14 @@ public class AccountServiceImpl implements AccountService {
       account.setPassword(passwordEncoder.encode(request.getPassword()));
     }
 
-    if (!StringUtils.isEmpty(avatarURL)) {
-      account.setImageUrl(AppConstant.DEFAULT_AVATAR_URL);
-    }
-
     if (role.getId() == RoleEnum.USER.getId()) {
+
+      if (!StringUtils.isEmpty(avatarURL)) {
+        account.setImageUrl(avatarURL);
+      } else {
+        account.setImageUrl(AppConstant.DEFAULT_AVATAR_URL);
+      }
+
       account.setWorkspaces(
           Stream.of(Workspace.builder()
               .name(AppConstant.DEFAULT_WORKSPACE_NAME)
@@ -195,6 +202,8 @@ public class AccountServiceImpl implements AccountService {
               .status("Default")
               .build())
               .collect(Collectors.toSet()));
+    } else {
+      account.setImageUrl(AppConstant.DEFAULT_AVATAR_ADMIN_URL);
     }
 
     account.setRole(role);

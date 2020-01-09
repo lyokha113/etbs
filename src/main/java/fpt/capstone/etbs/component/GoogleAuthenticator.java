@@ -54,11 +54,11 @@ public class GoogleAuthenticator {
         .setApplicationName("ETBS").build();
   }
 
-  public String authorize() throws GeneralSecurityException, IOException {
+  public String authorize(String redirect) throws GeneralSecurityException, IOException {
     AuthorizationCodeRequestUrl authorizationUrl = getFlow()
         .newAuthorizationUrl()
         .setState("raw")
-        .setRedirectUri(redirectUri);
+        .setRedirectUri(redirectUri + redirect);
     return authorizationUrl.build();
   }
 }
