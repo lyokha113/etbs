@@ -54,9 +54,6 @@ public class UserEmail extends Auditing {
   @Column
   private String status;
 
-  @Column
-  private String provider;
-
   @Column(columnDefinition = "text")
   private String token;
 }

@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SendConfirmEmailRequest {
 
-  private String provider;
   private String email;
   private String name;
   private String token;

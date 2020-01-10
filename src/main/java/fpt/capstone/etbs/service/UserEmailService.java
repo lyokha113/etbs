@@ -16,5 +16,5 @@ public interface UserEmailService {
 
   void deleteUserEmail(Integer id);
 
-  List<UserEmail> getUserEmailList();
+  List<UserEmail> getUserEmailList(UUID id);
 }

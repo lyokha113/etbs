@@ -94,7 +94,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     if (!StringUtils.isEmpty(request.getPassword())) {
-      account.setPassword(passwordEncoder.encode(request.getPassword()));;
+      account.setPassword(passwordEncoder.encode(request.getPassword()));
+      ;
     }
 
     account.setFullName(request.getFullName());
@@ -113,13 +114,17 @@ public class AccountServiceImpl implements AccountService {
       throw new BadRequestException("Google account can't be update");
     }
 
-    if (request.getAvatar() != null) {
-      BufferedImage bufferedImage = ImageUtils.base64ToImage(request.getAvatar());
+    if (request.getImageUrl() != null) {
+      BufferedImage bufferedImage = ImageUtils.base64ToImage(request.getImageUrl());
       String avatar = firebaseService.createUserAvatar(bufferedImage, account.getId().toString());
       account.setImageUrl(avatar);
     }
-
-    account.setFullName(request.getFullName());
+    if (request.getFullName() != null) {
+      account.setFullName(request.getFullName());
+    }
+    if (request.getPassword() != null) {
+      account.setPassword(request.getPassword());
+    }
     return accountRepository.save(account);
   }
 
@@ -163,7 +168,8 @@ public class AccountServiceImpl implements AccountService {
 
   }
 
-  private Account setNewAccount(AccountRequest request, AuthProvider provider, String avatarURL,
+  private Account setNewAccount(AccountRequest request, AuthProvider provider, String
+      avatarURL,
       Role role) {
     Account account = new Account();
     account.setEmail(request.getEmail());
@@ -191,7 +197,6 @@ public class AccountServiceImpl implements AccountService {
               .account(account)
               .email(request.getEmail())
               .name(request.getFullName())
-              .provider("Gmail")
               .status("Default")
               .build())
               .collect(Collectors.toSet()));

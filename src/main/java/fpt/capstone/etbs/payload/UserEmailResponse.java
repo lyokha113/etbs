@@ -16,7 +16,6 @@ public class UserEmailResponse {
   private String name;
   private String email;
   private String status;
-  private String provider;
 
   public static UserEmailResponse setResponse(UserEmail userEmail) {
     return UserEmailResponse.builder()
@@ -24,7 +23,6 @@ public class UserEmailResponse {
         .email(userEmail.getEmail())
         .name(userEmail.getName())
         .status(userEmail.getStatus())
-        .provider(userEmail.getProvider())
         .build();
   }
 }
