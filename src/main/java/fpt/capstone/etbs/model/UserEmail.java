@@ -49,9 +49,6 @@ public class UserEmail extends Auditing {
   private Account account;
 
   @Column
-  private String name;
-
-  @Column
   private String status;
 
   @Column(columnDefinition = "text")

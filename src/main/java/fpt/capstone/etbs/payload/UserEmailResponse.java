@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 public class UserEmailResponse {
 
   private Integer id;
-  private String name;
   private String email;
   private String status;
 
@@ -21,7 +20,6 @@ public class UserEmailResponse {
     return UserEmailResponse.builder()
         .id(userEmail.getId())
         .email(userEmail.getEmail())
-        .name(userEmail.getName())
         .status(userEmail.getStatus())
         .build();
   }

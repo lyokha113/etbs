@@ -37,18 +37,8 @@ public class UserEmailServiceImpl implements UserEmailService {
         .account(account)
         .email(request.getEmail())
         .status("Requested")
-        .name(request.getName()).build();
+        .build();
     userEmail.setToken(tokenProvider.generateToken(userEmail.getId()));
-    return userEmailRepository.save(userEmail);
-  }
-
-  @Override
-  public UserEmail updateUserEmail(Integer id, UserEmailRequest request) {
-    UserEmail userEmail = userEmailRepository.findById(id).orElse(null);
-    if (userEmail == null) {
-      throw new BadRequestException("User email doesn't exist");
-    }
-    userEmail.setName(request.getName());
     return userEmailRepository.save(userEmail);
   }
 

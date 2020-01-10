@@ -12,6 +12,4 @@ import lombok.NoArgsConstructor;
 public class UserEmailRequest {
 
   private String email;
-  private String provider;
-  private String name;
 }

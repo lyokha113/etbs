@@ -32,9 +32,6 @@ public class AccountServiceImpl implements AccountService {
   private AccountRepository accountRepository;
 
   @Autowired
-  private RoleRepository roleRepository;
-
-  @Autowired
   private PasswordEncoder passwordEncoder;
 
   @Autowired
@@ -196,7 +193,6 @@ public class AccountServiceImpl implements AccountService {
           Stream.of(UserEmail.builder()
               .account(account)
               .email(request.getEmail())
-              .name(request.getFullName())
               .status("Default")
               .build())
               .collect(Collectors.toSet()));
