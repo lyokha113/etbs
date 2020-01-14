@@ -49,13 +49,7 @@ public class UserEmail extends Auditing {
   private Account account;
 
   @Column
-  private String name;
-
-  @Column
   private String status;
-
-  @Column
-  private String provider;
 
   @Column(columnDefinition = "text")
   private String token;

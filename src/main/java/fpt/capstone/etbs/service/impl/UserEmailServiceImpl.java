@@ -33,20 +33,12 @@ public class UserEmailServiceImpl implements UserEmailService {
     if (account == null) {
       throw new BadRequestException("Account doesn't exist");
     }
-    UserEmail userEmail = UserEmail.builder().account(account).status("Requested")
-        .provider(request.getProvider()).email(request.getEmail())
-        .name(request.getName()).build();
+    UserEmail userEmail = UserEmail.builder()
+        .account(account)
+        .email(request.getEmail())
+        .status("Requested")
+        .build();
     userEmail.setToken(tokenProvider.generateToken(userEmail.getId()));
-    return userEmailRepository.save(userEmail);
-  }
-
-  @Override
-  public UserEmail updateUserEmail(Integer id, UserEmailRequest request) {
-    UserEmail userEmail = userEmailRepository.findById(id).orElse(null);
-    if (userEmail == null) {
-      throw new BadRequestException("User email doesn't exist");
-    }
-    userEmail.setName(request.getName());
     return userEmailRepository.save(userEmail);
   }
 
@@ -71,7 +63,11 @@ public class UserEmailServiceImpl implements UserEmailService {
   }
 
   @Override
-  public List<UserEmail> getUserEmailList() {
-    return userEmailRepository.findAll();
+  public List<UserEmail> getUserEmailList(UUID id) {
+    Account account = accountRepository.findById(id).orElse(null);
+    if (account == null) {
+      throw new BadRequestException("Account doesn't exist");
+    }
+    return userEmailRepository.getAllByAccount(account);
   }
 }

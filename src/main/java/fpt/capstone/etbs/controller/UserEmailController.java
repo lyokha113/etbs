@@ -41,11 +41,17 @@ public class UserEmailController {
 
   @GetMapping("/useremail")
   private ResponseEntity<?> getUserEmails() {
-    List<UserEmail> userEmails = userEmailService.getUserEmailList();
-    List<UserEmailResponse> responses = userEmails.stream().map(UserEmailResponse::setResponse)
-        .collect(
-            Collectors.toList());
-    return ResponseEntity.ok(new ApiResponse<>(true, "", responses));
+    Authentication auth = authenticationFacade.getAuthentication();
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+    try {
+      List<UserEmail> userEmails = userEmailService.getUserEmailList(userPrincipal.getId());
+      List<UserEmailResponse> responses = userEmails.stream().map(UserEmailResponse::setResponse)
+          .collect(
+              Collectors.toList());
+      return ResponseEntity.ok(new ApiResponse<>(true, "", responses));
+    } catch (BadRequestException bre) {
+      return ResponseEntity.ok(new ApiResponse<>(false, "", null));
+    }
   }
 
   @PostMapping("/useremail")
@@ -57,8 +63,6 @@ public class UserEmailController {
       UserEmail userEmail = userEmailService.createUserEmail(userPrincipal.getId(), request);
       SendConfirmEmailRequest emailRequest = SendConfirmEmailRequest.builder()
           .email(userEmail.getEmail())
-          .name(userEmail.getName())
-          .provider(userEmail.getProvider())
           .token(userEmail.getToken())
           .build();
       emailService.sendConfirmUserEmail(emailRequest);
@@ -69,22 +73,9 @@ public class UserEmailController {
     }
   }
 
-  @PutMapping("/useremail/{id}")
-  private ResponseEntity<?> updateUserEmail(
-      @PathVariable("id") Integer id,
-      @Valid @RequestBody UserEmailRequest request) {
-    try {
-      UserEmail userEmail = userEmailService.updateUserEmail(id, request);
-      UserEmailResponse response = UserEmailResponse.setResponse(userEmail);
-      return ResponseEntity.ok(new ApiResponse<>(true, "", response));
-    } catch (BadRequestException bre) {
-      return ResponseEntity.badRequest().build();
-    }
-  }
-
   @DeleteMapping("/useremail/{id}")
   private ResponseEntity<?> deleteUserEmail(
-          @PathVariable("id") Integer id) {
+      @PathVariable("id") Integer id) {
     try {
       userEmailService.deleteUserEmail(id);
       return ResponseEntity.ok(new ApiResponse<>(true, "", null));
@@ -104,7 +95,4 @@ public class UserEmailController {
       return ResponseEntity.badRequest().build();
     }
   }
-
-
-
 }
