@@ -120,7 +120,7 @@ public class AccountServiceImpl implements AccountService {
       account.setFullName(request.getFullName());
     }
     if (request.getPassword() != null) {
-      account.setPassword(request.getPassword());
+      account.setPassword(passwordEncoder.encode(request.getPassword()));
     }
     return accountRepository.save(account);
   }
