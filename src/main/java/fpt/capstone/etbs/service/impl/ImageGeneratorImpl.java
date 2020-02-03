@@ -1,9 +1,15 @@
 package fpt.capstone.etbs.service.impl;
 
+import com.pdfcrowd.Pdfcrowd;
+import com.pdfcrowd.Pdfcrowd.Error;
 import fpt.capstone.etbs.component.ChromeDriverEx;
 import fpt.capstone.etbs.service.ImageGenerator;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import javax.imageio.ImageIO;
 import org.apache.commons.text.StringEscapeUtils;
 import org.openqa.selenium.By;
@@ -21,36 +27,47 @@ public class ImageGeneratorImpl implements ImageGenerator {
   @Override
   public BufferedImage generateImageFromHtml(String html) throws Exception {
 
-    ChromeOptions chromeOptions = new ChromeOptions();
-    chromeOptions.setHeadless(true);
-
-    ChromeDriverEx driver = new ChromeDriverEx(chromeOptions);
-
-    driver.get("about:blank");
-    WebElement e = driver.findElement(By.tagName("html"));
-    String script = "arguments[0].innerHTML='" + StringEscapeUtils.escapeEcmaScript(html) + "'";
-    ((JavascriptExecutor) driver).executeScript(script, e);
-
-    ExpectedCondition<Boolean> pageLoadCondition = jsExecutor -> ((JavascriptExecutor) jsExecutor)
-        .executeScript("return document.readyState").equals("complete");
-    WebDriverWait wait = new WebDriverWait(driver, 30);
-    wait.until(pageLoadCondition);
-
-    int imageToLoad = Integer
-        .parseInt(((JavascriptExecutor) driver).executeScript("return document.images.length")
-            .toString());
-    int loaded = 0;
-    while (loaded < imageToLoad) {
-      for (int i = 0; i < imageToLoad; i++) {
-        loaded +=
-            (Boolean) ((JavascriptExecutor) driver)
-                .executeScript("return document.images[" + i + "].complete;") ? 1 : 0;
-      }
-      Thread.sleep(500);
-    }
-
-    File screenshot = driver.getFullScreenshotAs(OutputType.FILE);
-    driver.quit();
-    return ImageIO.read(screenshot);
+//    ChromeOptions chromeOptions = new ChromeOptions();
+//    chromeOptions.setHeadless(true);
+//
+//    ChromeDriverEx driver = new ChromeDriverEx(chromeOptions);
+//
+//    driver.get("about:blank");
+//    WebElement e = driver.findElement(By.tagName("html"));
+//    String script = "arguments[0].innerHTML='" + StringEscapeUtils.escapeEcmaScript(html) + "'";
+//    ((JavascriptExecutor) driver).executeScript(script, e);
+//
+//    ExpectedCondition<Boolean> pageLoadCondition = jsExecutor -> {
+//      assert jsExecutor != null;
+//      return ((JavascriptExecutor) jsExecutor)
+//          .executeScript("return document.readyState").equals("complete");
+//    };
+//    WebDriverWait wait = new WebDriverWait(driver, 30);
+//    wait.until(pageLoadCondition);
+//
+//    int imageToLoad = Integer
+//        .parseInt(((JavascriptExecutor) driver).executeScript("return document.images.length")
+//            .toString());
+//    int loaded = 0;
+//    while (loaded < imageToLoad) {
+//      for (int i = 0; i < imageToLoad; i++) {
+//        loaded +=
+//            (Boolean) ((JavascriptExecutor) driver)
+//                .executeScript("return document.images[" + i + "].complete;") ? 1 : 0;
+//      }
+//      Thread.sleep(500);
+//    }
+//
+//    File screenshot = driver.getFullScreenshotAs(OutputType.FILE);
+//    driver.quit();
+//    return ImageIO.read(screenshot);
+    BufferedImage result = null;
+    Pdfcrowd.HtmlToImageClient client =
+        new Pdfcrowd.HtmlToImageClient("kaka_123_123", "4819f5c3ecabc60f2b473ecf3ef60b39");
+    client.setOutputFormat("png");
+    byte[] image = client.convertString(html);
+    ByteArrayInputStream bais = new ByteArrayInputStream(image);
+    result = ImageIO.read(bais);
+    return result;
   }
 }
