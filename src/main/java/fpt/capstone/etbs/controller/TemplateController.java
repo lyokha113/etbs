@@ -8,6 +8,7 @@ import fpt.capstone.etbs.payload.TemplateRequest;
 import fpt.capstone.etbs.payload.TemplateResponse;
 import fpt.capstone.etbs.service.TemplateService;
 import fpt.capstone.etbs.util.RoleUtils;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -39,7 +40,11 @@ public class TemplateController {
             ? templateService.getTemplates()
             : templateService.getTemplatesForUser();
     List<TemplateResponse> response =
-        templates.stream().map(TemplateResponse::setResponse).collect(Collectors.toList());
+        templates
+            .stream()
+            .map(TemplateResponse::setResponse)
+            .sorted(Comparator.comparingDouble(TemplateResponse::getScore))
+            .collect(Collectors.toList());
     return ResponseEntity.ok(new ApiResponse<>(true, "", response));
   }
 

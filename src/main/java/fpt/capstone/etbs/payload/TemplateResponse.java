@@ -13,12 +13,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TemplateResponse {
+public class TemplateResponse implements Comparable<TemplateResponse>{
 
   private int id;
   private String name;
@@ -70,6 +71,11 @@ public class TemplateResponse {
     TemplateResponse response = TemplateResponse.setResponse(template);
     response.setContent(template.getContent());
     return response;
+  }
+
+  @Override
+  public int compareTo(@NotNull TemplateResponse templateResponse) {
+    return (int) getId();
   }
 }
 
