@@ -18,8 +18,8 @@ public interface EmailService {
 
   void makeDraftOutlook(UUID accountId, DraftEmailRequest request) throws MessagingException;
 
-  void makeDraftGMail(UUID accountId, Integer rawId, Gmail gmail)
-      throws MessagingException, IOException;
+  void makeDraftGMail(String state, String code)
+      throws MessagingException, IOException, GeneralSecurityException;
 
   void sendConfirmUserEmail(SendConfirmEmailRequest request)
       throws MessagingException;

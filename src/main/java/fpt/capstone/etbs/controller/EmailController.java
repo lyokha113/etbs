@@ -7,13 +7,19 @@ import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.DraftEmailRequest;
 import fpt.capstone.etbs.payload.SendEmailRequest;
 import fpt.capstone.etbs.service.EmailService;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -24,6 +30,9 @@ public class EmailController {
 
   @Autowired
   private AuthenticationFacade authenticationFacade;
+
+  @Value("${app.clientGoogleAuthUri}")
+  private String clientUri;
 
   @PostMapping("/email/draft/yahoo")
   public ResponseEntity<?> makeDraftYahoo(@Valid @RequestBody DraftEmailRequest request) {
@@ -55,18 +64,17 @@ public class EmailController {
     }
   }
 
-  @PostMapping("/email/draft/gmail")
-  public ResponseEntity<?> makeDraftGMail(@Valid @RequestBody DraftEmailRequest request) {
-    Authentication auth = authenticationFacade.getAuthentication();
-    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+  @GetMapping("/email/draft/gmail")
+  public void makeDraftGMail(@RequestParam String state, @RequestParam String code,
+      HttpServletResponse response) throws IOException {
     try {
-      emailSenderService.makeDraftOutlook(userPrincipal.getId(), request);
-      return ResponseEntity.ok(new ApiResponse<>(true, "Draft was made", null));
-    } catch (MessagingException e) {
-      return ResponseEntity.badRequest()
-          .body(new ApiResponse<>(false, "Invalid login/security information", null));
+      emailSenderService.makeDraftGMail(state, code);
+      response.setHeader("Location", clientUri);
+      response.setStatus(302);
+    } catch (MessagingException | GeneralSecurityException e) {
+      response.setHeader("Location", clientUri + "?error=Google services error");
     } catch (BadRequestException ex) {
-      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+      response.setHeader("Location", clientUri + "?error=" + ex.getMessage());
     }
   }
 

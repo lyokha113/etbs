@@ -68,13 +68,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     // All
     http.authorizeRequests()
         .antMatchers(HttpMethod.GET, "/category", "/template", "/template/*", "/tutorial",
-            "/tutorial/*", "/ws-publish/*", "/ws-publish/**", "/useremail/confirm", "/google/authorize", "/google/authorize/verify")
+            "/tutorial/*", "/ws-publish/*", "/ws-publish/**", "/useremail/confirm")
         .permitAll()
         .antMatchers(HttpMethod.POST, "/login", "/google/login", "/register")
+        .permitAll()
+        .antMatchers("/email/draft/gmail") // Redirect URI from Google
         .permitAll();
 
     // User
-    http.authorizeRequests().antMatchers(HttpMethod.GET, "/rating", "/workspace", "/raw/*", "/user", "/useremail")
+    http.authorizeRequests().antMatchers(HttpMethod.GET, "/rating", "/workspace", "/raw/*", "/user", "/useremail", "/google/authorize")
         .hasRole(RoleEnum.USER.getName())
         .antMatchers(HttpMethod.POST, "/rating", "/template", "/workspace", "/rate", "/raw",
             "/email/send", "/email/draft/yahoo", "/email/draft/outlook", "/version", "/publish", "/useremail")

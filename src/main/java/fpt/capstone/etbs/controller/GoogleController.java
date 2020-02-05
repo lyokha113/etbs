@@ -1,12 +1,14 @@
 package fpt.capstone.etbs.controller;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.services.gmail.Gmail;
+import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.component.GoogleAuthenticator;
 import fpt.capstone.etbs.component.JwtTokenProvider;
+import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.payload.AccountResponse;
@@ -16,10 +18,15 @@ import fpt.capstone.etbs.payload.StringWrapperRequest;
 import fpt.capstone.etbs.service.AccountService;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +36,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class GoogleController {
+
+  private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
   @Autowired
   private AccountService accountService;
@@ -42,18 +51,25 @@ public class GoogleController {
   @Autowired
   private GoogleAuthenticator googleAuthenticator;
 
+  @Autowired
+  private AuthenticationFacade authenticationFacade;
+
   @GetMapping("/google/authorize")
-  public ResponseEntity<?> getAuthorizedURL(@RequestParam String redirect) throws Exception {
-    String authorize = googleAuthenticator.authorize(redirect);
+  public ResponseEntity<?> getAuthorizedURL(@RequestParam String redirectUri,
+      @RequestParam String rawId) throws Exception {
+    Authentication auth = authenticationFacade.getAuthentication();
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+
+    Map<String, Object> state = new HashMap<>();
+    state.put("rawId", rawId);
+    state.put("accountId", userPrincipal.getId());
+    state.put("redirectUri", redirectUri);
+
+    String encodedState = Base64.getUrlEncoder()
+        .encodeToString(JSON_MAPPER.writeValueAsString(state).getBytes());
+    String authorize = googleAuthenticator.authorize(redirectUri, encodedState);
+
     return ResponseEntity.ok(new ApiResponse<>(true, "Authorized url", authorize));
-  }
-
-  @GetMapping("/google/authorize/verify")
-  public ResponseEntity<?> verifyAuthorizeURL(@RequestParam String code)
-      throws GeneralSecurityException, IOException {
-
-    Gmail gmail = googleAuthenticator.getGMailInstance(code);
-    return ResponseEntity.ok(new ApiResponse<>(true, "Code", null));
   }
 
   @PostMapping("/google/login")

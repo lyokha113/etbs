@@ -1,10 +1,12 @@
 package fpt.capstone.etbs.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.util.Base64;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Draft;
 import com.google.api.services.gmail.model.Message;
 import com.sendgrid.SendGrid;
+import fpt.capstone.etbs.component.GoogleAuthenticator;
 import fpt.capstone.etbs.constant.MailProvider;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.RawTemplate;
@@ -15,6 +17,8 @@ import fpt.capstone.etbs.service.EmailService;
 import fpt.capstone.etbs.service.RawTemplateService;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 import javax.mail.Flags;
@@ -31,6 +35,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailServiceImpl implements EmailService {
 
+  private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
+
   @Autowired
   private JavaMailSender javaMailSender;
 
@@ -39,6 +45,9 @@ public class EmailServiceImpl implements EmailService {
 
   @Autowired
   private RawTemplateService rawTemplateService;
+
+  @Autowired
+  private GoogleAuthenticator googleAuthenticator;
 
 //    @Override
 //    @Async("mailAsyncExecutor")
@@ -77,12 +86,26 @@ public class EmailServiceImpl implements EmailService {
   }
 
   @Override
-  public void makeDraftGMail(UUID accountId, Integer rawId, Gmail gmail)
-      throws MessagingException, IOException {
+  public void makeDraftGMail(String state, String code)
+      throws MessagingException, IOException, GeneralSecurityException {
+
+    UUID accountId;
+    int rawId;
+    String redirectUri;
+    try {
+      byte [] decodedState = java.util.Base64.getUrlDecoder().decode(state);
+      Map mapState = JSON_MAPPER.readValue(decodedState, Map.class);
+      accountId = UUID.fromString(String.valueOf(mapState.get("accountId")));
+      rawId = Integer.parseInt(String.valueOf(mapState.get("rawId")));
+      redirectUri = String.valueOf(mapState.get("redirectUri"));
+    } catch (Exception e) {
+      throw new BadRequestException("Invalid state information");
+    }
+
+    Gmail gmail = googleAuthenticator.getGMailInstance(redirectUri, code);
     MimeMessage draftMessage = createDraftMessage(rawId, accountId);
     createDraft(draftMessage, gmail);
   }
-
 
   private MimeMessage createDraftMessage(Integer rawId, UUID accountId)
       throws MessagingException {
