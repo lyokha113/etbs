@@ -6,4 +6,6 @@ import java.io.IOException;
 public interface ImageGenerator {
 
   BufferedImage generateImageFromHtml(String html) throws Exception;
+
+  BufferedImage generateImageFromHtmlWithChrome(String html) throws Exception;
 }

@@ -46,8 +46,7 @@ public class UserEmailController {
     try {
       List<UserEmail> userEmails = userEmailService.getUserEmailList(userPrincipal.getId());
       List<UserEmailResponse> responses = userEmails.stream().map(UserEmailResponse::setResponse)
-          .collect(
-              Collectors.toList());
+          .collect(Collectors.toList());
       return ResponseEntity.ok(new ApiResponse<>(true, "", responses));
     } catch (BadRequestException bre) {
       return ResponseEntity.ok(new ApiResponse<>(false, "", null));

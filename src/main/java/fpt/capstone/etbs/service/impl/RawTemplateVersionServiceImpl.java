@@ -121,7 +121,7 @@ public class RawTemplateVersionServiceImpl implements RawTemplateVersionService 
     }
 
     RawTemplateVersion version = rawTemplate.getCurrentVersion();
-    BufferedImage file = imageGenerator.generateImageFromHtml(content);
+    BufferedImage file = imageGenerator.generateImageFromHtmlWithChrome(content);
     String thumbnail = firebaseService.createRawThumbnail(file, version.getId().toString());
 
     version.setThumbnail(thumbnail);
