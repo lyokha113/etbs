@@ -5,12 +5,21 @@ import com.google.api.client.util.Base64;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Draft;
 import com.google.api.services.gmail.model.Message;
+import com.sendgrid.Method;
+import com.sendgrid.Request;
 import com.sendgrid.SendGrid;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
+import com.sendgrid.helpers.mail.objects.Personalization;
 import fpt.capstone.etbs.component.GoogleAuthenticator;
+import fpt.capstone.etbs.component.SendGridMail;
 import fpt.capstone.etbs.constant.MailProvider;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.payload.DraftEmailRequest;
+import fpt.capstone.etbs.payload.DynamicData;
+import fpt.capstone.etbs.payload.DynamicDataAttrs;
 import fpt.capstone.etbs.payload.SendConfirmEmailRequest;
 import fpt.capstone.etbs.payload.SendEmailRequest;
 import fpt.capstone.etbs.service.EmailService;
@@ -18,18 +27,24 @@ import fpt.capstone.etbs.service.RawTemplateService;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.internet.MimeMessage;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -49,26 +64,55 @@ public class EmailServiceImpl implements EmailService {
   @Autowired
   private GoogleAuthenticator googleAuthenticator;
 
-//    @Override
-//    @Async("mailAsyncExecutor")
-//    public void sendEmail(UUID accountId, SendEmailRequest request)
-//            throws MessagingException, IOException {
-//
-//        RawTemplate template = rawTemplateService.getRawTemplate(request.getRawTemplateId(), accountId);
-//        if (template == null) {
-//            throw new BadRequestException("Template doesn't existed");
-//        }
-//
-//        String provider = request.getProvider();
-//        String subject = template.getName().toUpperCase();
-//        String content = template.getCurrentVersion().getContent();
-//
-//        if (provider.equalsIgnoreCase(MailProvider.GMAIL.name())) {
-//            javaMailSender.send(createMessage(request.getTo()[0], subject, content));
-//        } else if (provider.equalsIgnoreCase(MailProvider.SENDGRID.name())) {
-//            sendEmailBySendGrid(request, subject, content);
-//        }
-//    }
+  @Autowired
+  private int sendMailType;
+
+  @Override
+  @Async("mailAsyncExecutor")
+  public void sendEmail(UUID accountId, SendEmailRequest request)
+      throws MessagingException, IOException {
+
+    RawTemplate template = rawTemplateService.getRawTemplate(request.getRawId(), accountId);
+    if (template == null) {
+      throw new BadRequestException("Template doesn't existed");
+    }
+
+    String subject = template.getName().toUpperCase();
+    String content = template.getCurrentVersion().getContent();
+
+    List<DynamicData> dataSet = request.getData();
+    if (dataSet.stream().anyMatch(data -> !data.getAttrs().isEmpty())) {
+      for (DynamicData data : dataSet) {
+        String email = data.getEmail();
+        String modifiedContent = setDynamicData(content, data.getAttrs());
+
+        if (sendMailType <= 0) {
+          javaMailSender.send(createSendMessage(email, subject, modifiedContent));
+          sendMailType++;
+        } else {
+          sendBySendGrid(email, subject, modifiedContent);
+          sendMailType--;
+        }
+      }
+    } else {
+      List<String> receivers = dataSet.stream().map(DynamicData::getEmail)
+          .collect(Collectors.toList());
+      String[] emails = new String[receivers.size()];
+      receivers.toArray(emails);
+
+      if (sendMailType <= 0) {
+        javaMailSender.send(createSendMessage(emails, subject, content));
+        sendMailType++;
+      } else {
+        sendBySendGrid(emails, subject, content);
+        sendMailType--;
+      }
+    }
+
+
+
+    System.out.println(sendMailType);
+  }
 
 
   @Override
@@ -93,7 +137,7 @@ public class EmailServiceImpl implements EmailService {
     int rawId;
     String redirectUri;
     try {
-      byte [] decodedState = java.util.Base64.getUrlDecoder().decode(state);
+      byte[] decodedState = java.util.Base64.getUrlDecoder().decode(state);
       Map mapState = JSON_MAPPER.readValue(decodedState, Map.class);
       accountId = UUID.fromString(String.valueOf(mapState.get("accountId")));
       rawId = Integer.parseInt(String.valueOf(mapState.get("rawId")));
@@ -152,11 +196,49 @@ public class EmailServiceImpl implements EmailService {
     gmail.users().drafts().create("me", draft).execute();
   }
 
+  private MimeMessage createSendMessage(String receiver, String subject, String content)
+      throws MessagingException {
+    MimeMessage message = javaMailSender.createMimeMessage();
+    MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+    helper.setTo(receiver);
+    helper.setSubject(subject);
+    helper.setText(content, true);
+    return message;
+  }
 
-  @Override
-  public void sendEmail(UUID accountId, SendEmailRequest request)
-      throws MessagingException, IOException {
+  private MimeMessage createSendMessage(String [] receiver, String subject, String content)
+      throws MessagingException {
+    MimeMessage message = javaMailSender.createMimeMessage();
+    MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+    helper.setTo(receiver);
+    helper.setSubject(subject);
+    helper.setText(content, true);
+    return message;
+  }
 
+
+  private String setDynamicData(String content, List<DynamicDataAttrs> attrs) {
+
+    if (attrs.isEmpty()) {
+      return content;
+    }
+
+    Document doc = Jsoup.parse(content, "UTF-8");
+    attrs.forEach(attr -> {
+      String cssQuery =
+          "[datatype=" + attr.getDatatype() + "]"
+              + "[name=" + attr.getName() + "]";
+      Element ele = doc.select(cssQuery).first();
+      if (ele != null) {
+        String value = attr.getValue();
+        if (attr.getDatatype().equalsIgnoreCase("dynamic text")) {
+          ele.text(value);
+        } else if (attr.getDatatype().equalsIgnoreCase("dynamic link")) {
+          ele.attr("href", value);
+        }
+      }
+    });
+    return doc.outerHtml();
   }
 
 
@@ -169,7 +251,6 @@ public class EmailServiceImpl implements EmailService {
   public void sendConfirmAccount(SendConfirmEmailRequest request) throws MessagingException {
 
   }
-
 
 //    @Override
 //    public void sendConfirmUserEmail(SendConfirmEmailRequest request)
@@ -186,44 +267,48 @@ public class EmailServiceImpl implements EmailService {
 //      javaMailSender.send(createMessage(request.getEmail(), AppConstant.ACCOUNT_CONFIRM_SUBJECT, content));
 //    }
 
-//    private MimeMessage createMessage(String receiver, String subject, String content)
-//            throws MessagingException {
-//        MimeMessage message = javaMailSender.createMimeMessage();
-//        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-//        helper.setTo(receiver);
-//        helper.setSubject(subject);
-//        helper.setText(content, true);
-//        return message;
-//    }
-//
-//
-//
-//    private void sendEmailBySendGrid(SendEmailRequest request, String subject, String content)
-//            throws IOException {
-//
-//        SendGridMail mail = new SendGridMail();
-//        mail.setSubject(subject);
-//        Email sender = new Email("etbsonline@gmail.com");
-//        mail.setFrom(sender);
-//
-//        Personalization personalization = new Personalization();
-//        String[] receivers = request.getTo();
-//        for (String receiver : receivers) {
-//            Email email = new Email(receiver);
-//            personalization.addTo(email);
-//        }
-//        personalization.setSubject(subject);
-//        mail.addPersonalization(personalization);
-//
-//        Content body = new Content("text/html", content);
-//        mail.addContent(body);
-//
-//        Request re = new Request();
-//        re.setMethod(Method.POST);
-//        re.setEndpoint("mail/send");
-//        re.setBody(mail.build());
-//        sendGrid.api(re);
-//    }
+
+  private void sendBySendGrid(String receiver, String subject, String content)
+      throws IOException {
+
+    Email from = new Email("etbsonline@gmail.com");
+    Email to = new Email(receiver);
+    Content body = new Content("text/html", content);
+    Mail mail = new Mail(from, subject, to, body);
+
+    Request request = new Request();
+    request.setMethod(Method.POST);
+    request.setEndpoint("mail/send");
+    request.setBody(mail.build());
+    sendGrid.api(request);
+  }
+
+      private void sendBySendGrid(String [] receivers , String subject, String content)
+            throws IOException {
+
+        SendGridMail mail = new SendGridMail();
+        mail.setSubject(subject);
+        Email sender = new Email("etbsonline@gmail.com");
+        mail.setFrom(sender);
+
+        Personalization personalization = new Personalization();
+        for (String receiver : receivers) {
+            Email email = new Email(receiver);
+            personalization.addTo(email);
+        }
+        personalization.setSubject(subject);
+        mail.addPersonalization(personalization);
+
+        Content body = new Content("text/html", content);
+        mail.addContent(body);
+
+        Request re = new Request();
+        re.setMethod(Method.POST);
+        re.setEndpoint("mail/send");
+        re.setBody(mail.build());
+        sendGrid.api(re);
+    }
+
 
 
 }

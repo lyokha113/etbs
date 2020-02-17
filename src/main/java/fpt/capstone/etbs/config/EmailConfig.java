@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 
 @Configuration
 public class EmailConfig {
@@ -21,6 +22,12 @@ public class EmailConfig {
   @Bean
   public SendGrid sendGrid() {
     return new SendGrid(SENDGRID_API_KEY);
+  }
+
+  @Bean
+  public int sendMailType() {
+    // send by gmail if <= 0 - send by sendgrid if > 0
+    return 0;
   }
 
 }
