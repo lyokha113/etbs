@@ -1,6 +1,7 @@
 package fpt.capstone.etbs.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.component.JwtTokenProvider;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
@@ -18,10 +19,10 @@ import org.springframework.stereotype.Service;
 public class UserEmailServiceImpl implements UserEmailService {
 
   @Autowired
-  UserEmailRepository userEmailRepository;
+  private UserEmailRepository userEmailRepository;
 
   @Autowired
-  AccountRepository accountRepository;
+  private AccountRepository accountRepository;
 
   @Autowired
   private JwtTokenProvider tokenProvider;
@@ -68,6 +69,6 @@ public class UserEmailServiceImpl implements UserEmailService {
     if (account == null) {
       throw new BadRequestException("Account doesn't exist");
     }
-    return userEmailRepository.getAllByAccount(account);
+    return userEmailRepository.getAllByAccount_Id(account.getId());
   }
 }

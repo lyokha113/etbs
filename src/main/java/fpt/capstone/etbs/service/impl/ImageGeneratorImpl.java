@@ -38,6 +38,11 @@ public class ImageGeneratorImpl implements ImageGenerator {
 
   @Override
   public BufferedImage generateImageFromHtmlWithChrome(String html) throws Exception {
+
+    if (System.getProperty("os.name").toLowerCase().contains("win")) {
+      System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
+    }
+
     ChromeOptions chromeOptions = new ChromeOptions();
     chromeOptions.setHeadless(true);
 
