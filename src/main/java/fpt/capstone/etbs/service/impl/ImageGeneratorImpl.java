@@ -29,7 +29,8 @@ public class ImageGeneratorImpl implements ImageGenerator {
 
   @Override
   public BufferedImage generateImageFromHtml(String html) throws Exception {
-    Pdfcrowd.HtmlToImageClient client = new Pdfcrowd.HtmlToImageClient(pdfCrowdUserName, pdfCrowdAPIKey);
+    Pdfcrowd.HtmlToImageClient client = new Pdfcrowd.HtmlToImageClient(pdfCrowdUserName,
+        pdfCrowdAPIKey);
     client.setOutputFormat("png");
     byte[] image = client.convertString(html);
     ByteArrayInputStream is = new ByteArrayInputStream(image);

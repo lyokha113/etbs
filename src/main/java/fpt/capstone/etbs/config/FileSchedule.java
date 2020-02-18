@@ -26,9 +26,8 @@ import org.springframework.stereotype.Component;
 @EnableScheduling
 public class FileSchedule {
 
-  private final Logger logger = LoggerFactory.getLogger(FileSchedule.class);
   private static final int THREAD_POOL = 5;
-
+  private final Logger logger = LoggerFactory.getLogger(FileSchedule.class);
   @Autowired
   private FirebaseService firebaseService;
 

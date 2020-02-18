@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DynamicData {
+
   private String email;
   private List<DynamicDataAttrs> attrs;
 }

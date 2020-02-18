@@ -14,13 +14,13 @@ import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.objects.Personalization;
 import fpt.capstone.etbs.component.GoogleAuthenticator;
 import fpt.capstone.etbs.component.SendGridMail;
+import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.constant.MailProvider;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.payload.DraftEmailRequest;
 import fpt.capstone.etbs.payload.DynamicData;
 import fpt.capstone.etbs.payload.DynamicDataAttrs;
-import fpt.capstone.etbs.payload.SendConfirmEmailRequest;
 import fpt.capstone.etbs.payload.SendEmailRequest;
 import fpt.capstone.etbs.service.EmailService;
 import fpt.capstone.etbs.service.RawTemplateService;
@@ -78,7 +78,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     String subject = template.getName().toUpperCase();
-    String content = template.getCurrentVersion().getContent();
+    String content = template.getContent();
 
     List<DynamicData> dataSet = request.getData();
     if (dataSet.stream().anyMatch(data -> !data.getAttrs().isEmpty())) {
@@ -108,10 +108,6 @@ public class EmailServiceImpl implements EmailService {
         sendMailType--;
       }
     }
-
-
-
-    System.out.println(sendMailType);
   }
 
 
@@ -151,6 +147,20 @@ public class EmailServiceImpl implements EmailService {
     createDraft(draftMessage, gmail);
   }
 
+
+  @Override
+  public void sendConfirmUserEmail(String email, String token) throws MessagingException {
+    String content = AppConstant.EMAIL_CONFIRM_CONTENT_1 + token + AppConstant.EMAIL_CONFIRM_CONTENT_2;
+    javaMailSender.send(createSendMessage(email, AppConstant.EMAIL_CONFIRM_SUBJECT, content));
+  }
+
+  @Override
+  public void sendConfirmAccount(String email, String token) throws MessagingException {
+    String content = AppConstant.ACCOUNT_CONFIRM_CONTENT_1 + token
+        + AppConstant.ACCOUNT_CONFIRM_CONTENT_2;
+    javaMailSender.send(createSendMessage(email, AppConstant.ACCOUNT_CONFIRM_SUBJECT, content));
+  }
+
   private MimeMessage createDraftMessage(Integer rawId, UUID accountId)
       throws MessagingException {
 
@@ -160,7 +170,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     String subject = template.getName().toUpperCase();
-    String content = template.getCurrentVersion().getContent();
+    String content = template.getContent();
 
     MimeMessage message = javaMailSender.createMimeMessage();
     message.setFlag(Flags.Flag.DRAFT, true);
@@ -206,7 +216,7 @@ public class EmailServiceImpl implements EmailService {
     return message;
   }
 
-  private MimeMessage createSendMessage(String [] receiver, String subject, String content)
+  private MimeMessage createSendMessage(String[] receiver, String subject, String content)
       throws MessagingException {
     MimeMessage message = javaMailSender.createMimeMessage();
     MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -242,32 +252,6 @@ public class EmailServiceImpl implements EmailService {
   }
 
 
-  @Override
-  public void sendConfirmUserEmail(SendConfirmEmailRequest request) throws MessagingException {
-
-  }
-
-  @Override
-  public void sendConfirmAccount(SendConfirmEmailRequest request) throws MessagingException {
-
-  }
-
-//    @Override
-//    public void sendConfirmUserEmail(SendConfirmEmailRequest request)
-//            throws MessagingException {
-//        String content = AppConstant.EMAIL_CONFIRM_CONTENT_1 + request.getToken()
-//                        + AppConstant.EMAIL_CONFIRM_CONTENT_2;
-//        javaMailSender.send(createMessage(request.getEmail(), AppConstant.EMAIL_CONFIRM_SUBJECT, content));
-//    }
-//
-//    @Override
-//    public void sendConfirmAccount(SendConfirmEmailRequest request) throws MessagingException {
-//        String content = AppConstant.ACCOUNT_CONFIRM_CONTENT_1 + request.getToken()
-//                        + AppConstant.ACCOUNT_CONFIRM_CONTENT_2;
-//      javaMailSender.send(createMessage(request.getEmail(), AppConstant.ACCOUNT_CONFIRM_SUBJECT, content));
-//    }
-
-
   private void sendBySendGrid(String receiver, String subject, String content)
       throws IOException {
 
@@ -283,32 +267,30 @@ public class EmailServiceImpl implements EmailService {
     sendGrid.api(request);
   }
 
-      private void sendBySendGrid(String [] receivers , String subject, String content)
-            throws IOException {
+  private void sendBySendGrid(String[] receivers, String subject, String content)
+      throws IOException {
 
-        SendGridMail mail = new SendGridMail();
-        mail.setSubject(subject);
-        Email sender = new Email("etbsonline@gmail.com");
-        mail.setFrom(sender);
+    SendGridMail mail = new SendGridMail();
+    mail.setSubject(subject);
+    Email sender = new Email("etbsonline@gmail.com");
+    mail.setFrom(sender);
 
-        Personalization personalization = new Personalization();
-        for (String receiver : receivers) {
-            Email email = new Email(receiver);
-            personalization.addTo(email);
-        }
-        personalization.setSubject(subject);
-        mail.addPersonalization(personalization);
-
-        Content body = new Content("text/html", content);
-        mail.addContent(body);
-
-        Request re = new Request();
-        re.setMethod(Method.POST);
-        re.setEndpoint("mail/send");
-        re.setBody(mail.build());
-        sendGrid.api(re);
+    Personalization personalization = new Personalization();
+    for (String receiver : receivers) {
+      Email email = new Email(receiver);
+      personalization.addTo(email);
     }
+    personalization.setSubject(subject);
+    mail.addPersonalization(personalization);
 
+    Content body = new Content("text/html", content);
+    mail.addContent(body);
 
+    Request re = new Request();
+    re.setMethod(Method.POST);
+    re.setEndpoint("mail/send");
+    re.setBody(mail.build());
+    sendGrid.api(re);
+  }
 
 }

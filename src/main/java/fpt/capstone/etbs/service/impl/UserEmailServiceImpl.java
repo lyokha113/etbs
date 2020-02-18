@@ -1,12 +1,8 @@
 package fpt.capstone.etbs.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import fpt.capstone.etbs.component.AuthenticationFacade;
-import fpt.capstone.etbs.component.JwtTokenProvider;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.UserEmail;
-import fpt.capstone.etbs.payload.UserEmailRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.UserEmailRepository;
 import fpt.capstone.etbs.service.UserEmailService;
@@ -24,32 +20,35 @@ public class UserEmailServiceImpl implements UserEmailService {
   @Autowired
   private AccountRepository accountRepository;
 
-  @Autowired
-  private JwtTokenProvider tokenProvider;
-
   @Override
-  public UserEmail createUserEmail(UUID uuid, UserEmailRequest request)
-      throws JsonProcessingException {
-    Account account = accountRepository.findById(uuid).orElse(null);
+  public UserEmail createUserEmail(UUID accountId, String email) {
+    Account account = accountRepository.findById(accountId).orElse(null);
     if (account == null) {
       throw new BadRequestException("Account doesn't exist");
     }
-    UserEmail userEmail = UserEmail.builder()
+
+    UserEmail userEmail = userEmailRepository
+        .getByAccount_IdAndEmail(accountId, email).orElse(null);
+    if (userEmail != null) {
+      throw new BadRequestException("Email is existed");
+    }
+
+    userEmail = UserEmail.builder()
         .account(account)
-        .email(request.getEmail())
-        .status("Requested")
+        .email(email)
+        .status(false)
         .build();
-    userEmail.setToken(tokenProvider.generateToken(userEmail.getId()));
+
     return userEmailRepository.save(userEmail);
   }
 
   @Override
-  public UserEmail confirmUserEmail(String token) {
-    UserEmail userEmail = userEmailRepository.getByToken(token).orElse(null);
+  public UserEmail confirmUserEmail(Integer id) {
+    UserEmail userEmail = userEmailRepository.findById(id).orElse(null);
     if (userEmail == null) {
-      throw new BadRequestException("User email doesn't exist");
+      throw new BadRequestException("Email doesn't exist");
     }
-    userEmail.setStatus("Accept");
+    userEmail.setStatus(true);
     return userEmailRepository.save(userEmail);
   }
 
@@ -58,17 +57,18 @@ public class UserEmailServiceImpl implements UserEmailService {
   public void deleteUserEmail(Integer id) {
     UserEmail userEmail = userEmailRepository.findById(id).orElse(null);
     if (userEmail == null) {
-      throw new BadRequestException("User email doesn't exist");
+      throw new BadRequestException("Email doesn't exist");
     }
     userEmailRepository.delete(userEmail);
   }
 
   @Override
-  public List<UserEmail> getUserEmailList(UUID id) {
-    Account account = accountRepository.findById(id).orElse(null);
-    if (account == null) {
-      throw new BadRequestException("Account doesn't exist");
-    }
-    return userEmailRepository.getAllByAccount_Id(account.getId());
+  public List<UserEmail> getUserEmails(UUID accountId) {
+    return userEmailRepository.getByAccount_Id(accountId);
+  }
+
+  @Override
+  public UserEmail getUserEmail(UUID accountId, Integer id) {
+    return userEmailRepository.getByAccount_IdAndId(accountId, id).orElse(null);
   }
 }

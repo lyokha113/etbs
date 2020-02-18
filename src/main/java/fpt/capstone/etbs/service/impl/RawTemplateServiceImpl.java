@@ -5,22 +5,19 @@ import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.DeletingMediaFile;
 import fpt.capstone.etbs.model.RawTemplate;
-import fpt.capstone.etbs.model.RawTemplateVersion;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.model.Workspace;
 import fpt.capstone.etbs.payload.RawTemplateRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.DeletingMediaFileRepository;
 import fpt.capstone.etbs.repository.RawTemplateRepository;
-import fpt.capstone.etbs.repository.RawTemplateVersionRepository;
 import fpt.capstone.etbs.repository.WorkspaceRepository;
+import fpt.capstone.etbs.service.FirebaseService;
+import fpt.capstone.etbs.service.ImageGenerator;
 import fpt.capstone.etbs.service.RawTemplateService;
-import fpt.capstone.etbs.service.RawTemplateVersionService;
 import fpt.capstone.etbs.service.TemplateService;
-import java.util.List;
+import java.awt.image.BufferedImage;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -30,9 +27,6 @@ public class RawTemplateServiceImpl implements RawTemplateService {
 
   @Autowired
   private RawTemplateRepository rawTemplateRepository;
-
-  @Autowired
-  private RawTemplateVersionRepository rawTemplateVersionRepository;
 
   @Autowired
   private WorkspaceRepository workspaceRepository;
@@ -47,7 +41,10 @@ public class RawTemplateServiceImpl implements RawTemplateService {
   private TemplateService templateService;
 
   @Autowired
-  private RawTemplateVersionService rawTemplateVersionService;
+  private FirebaseService firebaseService;
+
+  @Autowired
+  private ImageGenerator imageGenerator;
 
   @Override
   public RawTemplate getRawTemplate(Integer id, UUID accountId) {
@@ -73,36 +70,22 @@ public class RawTemplateServiceImpl implements RawTemplateService {
       throw new BadRequestException("Template name is existed in this workspace");
     }
 
-    Template template = null;
-    if (request.getTemplateId() != null) {
-      template = templateService.getTemplate(request.getTemplateId());
-      if (template == null) {
-        throw new BadRequestException("Template doesn't exist");
-      }
-    }
-
     RawTemplate rawTemplate = RawTemplate.builder()
         .name(request.getName())
         .description(request.getDescription())
+        .thumbnail(AppConstant.DEFAULT_RAW_TEMPLATE_THUMBNAIL)
+        .content(
+            "<p style=\"text-align: center; font-size: 40px; font-weight: bold\">Blank content</p>")
         .workspace(workspace)
         .build();
 
-    RawTemplateVersion currentVersion = RawTemplateVersion.builder()
-        .name(AppConstant.DEFAULT_VERSION_NAME)
-        .content(
-            "<p style=\"text-align: center; font-size: 40px; font-weight: bold\">Blank content</p>")
-        .thumbnail(AppConstant.DEFAULT_RAW_TEMPLATE_THUMBNAIL)
-        .rawTemplate(rawTemplate)
-        .build();
-
-    rawTemplate.setCurrentVersion(currentVersion);
-    rawTemplate.setVersions(Stream.of(currentVersion).collect(Collectors.toSet()));
     rawTemplate = rawTemplateRepository.save(rawTemplate);
 
-    if (template != null) {
-      RawTemplateVersion version = rawTemplateVersionService
-          .updateContent(accountId, rawTemplate.getId(), template.getContent());
-      rawTemplate.setCurrentVersion(version);
+    if (request.getTemplateId() != null) {
+      Template template = templateService.getTemplate(request.getTemplateId());
+      if (template != null) {
+        updateContent(accountId, rawTemplate.getId(), template.getContent());
+      }
     }
 
     return rawTemplate;
@@ -147,24 +130,21 @@ public class RawTemplateServiceImpl implements RawTemplateService {
   }
 
   @Override
-  public RawTemplate changeVersion(UUID accountId, Integer id, Integer versionId) {
+  public RawTemplate updateContent(UUID accountId, Integer id, String content) throws Exception {
 
     RawTemplate rawTemplate = rawTemplateRepository
-        .getByIdAndWorkspace_Account_Id(id, accountId).orElse(null);
-
-    if (rawTemplate == null) {
-      throw new BadRequestException("Template doesn't exist");
-    }
-
-    RawTemplateVersion version = rawTemplateVersionRepository
-        .getByIdAndRawTemplate_Workspace_Account_Id(versionId, accountId)
+        .getByIdAndWorkspace_Account_Id(id, accountId)
         .orElse(null);
 
-    if (version == null) {
-      throw new BadRequestException("Version doesn't exist");
+    if (rawTemplate == null) {
+      throw new BadRequestException("Raw template doesn't exist");
     }
 
-    rawTemplate.setCurrentVersion(version);
+    BufferedImage file = imageGenerator.generateImageFromHtmlWithChrome(content);
+    String thumbnail = firebaseService.createRawThumbnail(file, rawTemplate.getId().toString());
+
+    rawTemplate.setThumbnail(thumbnail);
+    rawTemplate.setContent(content);
     return rawTemplateRepository.save(rawTemplate);
   }
 
@@ -178,12 +158,11 @@ public class RawTemplateServiceImpl implements RawTemplateService {
       throw new BadRequestException("Template doesn't exist");
     }
 
-    List<DeletingMediaFile> thumbnails = rawTemplate.getVersions().stream()
-        .map(v -> DeletingMediaFile.builder().link(AppConstant.RAW_TEMPLATE_THUMBNAIL + v.getId())
-            .build())
-        .collect(Collectors.toList());
+    DeletingMediaFile thumbnail = DeletingMediaFile
+        .builder().link(rawTemplate.getThumbnail() + rawTemplate.getId())
+        .build();
 
-    deletingMediaFileRepository.saveAll(thumbnails);
+    deletingMediaFileRepository.save(thumbnail);
     rawTemplateRepository.delete(rawTemplate);
   }
 

@@ -3,7 +3,6 @@ package fpt.capstone.etbs.controller;
 import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.model.Rating;
-import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.RatingRequest;
 import fpt.capstone.etbs.payload.RatingResponse;
@@ -22,9 +21,6 @@ public class RatingController {
 
   @Autowired
   private RatingService ratingService;
-
-  @Autowired
-  private TemplateService templateService;
 
   @Autowired
   private AuthenticationFacade authenticationFacade;

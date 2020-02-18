@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TemplateResponse implements Comparable<TemplateResponse>{
+public class TemplateResponse implements Comparable<TemplateResponse> {
 
   private int id;
   private String name;

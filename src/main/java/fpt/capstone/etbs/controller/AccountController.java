@@ -27,10 +27,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class AccountController {
 
   @Autowired
-  private AccountService accountService;
-
-  @Autowired
   JwtTokenProvider tokenProvider;
+  @Autowired
+  private AccountService accountService;
 
   @GetMapping("/account")
   public ResponseEntity<?> getAccounts() {
@@ -57,8 +56,8 @@ public class AccountController {
     try {
       AccountResponse accountResponse = tokenProvider.getTokenValue(token, AccountResponse.class);
       return ResponseEntity.ok(new ApiResponse<>(true, "", accountResponse));
-    } catch (BadRequestException | IOException bre) {
-      return ResponseEntity.badRequest().build();
+    } catch (BadRequestException | IOException ex) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
   }
 

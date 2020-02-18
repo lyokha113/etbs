@@ -7,6 +7,7 @@ import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.RawTemplateRequest;
 import fpt.capstone.etbs.payload.RawTemplateResponse;
+import fpt.capstone.etbs.payload.StringWrapperRequest;
 import fpt.capstone.etbs.service.RawTemplateService;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -73,14 +73,15 @@ public class RawTemplateController {
     }
   }
 
-  @PatchMapping("/raw/{id}}")
-  private ResponseEntity<?> changeVersion(
+  @PatchMapping("/raw/{id}")
+  private ResponseEntity<?> updateContent(
       @PathVariable("id") Integer id,
-      @RequestParam("versionId") Integer versionId) {
+      @Valid @RequestBody StringWrapperRequest wrapper) throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      RawTemplate template = rawTemplateService.changeVersion(userPrincipal.getId(), id, versionId);
+      RawTemplate template = rawTemplateService
+          .updateContent(userPrincipal.getId(), id, wrapper.getString());
       RawTemplateResponse response = RawTemplateResponse.setResponseWithContent(template);
       return ResponseEntity.ok(new ApiResponse<>(true, "Raw template version changed", response));
     } catch (BadRequestException ex) {

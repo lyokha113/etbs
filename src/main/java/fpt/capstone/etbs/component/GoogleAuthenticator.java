@@ -15,9 +15,7 @@ import com.google.api.services.gmail.GmailScopes;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -45,7 +43,8 @@ public class GoogleAuthenticator {
         .build();
   }
 
-  public Gmail getGMailInstance(String redirectUri, String code) throws GeneralSecurityException, IOException {
+  public Gmail getGMailInstance(String redirectUri, String code)
+      throws GeneralSecurityException, IOException {
     GoogleAuthorizationCodeFlow flow = getFlow();
     TokenResponse response = flow.newTokenRequest(code).setRedirectUri(redirectUri).execute();
     Credential credential = flow.createAndStoreCredential(response, null);
@@ -54,7 +53,8 @@ public class GoogleAuthenticator {
         .setApplicationName("ETBS").build();
   }
 
-  public String authorize(String redirectUri, String state) throws GeneralSecurityException, IOException {
+  public String authorize(String redirectUri, String state)
+      throws GeneralSecurityException, IOException {
     AuthorizationCodeRequestUrl authorizationUrl = getFlow()
         .newAuthorizationUrl()
         .setState(state)

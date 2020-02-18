@@ -14,7 +14,7 @@ public class UserEmailResponse {
 
   private Integer id;
   private String email;
-  private String status;
+  private Boolean status;
 
   public static UserEmailResponse setResponse(UserEmail userEmail) {
     return UserEmailResponse.builder()

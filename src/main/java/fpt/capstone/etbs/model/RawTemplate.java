@@ -53,15 +53,15 @@ public class RawTemplate extends Auditing {
   @Column(columnDefinition = "text")
   private String description;
 
+  @Column(columnDefinition = "longtext")
+  @NotBlank
+  private String content;
+
+  @Column(columnDefinition = "text")
+  private String thumbnail;
+
   @ManyToOne
   @NonNull
   private Workspace workspace;
-
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "current_version_id", referencedColumnName = "id")
-  private RawTemplateVersion currentVersion;
-
-  @OneToMany(mappedBy = "rawTemplate", cascade = CascadeType.ALL)
-  private Set<RawTemplateVersion> versions;
 
 }

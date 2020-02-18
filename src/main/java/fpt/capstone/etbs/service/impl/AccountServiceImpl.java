@@ -6,11 +6,9 @@ import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Role;
-import fpt.capstone.etbs.model.UserEmail;
 import fpt.capstone.etbs.model.Workspace;
 import fpt.capstone.etbs.payload.AccountRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
-import fpt.capstone.etbs.repository.RoleRepository;
 import fpt.capstone.etbs.service.AccountService;
 import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.util.ImageUtils;
@@ -169,9 +167,8 @@ public class AccountServiceImpl implements AccountService {
 
   }
 
-  private Account setNewAccount(AccountRequest request, AuthProvider provider, String
-      avatarURL,
-      Role role) {
+  private Account setNewAccount(AccountRequest request, AuthProvider provider,
+      String avatarURL, Role role) {
     Account account = new Account();
     account.setEmail(request.getEmail());
     account.setFullName(request.getFullName());
@@ -196,13 +193,6 @@ public class AccountServiceImpl implements AccountService {
               .build())
               .collect(Collectors.toSet()));
 
-      account.setUserEmails(
-          Stream.of(UserEmail.builder()
-              .account(account)
-              .email(request.getEmail())
-              .status("Default")
-              .build())
-              .collect(Collectors.toSet()));
     } else {
       account.setImageUrl(AppConstant.DEFAULT_AVATAR_ADMIN_URL);
     }

@@ -1,8 +1,6 @@
 package fpt.capstone.etbs.service;
 
-import com.google.api.services.gmail.Gmail;
 import fpt.capstone.etbs.payload.DraftEmailRequest;
-import fpt.capstone.etbs.payload.SendConfirmEmailRequest;
 import fpt.capstone.etbs.payload.SendEmailRequest;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -21,9 +19,7 @@ public interface EmailService {
   void makeDraftGMail(String state, String code)
       throws MessagingException, IOException, GeneralSecurityException;
 
-  void sendConfirmUserEmail(SendConfirmEmailRequest request)
-      throws MessagingException;
+  void sendConfirmUserEmail(String email, String token) throws MessagingException;
 
-  void sendConfirmAccount(SendConfirmEmailRequest request)
-      throws MessagingException;
+  void sendConfirmAccount(String email, String token) throws MessagingException;
 }

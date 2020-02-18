@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DynamicDataAttrs {
+
   private String datatype;
   private String name;
   private String value;

@@ -1,6 +1,5 @@
 package fpt.capstone.etbs.repository;
 
-import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.UserEmail;
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +10,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserEmailRepository extends JpaRepository<UserEmail, Integer> {
 
-  Optional<UserEmail> getByToken(String token);
+  Optional<UserEmail> getByAccount_IdAndId(UUID accountId, Integer id);
 
-  List<UserEmail> getAllByAccount_Id(UUID accountId);
+  Optional<UserEmail> getByAccount_IdAndEmail(UUID accountId, String email);
+
+  List<UserEmail> getByAccount_Id(UUID accountId);
 }

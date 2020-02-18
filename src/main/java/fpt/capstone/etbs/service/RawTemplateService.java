@@ -12,7 +12,7 @@ public interface RawTemplateService {
 
   RawTemplate updateRawTemplate(UUID accountId, Integer id, RawTemplateRequest request);
 
-  RawTemplate changeVersion(UUID accountId, Integer id, Integer versionId);
+  RawTemplate updateContent(UUID accountId, Integer id, String content) throws Exception;
 
   void deleteRawTemplate(UUID accountId, Integer id) throws Exception;
 }
