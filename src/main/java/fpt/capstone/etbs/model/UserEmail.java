@@ -3,9 +3,12 @@ package fpt.capstone.etbs.model;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import fpt.capstone.etbs.constant.UserEmailStatus;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -47,6 +50,7 @@ public class UserEmail extends Auditing {
   @NonNull
   private Account account;
 
+  @Enumerated(EnumType.STRING)
   @Column
-  private Boolean status;
+  private UserEmailStatus status;
 }

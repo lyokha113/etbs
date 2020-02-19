@@ -14,13 +14,13 @@ public class UserEmailResponse {
 
   private Integer id;
   private String email;
-  private Boolean status;
+  private String status;
 
   public static UserEmailResponse setResponse(UserEmail userEmail) {
     return UserEmailResponse.builder()
         .id(userEmail.getId())
         .email(userEmail.getEmail())
-        .status(userEmail.getStatus())
+        .status(userEmail.getStatus().toString())
         .build();
   }
 }

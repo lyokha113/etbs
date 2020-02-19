@@ -13,7 +13,7 @@ public interface UserEmailService {
 
   UserEmail createUserEmail(UUID accountId, String email) throws JsonProcessingException;
 
-  UserEmail confirmUserEmail(Integer id);
+  void confirmUserEmail(Integer id);
 
-  void deleteUserEmail(Integer id);
+  void deleteUserEmail(UUID accountId, Integer id);
 }

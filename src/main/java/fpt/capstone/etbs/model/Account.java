@@ -87,7 +87,7 @@ public class Account extends Auditing {
   @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
   private Set<Publish> publishes;
 
-  @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
   private Set<UserEmail> userEmails;
 
 }

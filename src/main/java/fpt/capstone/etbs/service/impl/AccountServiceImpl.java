@@ -90,7 +90,6 @@ public class AccountServiceImpl implements AccountService {
 
     if (!StringUtils.isEmpty(request.getPassword())) {
       account.setPassword(passwordEncoder.encode(request.getPassword()));
-      ;
     }
 
     account.setFullName(request.getFullName());
@@ -109,15 +108,15 @@ public class AccountServiceImpl implements AccountService {
       throw new BadRequestException("Google account can't be update");
     }
 
-    if (request.getImageUrl() != null) {
+    if (!StringUtils.isEmpty(request.getImageUrl())) {
       BufferedImage bufferedImage = ImageUtils.base64ToImage(request.getImageUrl());
       String avatar = firebaseService.createUserAvatar(bufferedImage, account.getId().toString());
       account.setImageUrl(avatar);
     }
-    if (request.getFullName() != null) {
+    if (!StringUtils.isEmpty(request.getFullName())) {
       account.setFullName(request.getFullName());
     }
-    if (request.getPassword() != null) {
+    if (!StringUtils.isEmpty(request.getPassword())) {
       account.setPassword(passwordEncoder.encode(request.getPassword()));
     }
     return accountRepository.save(account);
