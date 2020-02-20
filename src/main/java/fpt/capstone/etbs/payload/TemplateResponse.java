@@ -3,6 +3,7 @@ package fpt.capstone.etbs.payload;
 import fpt.capstone.etbs.model.Category;
 import fpt.capstone.etbs.model.Rating;
 import fpt.capstone.etbs.model.Template;
+import fpt.capstone.etbs.service.TemplateService;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -40,18 +41,9 @@ public class TemplateResponse implements Comparable<TemplateResponse> {
         categories == null
             ? new ArrayList<>()
             : categories.stream().map(CategoryOfTemplate::setResponse).collect(Collectors.toList());
-    int upVote = 0;
-    int downVote = 0;
-    double score = 0;
-    if (template.getRatings() != null) {
-      upVote = (int) template.getRatings().stream().filter(Rating::isVote).count();
-      downVote =
-          (int) template.getRatings().stream().filter(r -> !r.isVote()).count();
-      double gravity = 1.81;
-      LocalDateTime now = LocalDateTime.now();
-      Duration duration = Duration.between(template.getCreatedDate(), now);
-      score = (upVote - downVote) / Math.pow(duration.toHours(), gravity);
-    }
+    Set<Rating> ratings = template.getRatings();
+    int up = ratings != null ? (int) template.getRatings().stream().filter(Rating::isVote).count() : 0;
+    int down = ratings != null ? (int) template.getRatings().stream().filter(r -> !r.isVote()).count() : 0;
     return TemplateResponse.builder()
         .id(template.getId())
         .name(template.getName())
@@ -59,9 +51,9 @@ public class TemplateResponse implements Comparable<TemplateResponse> {
         .authorId(template.getAuthor().getId().toString())
         .authorAvatar(template.getAuthor().getImageUrl())
         .thumbnail(template.getThumbnail())
-        .upVote(upVote)
-        .downVote(downVote)
-        .score(score)
+        .upVote(up)
+        .downVote(down)
+        .score(TemplateService.calculateScore(up, down, template.getCreatedDate()))
         .description(template.getDescription())
         .categories(categoryOfTemplates)
         .build();

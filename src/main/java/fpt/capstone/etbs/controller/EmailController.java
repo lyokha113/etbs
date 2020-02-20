@@ -92,7 +92,6 @@ public class EmailController {
     }
   }
 
-
   @PostMapping("/email/send")
   public ResponseEntity<?> sendEmail(
       @Valid @RequestBody SendEmailRequest request) throws Exception {
@@ -102,24 +101,6 @@ public class EmailController {
       emailService.sendEmail(userPrincipal.getId(), request);
       return ResponseEntity.ok(new ApiResponse<>(true, "Email was sent", null));
     } catch (BadRequestException ex) {
-      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
-    }
-  }
-
-  @PostMapping("/email/confirm/useremail")
-  public ResponseEntity<?> sendConfirmUseremail(@RequestParam Integer id) throws Exception {
-    Authentication auth = authenticationFacade.getAuthentication();
-    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-    try {
-      UserEmail userEmail = userEmailService.getUserEmail(userPrincipal.getId(), id);
-      if (userEmail != null) {
-        String token = tokenProvider.generateToken(userEmail);
-        emailService.sendConfirmUserEmail(userEmail.getEmail(), token);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Re-send confirm mail", null));
-      }
-
-      return ResponseEntity.badRequest().body(new ApiResponse<>(false, "Wrong information", null));
-    } catch (BadRequestException | JsonProcessingException | MessagingException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
   }

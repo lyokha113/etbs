@@ -72,7 +72,7 @@ public class UserEmailController {
       UserEmailResponse response = UserEmailResponse.setResponse(userEmail);
 
       if (userEmail.getStatus().equals(UserEmailStatus.PENDING)) {
-        String token = tokenProvider.generateToken(userEmail);
+        String token = tokenProvider.generateToken(userEmail.getId());
         emailService.sendConfirmUserEmail(userEmail.getEmail(), token);
       }
 
@@ -98,8 +98,8 @@ public class UserEmailController {
   @GetMapping("/useremail/confirm")
   private void confirmUserEmail(@RequestParam("token") String token, HttpServletResponse response) {
     try {
-      UserEmail userEmail = tokenProvider.getTokenValue(token, UserEmail.class);
-      userEmailService.confirmUserEmail(userEmail.getId());
+      Integer id = tokenProvider.getTokenValue(token, Integer.class);
+      userEmailService.confirmUserEmail(id);
       response.setHeader("Location", clientConfirmUri);
       response.setStatus(302);
     } catch (BadRequestException | IOException ex) {
