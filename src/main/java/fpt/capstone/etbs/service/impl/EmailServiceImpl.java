@@ -42,6 +42,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -66,6 +67,9 @@ public class EmailServiceImpl implements EmailService {
 
   @Autowired
   private int sendMailType;
+
+  @Value("${app.serverConfirmEmailUri}")
+  private String serverConfirmEmailUri;
 
   @Override
   @Async("mailAsyncExecutor")
@@ -150,7 +154,7 @@ public class EmailServiceImpl implements EmailService {
 
   @Override
   public void sendConfirmUserEmail(String email, String token) throws MessagingException {
-    String content = AppConstant.EMAIL_CONFIRM_CONTENT_1 + token + AppConstant.EMAIL_CONFIRM_CONTENT_2;
+    String content = setTokenUserEmail(token);
     javaMailSender.send(createSendMessage(email, AppConstant.EMAIL_CONFIRM_SUBJECT, content));
   }
 
@@ -226,7 +230,6 @@ public class EmailServiceImpl implements EmailService {
     return message;
   }
 
-
   private String setDynamicData(String content, List<DynamicDataAttrs> attrs) {
 
     if (attrs.isEmpty()) {
@@ -248,6 +251,14 @@ public class EmailServiceImpl implements EmailService {
         }
       }
     });
+    return doc.outerHtml();
+  }
+
+  private String setTokenUserEmail(String token) {
+    Document doc = Jsoup.parse(AppConstant.EMAIL_CONFIRM_CONTENT, "UTF-8");
+    String cssQuery = "#token";
+    Element ele = doc.select(cssQuery).first();
+    ele.attr("href", serverConfirmEmailUri + "?token=" + token);
     return doc.outerHtml();
   }
 

@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.service;
 
+import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.TemplateRequest;
 import java.math.BigDecimal;
@@ -16,7 +17,7 @@ public interface TemplateService {
 
     long pivot = LocalDateTime.parse("2020-01-01T00:00:00").toEpochSecond(ZoneOffset.UTC);
     long timeElapsed = createdDate.toEpochSecond(ZoneOffset.UTC) - pivot;
-    BigDecimal timeScore = new BigDecimal(sign * timeElapsed / 45000);
+    BigDecimal timeScore = new BigDecimal(sign * timeElapsed / AppConstant.TIME_TO_SCORE);
 
     return voteScore.add(timeScore).setScale(7, BigDecimal.ROUND_UNNECESSARY).doubleValue();
 
