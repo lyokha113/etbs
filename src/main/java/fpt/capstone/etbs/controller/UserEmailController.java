@@ -77,7 +77,7 @@ public class UserEmailController {
       }
 
       return ResponseEntity.ok(new ApiResponse<>(true, "Email was created", response));
-    } catch (BadRequestException | MessagingException | JsonProcessingException ex) {
+    } catch (BadRequestException | MessagingException | IOException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
 
     }

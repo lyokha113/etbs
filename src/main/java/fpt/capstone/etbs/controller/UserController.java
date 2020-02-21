@@ -12,9 +12,14 @@ import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.LoginRequest;
 import fpt.capstone.etbs.payload.LoginResponse;
 import fpt.capstone.etbs.service.AccountService;
+import fpt.capstone.etbs.service.EmailService;
 import java.io.IOException;
+import java.util.UUID;
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -27,6 +32,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -43,6 +49,12 @@ public class UserController {
 
   @Autowired
   private JwtTokenProvider tokenProvider;
+
+  @Autowired
+  private EmailService emailService;
+
+  @Value("${app.clientConfirmUri}")
+  private String clientConfirmUri;
 
   @GetMapping("/user")
   public ResponseEntity<?> getUserDetail() {
@@ -96,7 +108,7 @@ public class UserController {
           .body(new ApiResponse<>(false, "Incorrect login information", null));
     } catch (LockedException ex) {
       return ResponseEntity.badRequest()
-          .body((new ApiResponse<>(false, "Account was locked", null)));
+          .body((new ApiResponse<>(false, "Account was locked or haven't approved.", null)));
     } catch (JsonProcessingException e) {
       throw new Exception("Json parsing error");
     }
@@ -106,10 +118,24 @@ public class UserController {
   public ResponseEntity<?> registerAccount(@Valid @RequestBody AccountRequest request) {
     try {
       Account account = accountService.registerAccount(request);
+      String token = tokenProvider.generateToken(account.getId());
+      emailService.sendConfirmAccount(account.getEmail(), token);
       return ResponseEntity.ok(
           new ApiResponse<>(true, "Account created", AccountResponse.setResponse(account)));
-    } catch (BadRequestException ex) {
+    } catch (BadRequestException | MessagingException | IOException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
+  }
+
+  @GetMapping("/user/confirm")
+  private void confirmAccount(@RequestParam("token") String token, HttpServletResponse response) {
+    try {
+      UUID uuid = tokenProvider.getTokenValue(token, UUID.class);
+      accountService.confirmAccount(uuid);
+      response.setHeader("Location", clientConfirmUri);
+      response.setStatus(302);
+    } catch (BadRequestException | IOException ex) {
+      response.setHeader("Location", clientConfirmUri + "?error=" + ex.getMessage());
     }
   }
 }

@@ -26,4 +26,6 @@ public interface AccountService {
 
   Account setGoogleAccount(String email, String name, String avatar);
 
+  void confirmAccount(UUID uuid);
+
 }

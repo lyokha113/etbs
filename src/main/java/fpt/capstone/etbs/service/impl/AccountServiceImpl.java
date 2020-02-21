@@ -166,8 +166,19 @@ public class AccountServiceImpl implements AccountService {
 
   }
 
-  private Account setNewAccount(AccountRequest request, AuthProvider provider,
-      String avatarURL, Role role) {
+  @Override
+  public void confirmAccount(UUID uuid) {
+    Account account = getAccount(uuid);
+    if (account == null) {
+      throw new BadRequestException("Account doesn't existed");
+    }
+
+    account.setApproved(true);
+    accountRepository.save(account);
+  }
+
+  private Account setNewAccount(AccountRequest request, AuthProvider provider, String avatarURL,
+      Role role) {
     Account account = new Account();
     account.setEmail(request.getEmail());
     account.setFullName(request.getFullName());
@@ -178,6 +189,10 @@ public class AccountServiceImpl implements AccountService {
     }
 
     if (role.getId() == RoleEnum.USER.getId()) {
+
+      if (provider.equals(AuthProvider.google)) {
+        account.setApproved(true);
+      }
 
       if (!StringUtils.isEmpty(avatarURL)) {
         account.setImageUrl(avatarURL);
@@ -193,6 +208,7 @@ public class AccountServiceImpl implements AccountService {
               .collect(Collectors.toSet()));
 
     } else {
+      account.setApproved(true);
       account.setImageUrl(AppConstant.DEFAULT_AVATAR_ADMIN_URL);
     }
 

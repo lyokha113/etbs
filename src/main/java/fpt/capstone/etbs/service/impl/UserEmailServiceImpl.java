@@ -61,7 +61,8 @@ public class UserEmailServiceImpl implements UserEmailService {
     if (userEmail == null) {
       throw new BadRequestException("Email doesn't exist");
     }
-    if (!userEmail.getStatus().equals(UserEmailStatus.PENDING)) {
+    if (userEmail.getStatus().equals(UserEmailStatus.CANCELED) ||
+        userEmail.getStatus().equals(UserEmailStatus.DELETED)) {
       throw new BadRequestException("Email isn't pending status to approve");
     }
 

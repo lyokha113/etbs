@@ -1,6 +1,7 @@
 package fpt.capstone.etbs.service;
 
 import fpt.capstone.etbs.model.RawTemplate;
+import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.RawTemplateRequest;
 import java.util.UUID;
 

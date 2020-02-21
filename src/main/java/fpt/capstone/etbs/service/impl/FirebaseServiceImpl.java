@@ -62,6 +62,7 @@ public class FirebaseServiceImpl implements FirebaseService {
     return createImage(fbPath, file);
   }
 
+
   @Override
   public boolean deleteImage(String fbPath) {
     Storage storage = bucket.getStorage();

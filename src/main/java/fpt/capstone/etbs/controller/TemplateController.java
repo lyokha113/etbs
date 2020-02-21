@@ -10,6 +10,7 @@ import fpt.capstone.etbs.service.TemplateService;
 import fpt.capstone.etbs.util.RoleUtils;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,10 +41,10 @@ public class TemplateController {
             ? templateService.getTemplates()
             : templateService.getTemplatesForUser();
     List<TemplateResponse> response =
-        templates
-            .stream()
+        templates.stream()
+            .sorted(Comparator.comparing(Template::getCreatedDate).reversed())
             .map(TemplateResponse::setResponse)
-            .sorted(Comparator.comparingDouble(TemplateResponse::getScore))
+            .sorted(Comparator.comparingDouble(TemplateResponse::getScore).reversed())
             .collect(Collectors.toList());
     return ResponseEntity.ok(new ApiResponse<>(true, "", response));
   }
@@ -55,6 +56,18 @@ public class TemplateController {
         ? ResponseEntity
         .ok(new ApiResponse<>(true, "", TemplateResponse.setResponseWithContent(response)))
         : ResponseEntity.badRequest().body(new ApiResponse<>(true, "Not found", null));
+  }
+
+  @GetMapping("/template/author/{uuid}")
+  private ResponseEntity<?> getTemplateByAuthor(@PathVariable("uuid") UUID uuid) {
+    List<Template> templates = templateService.getTemplatesByAuthor(uuid);
+    List<TemplateResponse> response =
+        templates.stream()
+            .sorted(Comparator.comparing(Template::getCreatedDate).reversed())
+            .map(TemplateResponse::setResponse)
+            .sorted(Comparator.comparingDouble(TemplateResponse::getScore).reversed())
+            .collect(Collectors.toList());
+    return ResponseEntity.ok(new ApiResponse<>(true, "", response));
   }
 
   @PostMapping("/template")

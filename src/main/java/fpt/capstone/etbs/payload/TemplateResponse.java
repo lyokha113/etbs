@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TemplateResponse implements Comparable<TemplateResponse> {
+public class TemplateResponse  {
 
   private int id;
   private String name;
@@ -65,10 +65,6 @@ public class TemplateResponse implements Comparable<TemplateResponse> {
     return response;
   }
 
-  @Override
-  public int compareTo(@NotNull TemplateResponse templateResponse) {
-    return (int) getId();
-  }
 }
 
 @Data

@@ -71,6 +71,9 @@ public class EmailServiceImpl implements EmailService {
   @Value("${app.serverConfirmEmailUri}")
   private String serverConfirmEmailUri;
 
+  @Value("${app.serverConfirmUserUri}")
+  private String serverConfirmUserUri;
+
   @Override
   @Async("mailAsyncExecutor")
   public void sendEmail(UUID accountId, SendEmailRequest request)
@@ -89,28 +92,14 @@ public class EmailServiceImpl implements EmailService {
       for (DynamicData data : dataSet) {
         String email = data.getEmail();
         String modifiedContent = setDynamicData(content, data.getAttrs());
-
-        if (sendMailType <= 0) {
-          javaMailSender.send(createSendMessage(email, subject, modifiedContent));
-          sendMailType++;
-        } else {
-          sendBySendGrid(email, subject, modifiedContent);
-          sendMailType--;
-        }
+        this.balancingSend(email, subject, modifiedContent);
       }
     } else {
       List<String> receivers = dataSet.stream().map(DynamicData::getEmail)
           .collect(Collectors.toList());
       String[] emails = new String[receivers.size()];
       receivers.toArray(emails);
-
-      if (sendMailType <= 0) {
-        javaMailSender.send(createSendMessage(emails, subject, content));
-        sendMailType++;
-      } else {
-        sendBySendGrid(emails, subject, content);
-        sendMailType--;
-      }
+      this.balancingSend(emails, subject, content);
     }
   }
 
@@ -153,16 +142,16 @@ public class EmailServiceImpl implements EmailService {
 
 
   @Override
-  public void sendConfirmUserEmail(String email, String token) throws MessagingException {
-    String content = setTokenUserEmail(token);
-    javaMailSender.send(createSendMessage(email, AppConstant.EMAIL_CONFIRM_SUBJECT, content));
+  public void sendConfirmUserEmail(String email, String token)
+      throws MessagingException, IOException {
+    String content = setConfirmToken(serverConfirmEmailUri, token, AppConstant.EMAIL_CONFIRM_CONTENT);
+    this.balancingSend(email, AppConstant.EMAIL_CONFIRM_SUBJECT, content);
   }
 
   @Override
-  public void sendConfirmAccount(String email, String token) throws MessagingException {
-    String content = AppConstant.ACCOUNT_CONFIRM_CONTENT_1 + token
-        + AppConstant.ACCOUNT_CONFIRM_CONTENT_2;
-    javaMailSender.send(createSendMessage(email, AppConstant.ACCOUNT_CONFIRM_SUBJECT, content));
+  public void sendConfirmAccount(String email, String token) throws MessagingException, IOException {
+    String content = setConfirmToken(serverConfirmUserUri, token, AppConstant.ACCOUNT_CONFIRM_CONTENT);
+    this.balancingSend(email, AppConstant.ACCOUNT_CONFIRM_SUBJECT, content);
   }
 
   private MimeMessage createDraftMessage(Integer rawId, UUID accountId)
@@ -183,7 +172,6 @@ public class EmailServiceImpl implements EmailService {
     helper.setText(content, true);
     return message;
   }
-
 
   private void createDraft(String email, String password, MailProvider provider,
       MimeMessage draftMessage)
@@ -254,11 +242,11 @@ public class EmailServiceImpl implements EmailService {
     return doc.outerHtml();
   }
 
-  private String setTokenUserEmail(String token) {
-    Document doc = Jsoup.parse(AppConstant.EMAIL_CONFIRM_CONTENT, "UTF-8");
+  private String setConfirmToken(String uri, String token, String content) {
+    Document doc = Jsoup.parse(content, "UTF-8");
     String cssQuery = "#token";
     Element ele = doc.select(cssQuery).first();
-    ele.attr("href", serverConfirmEmailUri + "?token=" + token);
+    ele.attr("href", uri + "?token=" + token);
     return doc.outerHtml();
   }
 
@@ -302,6 +290,28 @@ public class EmailServiceImpl implements EmailService {
     re.setEndpoint("mail/send");
     re.setBody(mail.build());
     sendGrid.api(re);
+  }
+
+  private void balancingSend(String email, String subject, String content)
+      throws MessagingException, IOException {
+    if (sendMailType <= 0) {
+      javaMailSender.send(createSendMessage(email, subject, content));
+      sendMailType++;
+    } else {
+      sendBySendGrid(email, subject, content);
+      sendMailType--;
+    }
+  }
+
+  private void balancingSend(String [] email, String subject, String content)
+      throws MessagingException, IOException {
+    if (sendMailType <= 0) {
+      javaMailSender.send(createSendMessage(email, subject, content));
+      sendMailType++;
+    } else {
+      sendBySendGrid(email, subject, content);
+      sendMailType--;
+    }
   }
 
 }

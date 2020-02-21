@@ -7,6 +7,7 @@ import fpt.capstone.etbs.payload.AccountRequest;
 import fpt.capstone.etbs.payload.AccountResponse;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.service.AccountService;
+import fpt.capstone.etbs.service.EmailService;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +29,7 @@ public class AccountController {
 
   @Autowired
   JwtTokenProvider tokenProvider;
+
   @Autowired
   private AccountService accountService;
 

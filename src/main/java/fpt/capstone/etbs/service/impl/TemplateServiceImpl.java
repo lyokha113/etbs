@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -58,6 +59,14 @@ public class TemplateServiceImpl implements TemplateService {
   @Override
   public List<Template> getTemplatesForUser() {
     List<Template> templates = templateRepository.findAll();
+    return templates.stream()
+        .filter(t -> t.getCategories().stream().anyMatch(Category::isActive))
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public List<Template> getTemplatesByAuthor(UUID uuid) {
+    List<Template> templates = templateRepository.getByAuthor_Id(uuid);
     return templates.stream()
         .filter(t -> t.getCategories().stream().anyMatch(Category::isActive))
         .collect(Collectors.toList());

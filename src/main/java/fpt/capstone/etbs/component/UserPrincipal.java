@@ -18,6 +18,7 @@ public class UserPrincipal implements UserDetails {
   private String fullName;
   private String email;
   private boolean active;
+  private boolean approved;
   private String imageUrl;
   private String password;
   private Collection<? extends GrantedAuthority> authorities;
@@ -28,6 +29,7 @@ public class UserPrincipal implements UserDetails {
       String fullName,
       String email,
       Boolean active,
+      Boolean approved,
       String password,
       String imageUrl,
       List<GrantedAuthority> authorities) {
@@ -35,6 +37,7 @@ public class UserPrincipal implements UserDetails {
     this.fullName = fullName;
     this.email = email;
     this.active = active;
+    this.approved = approved;
     this.password = password;
     this.authorities = authorities;
     this.imageUrl = imageUrl;
@@ -48,6 +51,7 @@ public class UserPrincipal implements UserDetails {
         account.getFullName(),
         account.getEmail(),
         account.isActive(),
+        account.isApproved(),
         account.getPassword(),
         account.getImageUrl(),
         grantedAuthorities);
@@ -74,7 +78,7 @@ public class UserPrincipal implements UserDetails {
 
   @Override
   public boolean isAccountNonLocked() {
-    return this.active;
+    return this.active && this.approved;
   }
 
   @Override

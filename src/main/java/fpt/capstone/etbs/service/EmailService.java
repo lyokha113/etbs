@@ -19,7 +19,7 @@ public interface EmailService {
   void makeDraftGMail(String state, String code)
       throws MessagingException, IOException, GeneralSecurityException;
 
-  void sendConfirmUserEmail(String email, String token) throws MessagingException;
+  void sendConfirmUserEmail(String email, String token) throws MessagingException, IOException;
 
-  void sendConfirmAccount(String email, String token) throws MessagingException;
+  void sendConfirmAccount(String email, String token) throws MessagingException, IOException;
 }

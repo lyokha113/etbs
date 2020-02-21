@@ -84,7 +84,7 @@ public class PublishServiceImpl implements PublishService {
     }
 
     Publish publish = Publish.builder()
-        .content(StringEscapeUtils.escapeEcmaScript(content))
+        .content(content)
         .author(author)
         .status(PublishStatus.PENDING)
         .build();

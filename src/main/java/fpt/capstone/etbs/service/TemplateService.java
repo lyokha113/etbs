@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.UUID;
 
 public interface TemplateService {
 
@@ -26,6 +27,8 @@ public interface TemplateService {
   List<Template> getTemplates();
 
   List<Template> getTemplatesForUser();
+
+  List<Template> getTemplatesByAuthor(UUID uuid);
 
   Template getTemplate(Integer id);
 

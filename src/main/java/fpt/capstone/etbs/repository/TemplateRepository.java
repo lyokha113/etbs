@@ -14,6 +14,6 @@ public interface TemplateRepository extends JpaRepository<Template, Integer> {
 
   Optional<Template> getByNameAndIdNot(String name, Integer id);
 
-  List<Template> getAllByAuthor_Id(UUID id);
+  List<Template> getByAuthor_Id(UUID id);
 
 }

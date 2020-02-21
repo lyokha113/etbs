@@ -46,7 +46,7 @@ public class TutorialServiceImpl implements TutorialService {
   }
 
   @Override
-  public Tutorial createTutorial(TutorialRequest request) throws Exception {
+  public Tutorial createTutorial(TutorialRequest request) {
 
     Tutorial tutorial = Tutorial.builder()
         .name(request.getName())
