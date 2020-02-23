@@ -45,9 +45,6 @@ public class UserEmailController {
   @Autowired
   private JwtTokenProvider tokenProvider;
 
-  @Value("${app.clientConfirmUri}")
-  private String clientConfirmUri;
-
   @GetMapping("/useremail")
   private ResponseEntity<?> getUserEmails() {
     Authentication auth = authenticationFacade.getAuthentication();
@@ -92,18 +89,6 @@ public class UserEmailController {
       return ResponseEntity.ok(new ApiResponse<>(true, "Email was deleted", null));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
-    }
-  }
-
-  @GetMapping("/useremail/confirm")
-  private void confirmUserEmail(@RequestParam("token") String token, HttpServletResponse response) {
-    try {
-      Integer id = tokenProvider.getTokenValue(token, Integer.class);
-      userEmailService.confirmUserEmail(id);
-      response.setHeader("Location", clientConfirmUri);
-      response.setStatus(302);
-    } catch (BadRequestException | IOException ex) {
-      response.setHeader("Location", clientConfirmUri + "?error=" + ex.getMessage());
     }
   }
 }

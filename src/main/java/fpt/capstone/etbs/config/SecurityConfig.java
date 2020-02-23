@@ -68,9 +68,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     // All
     http.authorizeRequests()
         .antMatchers(HttpMethod.GET, "/category", "/template", "/template/*", "/template/author/*", "/tutorial",
-            "/tutorial/*", "/ws-publish/*", "/ws-publish/**", "/useremail/confirm", "/user/confirm")
+            "/tutorial/*", "/ws-publish/*", "/ws-publish/**", "/confirm/*")
         .permitAll()
-        .antMatchers(HttpMethod.POST, "/login", "/google/login", "/register")
+        .antMatchers(HttpMethod.POST, "/login", "/google/login", "/register", "/email/confirm")
         .permitAll()
         .antMatchers("/email/draft/gmail") // Redirect URI from Google
         .permitAll();

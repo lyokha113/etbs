@@ -10,6 +10,7 @@ import fpt.capstone.etbs.model.Workspace;
 import fpt.capstone.etbs.payload.AccountRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.service.AccountService;
+import fpt.capstone.etbs.service.EmailService;
 import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.util.ImageUtils;
 import java.awt.image.BufferedImage;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,9 @@ public class AccountServiceImpl implements AccountService {
 
   @Autowired
   private FirebaseService firebaseService;
+
+  @Autowired
+  private EmailService emailService;
 
   @Override
   public List<Account> getAccounts() {
@@ -175,6 +180,24 @@ public class AccountServiceImpl implements AccountService {
 
     account.setApproved(true);
     accountRepository.save(account);
+  }
+
+  @Override
+  public void confirmRecovery(UUID uuid) throws IOException, MessagingException {
+    Account account = getAccount(uuid);
+    if (account == null) {
+      throw new BadRequestException("Account doesn't existed");
+    }
+
+    if (account.getProvider().equals(AuthProvider.google)) {
+      throw new BadRequestException("Can't recover password for Google account");
+    }
+
+    String password = fpt.capstone.etbs.util.StringUtils.generateRandomString(8);
+    String encode = passwordEncoder.encode(password);
+    account.setPassword(encode);
+    accountRepository.save(account);
+    emailService.sendRecovery(account.getEmail(), password);
   }
 
   private Account setNewAccount(AccountRequest request, AuthProvider provider, String avatarURL,

@@ -5,6 +5,7 @@ import fpt.capstone.etbs.payload.AccountRequest;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import javax.mail.MessagingException;
 
 public interface AccountService {
 
@@ -25,6 +26,8 @@ public interface AccountService {
   Account updateAccountStatus(UUID uuid, Boolean active);
 
   Account setGoogleAccount(String email, String name, String avatar);
+
+  void confirmRecovery(UUID uuid) throws IOException, MessagingException;
 
   void confirmAccount(UUID uuid);
 

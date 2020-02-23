@@ -71,8 +71,11 @@ public class EmailServiceImpl implements EmailService {
   @Value("${app.serverConfirmEmailUri}")
   private String serverConfirmEmailUri;
 
-  @Value("${app.serverConfirmUserUri}")
-  private String serverConfirmUserUri;
+  @Value("${app.serverConfirmAccountUri}")
+  private String serverConfirmAccountUri;
+
+  @Value("${app.serverConfirmRecoveryUri}")
+  private String serverConfirmRecoveryUri;
 
   @Override
   @Async("mailAsyncExecutor")
@@ -140,7 +143,6 @@ public class EmailServiceImpl implements EmailService {
     createDraft(draftMessage, gmail);
   }
 
-
   @Override
   public void sendConfirmUserEmail(String email, String token)
       throws MessagingException, IOException {
@@ -150,8 +152,21 @@ public class EmailServiceImpl implements EmailService {
 
   @Override
   public void sendConfirmAccount(String email, String token) throws MessagingException, IOException {
-    String content = setConfirmToken(serverConfirmUserUri, token, AppConstant.ACCOUNT_CONFIRM_CONTENT);
+    String content = setConfirmToken(serverConfirmAccountUri, token, AppConstant.ACCOUNT_CONFIRM_CONTENT);
     this.balancingSend(email, AppConstant.ACCOUNT_CONFIRM_SUBJECT, content);
+  }
+
+  @Override
+  public void sendConfirmRecovery(String email, String token)
+      throws MessagingException, IOException {
+    String content = setConfirmToken(serverConfirmRecoveryUri, token, AppConstant.RECOVERY_CONFIRM_CONTENT);
+    this.balancingSend(email, AppConstant.RECOVERY_CONFIRM_SUBJECT, content);
+  }
+
+  @Override
+  public void sendRecovery(String email, String password) throws MessagingException, IOException {
+    String content = setNewPassword(password, AppConstant.RECOVERY_CONTENT);
+    this.balancingSend(email, AppConstant.RECOVERY_SUBJECT,  content);
   }
 
   private MimeMessage createDraftMessage(Integer rawId, UUID accountId)
@@ -247,6 +262,14 @@ public class EmailServiceImpl implements EmailService {
     String cssQuery = "#token";
     Element ele = doc.select(cssQuery).first();
     ele.attr("href", uri + "?token=" + token);
+    return doc.outerHtml();
+  }
+
+  private String setNewPassword(String password, String content) {
+    Document doc = Jsoup.parse(content, "UTF-8");
+    String cssQuery = "#password";
+    Element ele = doc.select(cssQuery).first();
+    ele.text(password);
     return doc.outerHtml();
   }
 

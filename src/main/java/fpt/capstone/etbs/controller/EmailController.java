@@ -4,11 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.component.JwtTokenProvider;
 import fpt.capstone.etbs.component.UserPrincipal;
+import fpt.capstone.etbs.constant.AuthProvider;
 import fpt.capstone.etbs.exception.BadRequestException;
+import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.UserEmail;
+import fpt.capstone.etbs.payload.AccountResponse;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.DraftEmailRequest;
 import fpt.capstone.etbs.payload.SendEmailRequest;
+import fpt.capstone.etbs.service.AccountService;
 import fpt.capstone.etbs.service.EmailService;
 import fpt.capstone.etbs.service.UserEmailService;
 import java.io.IOException;
@@ -30,8 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class EmailController {
 
   @Autowired
-  private UserEmailService userEmailService;
-
+  private AccountService accountService;
 
   @Autowired
   private EmailService emailService;
@@ -105,34 +108,23 @@ public class EmailController {
     }
   }
 
-//  @PostMapping("/email/confirm/register")
-//  public ResponseEntity<?> sendConfirmRegister(@RequestParam Integer id) throws Exception {
-//    Authentication auth = authenticationFacade.getAuthentication();
-//    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-//    try {
-//      UserEmail userEmail = userEmailService.getUserEmail(userPrincipal.getId(), id);
-//      if (userEmail != null) {
-//        String token = tokenProvider.generateToken(userEmail);
-//        emailService.sendConfirmUserEmail(userEmail.getEmail(), token);
-//        return ResponseEntity.ok(new ApiResponse<>(true, "Re-send confirm mail", null));
-//      }
-//
-//      return ResponseEntity.badRequest().body(new ApiResponse<>(false, "Wrong information", null));
-//    } catch (BadRequestException | JsonProcessingException | MessagingException ex) {
-//      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
-//    }
-//  }
-//
-//  @PostMapping("/email/confirm/forgot")
-//  public ResponseEntity<?> sendConfirmForgot(
-//      @Valid @RequestBody SendEmailRequest request) throws Exception {
-//    Authentication auth = authenticationFacade.getAuthentication();
-//    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-//    try {
-//      emailService.sendEmail(userPrincipal.getId(), request);
-//      return ResponseEntity.ok(new ApiResponse<>(true, "Email was sent", null));
-//    } catch (BadRequestException ex) {
-//      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
-//    }
-//  }
+  @PostMapping("/email/confirm")
+  public ResponseEntity<?> sendConfirmAccount(@Valid @RequestParam String email) {
+    try {
+      Account account = accountService.getAccountByEmail(email);
+      if (account != null && account.getProvider().equals(AuthProvider.local)) {
+        String token = tokenProvider.generateToken(account.getId());
+        if (!account.isApproved()) {
+          emailService.sendConfirmAccount(email, token);
+        } else {
+          emailService.sendConfirmRecovery(email, token);
+        }
+      }
+      return ResponseEntity.ok(
+          new ApiResponse<>(true, "Email was sent", null));
+    } catch (BadRequestException | MessagingException | IOException ex) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
+  }
+
 }

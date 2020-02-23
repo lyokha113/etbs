@@ -77,8 +77,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
         .name(request.getName())
         .description(request.getDescription())
         .thumbnail(AppConstant.DEFAULT_RAW_TEMPLATE_THUMBNAIL)
-        .content(
-            "<p style=\"text-align: center; font-size: 40px; font-weight: bold\">Blank content</p>")
+        .content(AppConstant.BLANK_CONTENT)
         .workspace(workspace)
         .build();
 

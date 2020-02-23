@@ -22,4 +22,8 @@ public interface EmailService {
   void sendConfirmUserEmail(String email, String token) throws MessagingException, IOException;
 
   void sendConfirmAccount(String email, String token) throws MessagingException, IOException;
+
+  void sendConfirmRecovery(String email, String token) throws MessagingException, IOException;
+
+  void sendRecovery(String email, String password) throws MessagingException, IOException;
 }

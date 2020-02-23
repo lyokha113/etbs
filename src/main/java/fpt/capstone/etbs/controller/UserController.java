@@ -53,9 +53,6 @@ public class UserController {
   @Autowired
   private EmailService emailService;
 
-  @Value("${app.clientConfirmUri}")
-  private String clientConfirmUri;
-
   @GetMapping("/user")
   public ResponseEntity<?> getUserDetail() {
     try {
@@ -127,15 +124,5 @@ public class UserController {
     }
   }
 
-  @GetMapping("/user/confirm")
-  private void confirmAccount(@RequestParam("token") String token, HttpServletResponse response) {
-    try {
-      UUID uuid = tokenProvider.getTokenValue(token, UUID.class);
-      accountService.confirmAccount(uuid);
-      response.setHeader("Location", clientConfirmUri);
-      response.setStatus(302);
-    } catch (BadRequestException | IOException ex) {
-      response.setHeader("Location", clientConfirmUri + "?error=" + ex.getMessage());
-    }
-  }
+
 }
