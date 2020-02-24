@@ -27,18 +27,20 @@ public class ImageGeneratorImpl implements ImageGenerator {
   @Value("${app.pdfcrowd.apikey}")
   private String pdfCrowdAPIKey;
 
+  @Value("${app.generateImageApi}")
+  private boolean generateImageApi;
+
   @Override
   public BufferedImage generateImageFromHtml(String html) throws Exception {
-    Pdfcrowd.HtmlToImageClient client = new Pdfcrowd.HtmlToImageClient(pdfCrowdUserName,
-        pdfCrowdAPIKey);
-    client.setOutputFormat("png");
-    byte[] image = client.convertString(html);
-    ByteArrayInputStream is = new ByteArrayInputStream(image);
-    return ImageIO.read(is);
+    if (generateImageApi) {
+      return generateImageFromHtmlByPDFCrowd(html);
+    } else {
+      return generateImageFromHtmlByChrome(html);
+    }
   }
 
   @Override
-  public BufferedImage generateImageFromHtmlWithChrome(String html) throws Exception {
+  public BufferedImage generateImageFromHtmlByChrome(String html) throws Exception {
 
     if (System.getProperty("os.name").toLowerCase().contains("win")) {
       System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
@@ -62,9 +64,8 @@ public class ImageGeneratorImpl implements ImageGenerator {
     WebDriverWait wait = new WebDriverWait(driver, 30);
     wait.until(pageLoadCondition);
 
-    int imageToLoad = Integer
-        .parseInt(((JavascriptExecutor) driver).executeScript("return document.images.length")
-            .toString());
+    int imageToLoad = Integer.parseInt(((JavascriptExecutor) driver)
+        .executeScript("return document.images.length").toString());
     int loaded = 0;
     while (loaded < imageToLoad) {
       for (int i = 0; i < imageToLoad; i++) {
@@ -72,11 +73,22 @@ public class ImageGeneratorImpl implements ImageGenerator {
             (Boolean) ((JavascriptExecutor) driver)
                 .executeScript("return document.images[" + i + "].complete;") ? 1 : 0;
       }
-      Thread.sleep(500);
+      Thread.sleep(100);
     }
 
     File screenshot = driver.getFullScreenshotAs(OutputType.FILE);
     driver.quit();
     return ImageIO.read(screenshot);
   }
+
+  @Override
+  public BufferedImage generateImageFromHtmlByPDFCrowd(String html) throws Exception {
+    Pdfcrowd.HtmlToImageClient client =
+        new Pdfcrowd.HtmlToImageClient(pdfCrowdUserName, pdfCrowdAPIKey);
+    client.setOutputFormat("png");
+    byte[] image = client.convertString(html);
+    ByteArrayInputStream is = new ByteArrayInputStream(image);
+    return ImageIO.read(is);
+  }
+
 }

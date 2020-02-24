@@ -20,6 +20,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
@@ -50,5 +52,6 @@ public class Category extends Auditing {
   private boolean active;
 
   @ManyToMany(cascade = CascadeType.ALL, mappedBy = "categories")
+  @LazyCollection(LazyCollectionOption.EXTRA)
   private Set<Template> templates;
 }

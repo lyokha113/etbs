@@ -142,7 +142,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
       throw new BadRequestException("Raw template doesn't exist");
     }
 
-    BufferedImage file = imageGenerator.generateImageFromHtmlWithChrome(content);
+    BufferedImage file = imageGenerator.generateImageFromHtml(content);
     String thumbnail = firebaseService.createRawThumbnail(file, rawTemplate.getId().toString());
 
     rawTemplate.setThumbnail(thumbnail);

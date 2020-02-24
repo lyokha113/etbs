@@ -32,11 +32,6 @@ public class WorkspaceServiceImpl implements WorkspaceService {
   }
 
   @Override
-  public Workspace getWorkspaceOfAccount(Integer workspaceId, UUID accountId) {
-    return workspaceRepository.getByIdAndAccount_Id(workspaceId, accountId).orElse(null);
-  }
-
-  @Override
   public Workspace createWorkspace(UUID accountId, WorkspaceRequest request) {
 
     Account account = accountRepository.findById(accountId).orElse(null);

@@ -149,8 +149,7 @@ public class TemplateServiceImpl implements TemplateService {
 
   @Override
   public Template updateThumbnail(Template template) throws Exception {
-    BufferedImage bufferedImage = imageGenerator
-        .generateImageFromHtmlWithChrome(template.getContent());
+    BufferedImage bufferedImage = imageGenerator.generateImageFromHtml(template.getContent());
     String url = firebaseService
         .createTemplateThumbnail(bufferedImage, String.valueOf(template.getId()));
     template.setThumbnail(url);

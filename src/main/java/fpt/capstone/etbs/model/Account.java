@@ -71,7 +71,7 @@ public class Account extends Auditing {
   @NotBlank
   private String fullName;
 
-  @ManyToOne
+  @ManyToOne(optional = false)
   @NotNull
   private Role role;
 

@@ -6,5 +6,7 @@ public interface ImageGenerator {
 
   BufferedImage generateImageFromHtml(String html) throws Exception;
 
-  BufferedImage generateImageFromHtmlWithChrome(String html) throws Exception;
+  BufferedImage generateImageFromHtmlByChrome(String html) throws Exception;
+
+  BufferedImage generateImageFromHtmlByPDFCrowd(String html) throws Exception;
 }

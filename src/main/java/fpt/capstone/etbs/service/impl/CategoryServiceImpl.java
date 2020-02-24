@@ -22,7 +22,7 @@ public class CategoryServiceImpl implements CategoryService {
 
   @Override
   public List<Category> getActiveCategories() {
-    return categoryRepository.getAllByActiveTrue();
+    return categoryRepository.getByActiveTrue();
   }
 
   @Override

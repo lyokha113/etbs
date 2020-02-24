@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
@@ -37,12 +38,12 @@ public class Rating extends Auditing {
   @EmbeddedId
   RatingIdentity id;
 
-  @ManyToOne
+  @ManyToOne(optional = false)
   @MapsId("account_id")
   @JoinColumn(name = "account_id")
   private Account account;
 
-  @ManyToOne
+  @ManyToOne(optional = false)
   @MapsId("template_id")
   @JoinColumn(name = "template_id")
   private Template template;

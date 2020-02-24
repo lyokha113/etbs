@@ -3,20 +3,16 @@ package fpt.capstone.etbs.model;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import fpt.capstone.etbs.constant.PublishStatus;
-import javax.persistence.CascadeType;
+import fpt.capstone.etbs.constant.UserEmailStatus;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,7 +25,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Data
-@Table(name = "publish")
+@Table(name = "user_block")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -40,29 +36,23 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
     value = {"createdDate", "lastModifiedDate"},
     allowGetters = true)
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id")
-public class Publish extends Auditing {
+public class UserBlock extends Auditing {
 
   @Id
   @Column
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  @Column(columnDefinition = "text")
+  @Column(nullable = false)
+  private String name;
+
+  @Column(nullable = false)
+  private String tag;
+
+  @Column(nullable = false)
   private String content;
 
-  @Column
-  private Double duplicateRate;
-
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "duplicate_template_id", referencedColumnName = "id")
-  private Template duplicateTemplate;
-
-  @ManyToOne(optional = false)
-  @NonNull
-  private Account author;
-
-  @Enumerated(EnumType.STRING)
-  @Column
-  private PublishStatus status;
+  @Column(nullable = false)
+  private String icon;
 
 }

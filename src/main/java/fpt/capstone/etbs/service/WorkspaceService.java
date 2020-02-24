@@ -9,8 +9,6 @@ public interface WorkspaceService {
 
   List<Workspace> getWorkspacesOfAccount(UUID accountId);
 
-  Workspace getWorkspaceOfAccount(Integer workspaceId, UUID accountId);
-
   Workspace createWorkspace(UUID accountId, WorkspaceRequest request);
 
   Workspace updateWorkspace(UUID accountId, Integer workspaceId, WorkspaceRequest request);
