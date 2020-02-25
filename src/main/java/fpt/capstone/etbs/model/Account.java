@@ -93,4 +93,7 @@ public class Account extends Auditing {
   @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
   private Set<UserEmail> userEmails;
 
+  @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+  private Set<UserBlock> userBlocks;
+
 }

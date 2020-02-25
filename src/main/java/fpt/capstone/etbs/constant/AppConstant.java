@@ -3,7 +3,6 @@ package fpt.capstone.etbs.constant;
 public class AppConstant {
 
   public static final String DEFAULT_WORKSPACE_NAME = "Default workspace";
-
   public static final String DEFAULT_AVATAR_URL =
       "https://firebasestorage.googleapis.com/v0/b/etbs-441a1.appspot.com/o/default%2Fdefault_avatar.png?alt=media&token=ebb2ae07-77c1-4dd3-b5b3-985f4fb9eb99";
   public static final String DEFAULT_AVATAR_ADMIN_URL =
@@ -17,12 +16,15 @@ public class AppConstant {
   public static final String TEMPLATE_IMAGE = "template/";
   public static final String RAW_TEMPLATE_THUMBNAIL = "thumbnail/rawTemplate/";
   public static final String TEMPLATE_THUMBNAIL = "thumbnail/template/";
-
   public static final String TUTORIAL_THUMBNAIL = "thumbnail/tutorial/";
+
   public static final double MAX_DUPLICATION_RATE = 0.9;
   public static final double MIN_DUPLICATION_RATE = 0.2;
   public static final int TIME_TO_SCORE = 43200;
   public static final int MAX_PENDING_PUBLISH = 3;
+
+  public static final String WEB_SOCKET_PUBLISH_TOPIC = "/topic/get-publish";
+  public static final String WEB_SOCKET_USER_EMAIL_TOPIC = "/topic/get-useremail";
 
   public static final String BLANK_CONTENT = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\"><html xmlns=\"http://www.w3.org/1999/xhtml\"> <head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"> <meta name=\"format-detection\" content=\"telephone=no\"> <meta name=\"viewport\" content=\"width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no;\"> <meta http-equiv=\"X-UA-Compatible\" content=\"IE=9; IE=8; IE=7; IE=EDGE\"/> <title>ETBS</title> </head> <body style=\"margin: 0; padding: 0; min-width: 100%!important;\"> </body></html>";
   public static final String ACCOUNT_CONFIRM_SUBJECT = "Welcome to ETBS";

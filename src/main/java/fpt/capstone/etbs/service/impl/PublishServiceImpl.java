@@ -113,7 +113,7 @@ public class PublishServiceImpl implements PublishService {
     List<Publish> publishes = getPublishes();
     List<PublishResponse> responses = publishes.stream().map(PublishResponse::setResponse)
         .collect(Collectors.toList());
-    messagingTemplate.convertAndSend("/topic/get-publish", responses);
+    messagingTemplate.convertAndSend(AppConstant.WEB_SOCKET_PUBLISH_TOPIC, responses);
 
     return publish;
   }
@@ -159,7 +159,7 @@ public class PublishServiceImpl implements PublishService {
     List<Publish> publishes = getPublishes();
     List<PublishResponse> responses = publishes.stream().map(PublishResponse::setResponse)
         .collect(Collectors.toList());
-    messagingTemplate.convertAndSend("/topic/get-publish", responses);
+    messagingTemplate.convertAndSend(AppConstant.WEB_SOCKET_PUBLISH_TOPIC, responses);
   }
 
   @Override
@@ -191,7 +191,7 @@ public class PublishServiceImpl implements PublishService {
       List<Publish> publishes = getPublishes();
       List<PublishResponse> responses = publishes.stream().map(PublishResponse::setResponse)
           .collect(Collectors.toList());
-      messagingTemplate.convertAndSend("/topic/get-publish", responses);
+      messagingTemplate.convertAndSend(AppConstant.WEB_SOCKET_PUBLISH_TOPIC, responses);
 
     } catch (Exception e) {
       publish.setStatus(PublishStatus.ERROR);

@@ -48,7 +48,7 @@ public class WorkspaceController {
     try {
       Workspace workspace = workspaceService.createWorkspace(userPrincipal.getId(), request);
       WorkspaceResponse response = WorkspaceResponse.setResponse(workspace);
-      return ResponseEntity.ok(new ApiResponse<>(true, "Workspace created", response));
+      return ResponseEntity.ok(new ApiResponse<>(true, "Workspace was created", response));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
@@ -63,7 +63,7 @@ public class WorkspaceController {
     try {
       Workspace workspace = workspaceService.updateWorkspace(userPrincipal.getId(), id, request);
       WorkspaceResponse response = WorkspaceResponse.setResponse(workspace);
-      return ResponseEntity.ok(new ApiResponse<>(true, "Workspace updated", response));
+      return ResponseEntity.ok(new ApiResponse<>(true, "Workspace was updated", response));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
@@ -76,7 +76,7 @@ public class WorkspaceController {
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       workspaceService.deleteWorkspace(userPrincipal.getId(), id);
-      return ResponseEntity.ok(new ApiResponse<>(true, "Workspace deleted", null));
+      return ResponseEntity.ok(new ApiResponse<>(true, "Workspace was deleted", null));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }

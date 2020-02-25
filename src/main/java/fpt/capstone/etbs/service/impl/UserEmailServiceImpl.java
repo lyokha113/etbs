@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.service.impl;
 
+import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.constant.UserEmailStatus;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,6 +23,9 @@ public class UserEmailServiceImpl implements UserEmailService {
 
   @Autowired
   private AccountRepository accountRepository;
+
+  @Autowired
+  private SimpMessageSendingOperations messagingTemplate;
 
   @Override
   public UserEmail createUserEmail(UUID accountId, String email) {
@@ -67,7 +72,8 @@ public class UserEmailServiceImpl implements UserEmailService {
     }
 
     userEmail.setStatus(UserEmailStatus.APPROVED);
-    userEmailRepository.save(userEmail);
+    userEmail = userEmailRepository.save(userEmail);
+    messagingTemplate.convertAndSend(AppConstant.WEB_SOCKET_USER_EMAIL_TOPIC, userEmail);
   }
 
 
