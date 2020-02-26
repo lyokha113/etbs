@@ -18,5 +18,5 @@ public interface UserBlockService {
 
   void deleteUserBlock(UUID accountId, Integer id);
 
-  void synchronizeToRawTemplates(Integer id);
+  void synchronizeContent(Integer id);
 }

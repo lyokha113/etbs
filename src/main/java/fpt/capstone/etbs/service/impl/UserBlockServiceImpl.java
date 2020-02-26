@@ -87,7 +87,7 @@ public class UserBlockServiceImpl implements UserBlockService {
   }
 
   @Override
-  public void synchronizeToRawTemplates(Integer id) {
+  public void synchronizeContent(Integer id) {
 
   }
 

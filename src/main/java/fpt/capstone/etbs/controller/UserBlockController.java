@@ -48,7 +48,7 @@ public class UserBlockController {
       Authentication auth = authenticationFacade.getAuthentication();
       UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
       List<UserBlock> blocks = userBlockService.getUserBlocks(userPrincipal.getId());
-      List<UserBlockResponse> responses = blocks.stream().map(UserBlockResponse::setResponse)
+      List<UserBlockResponse> responses = blocks.stream().map(UserBlockResponse::setResponseWithContent)
           .collect(Collectors.toList());
       return ResponseEntity.ok(new ApiResponse<>(true, "", responses));
     } catch (BadRequestException ex) {
@@ -58,6 +58,20 @@ public class UserBlockController {
 
   @PostMapping("/userblock")
   private ResponseEntity<?> createUserBlock(@Valid @RequestBody UserBlockRequest request) {
+    Authentication auth = authenticationFacade.getAuthentication();
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+    try {
+      UserBlock block = userBlockService.createUserBlock(userPrincipal.getId(), request);
+      UserBlockResponse response = UserBlockResponse.setResponse(block);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Block was created", response));
+    } catch (BadRequestException ex) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+
+    }
+  }
+
+  @PostMapping("/userblock/sync")
+  private ResponseEntity<?> synchronizeContent(@Valid @RequestBody UserBlockRequest request) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
