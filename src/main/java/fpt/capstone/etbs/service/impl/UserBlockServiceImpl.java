@@ -42,7 +42,7 @@ public class UserBlockServiceImpl implements UserBlockService {
     }
 
     userBlock = UserBlock.builder()
-        .name(request.getName()).icon(request.getIcon()).tag(request.getTag())
+        .name(request.getName()).icon(request.getIcon())
         .content("").account(account)
         .build();
 
@@ -63,7 +63,6 @@ public class UserBlockServiceImpl implements UserBlockService {
 
     userBlock.setName(request.getName());
     userBlock.setIcon(request.getIcon());
-    userBlock.setTag(request.getTag());
     return userBlockRepository.save(userBlock);
   }
 

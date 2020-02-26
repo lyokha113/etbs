@@ -15,7 +15,6 @@ public class UserBlockResponse {
 
   private Integer id;
   private String name;
-  private String tag;
   private String icon;
   private String content;
 
@@ -23,7 +22,6 @@ public class UserBlockResponse {
     return UserBlockResponse.builder()
         .id(block.getId())
         .name(block.getName())
-        .tag(block.getTag())
         .icon(block.getIcon())
         .build();
   }

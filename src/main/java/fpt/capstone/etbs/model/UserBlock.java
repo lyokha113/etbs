@@ -50,9 +50,6 @@ public class UserBlock extends Auditing {
   private String name;
 
   @Column(nullable = false)
-  private String tag;
-
-  @Column(nullable = false)
   private String content;
 
   @Column(nullable = false)

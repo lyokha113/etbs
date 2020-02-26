@@ -12,6 +12,5 @@ import lombok.NoArgsConstructor;
 public class UserBlockRequest {
 
   private String name;
-  private String tag;
   private String icon;
 }
