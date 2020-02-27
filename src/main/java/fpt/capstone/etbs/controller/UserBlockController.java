@@ -11,6 +11,7 @@ import fpt.capstone.etbs.model.UserEmail;
 import fpt.capstone.etbs.payload.AccountResponse;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.StringWrapperRequest;
+import fpt.capstone.etbs.payload.SynchronizeContentRequest;
 import fpt.capstone.etbs.payload.UserBlockRequest;
 import fpt.capstone.etbs.payload.UserBlockResponse;
 import fpt.capstone.etbs.payload.UserEmailResponse;
@@ -71,13 +72,13 @@ public class UserBlockController {
   }
 
   @PostMapping("/userblock/sync")
-  private ResponseEntity<?> synchronizeContent(@Valid @RequestBody UserBlockRequest request) {
+  private ResponseEntity<?> synchronizeContent(@Valid @RequestBody SynchronizeContentRequest request)
+      throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      UserBlock block = userBlockService.createUserBlock(userPrincipal.getId(), request);
-      UserBlockResponse response = UserBlockResponse.setResponse(block);
-      return ResponseEntity.ok(new ApiResponse<>(true, "Block was created", response));
+      userBlockService.synchronizeContent(userPrincipal.getId(), request);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Content was synchronized", null));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
 

@@ -144,9 +144,17 @@ public class RawTemplateServiceImpl implements RawTemplateService {
 
     BufferedImage file = imageGenerator.generateImageFromHtml(content);
     String thumbnail = firebaseService.createRawThumbnail(file, rawTemplate.getId().toString());
-
     rawTemplate.setThumbnail(thumbnail);
+
     rawTemplate.setContent(content);
+    return rawTemplateRepository.save(rawTemplate);
+  }
+
+  @Override
+  public RawTemplate updateThumbnail(RawTemplate rawTemplate) throws Exception {
+    BufferedImage file = imageGenerator.generateImageFromHtml(rawTemplate.getContent());
+    String thumbnail = firebaseService.createRawThumbnail(file, rawTemplate.getId().toString());
+    rawTemplate.setThumbnail(thumbnail);
     return rawTemplateRepository.save(rawTemplate);
   }
 

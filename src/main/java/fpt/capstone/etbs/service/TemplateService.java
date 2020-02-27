@@ -32,7 +32,7 @@ public interface TemplateService {
 
   Template getTemplate(Integer id);
 
-  Template createTemplate(TemplateRequest request);
+  Template createTemplate(TemplateRequest request) throws Exception;
 
   Template updateTemplate(Integer id, TemplateRequest request) throws Exception;
 

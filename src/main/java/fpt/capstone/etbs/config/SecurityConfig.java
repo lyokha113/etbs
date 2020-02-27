@@ -80,7 +80,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.GET, "/rating", "/workspace", "/raw/*", "/user", "/useremail", "/userblock", "/google/authorize")
         .hasRole(RoleEnum.USER.getName())
         .antMatchers(HttpMethod.POST, "/rating", "/template", "/workspace", "/rate", "/raw",
-            "/email/send", "/email/confirm/*", "/email/draft/*", "/publish", "/useremail", "/userblock")
+            "/email/send", "/email/confirm/*", "/email/draft/*", "/publish", "/useremail", "/userblock", "/userblock/sync")
         .hasRole(RoleEnum.USER.getName())
         .antMatchers(HttpMethod.PUT, "/rating", "/workspace/*", "/raw/*", "/user", "/userblock/*")
         .hasRole(RoleEnum.USER.getName())

@@ -16,6 +16,7 @@ import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.ImageGenerator;
 import fpt.capstone.etbs.service.TemplateService;
 import java.awt.image.BufferedImage;
+import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -100,7 +101,7 @@ public class TemplateServiceImpl implements TemplateService {
   }
 
   @Override
-  public Template createTemplate(TemplateRequest request) {
+  public Template createTemplate(TemplateRequest request) throws Exception {
 
     Account author = accountRepository.findById(request.getAuthorId()).orElse(null);
     if (author == null) {
@@ -123,7 +124,9 @@ public class TemplateServiceImpl implements TemplateService {
         .categories(categories)
         .build();
 
-    return templateRepository.save(template);
+    template = templateRepository.save(template);
+    template = updateContentImage(template);
+    return template;
   }
 
   @Override
@@ -132,15 +135,17 @@ public class TemplateServiceImpl implements TemplateService {
     Document doc = Jsoup.parse(content, "UTF-8");
     int count = 1;
     for (Element element : doc.select("img")) {
-      String imgSrc = element.absUrl("src");
-      if (imgSrc.startsWith("http://storage.googleapis.com/") && imgSrc
-          .contains(AppConstant.USER_IMAGES)) {
-        String order = template.getId() + "/" + count;
-        imgSrc = imgSrc.substring(0, imgSrc.indexOf("?"));
-        String replace = firebaseService.createTemplateImages(imgSrc, order);
-        content = content.replaceAll(imgSrc, replace);
-        count++;
+      String src = element.absUrl("src");
+      String order = template.getId() + "/" + count;
+      String replace = "";
+      if (src.startsWith("http://storage.googleapis.com/") && src.contains(AppConstant.USER_IMAGES)) {
+        src = src.substring(0, src.indexOf("?"));
+        replace = firebaseService.createTemplateImages(src, order);
+      } else {
+        replace = firebaseService.createTemplateImages(new URL(src), order);
       }
+      content = content.replaceAll(src, replace);
+      count++;
     }
     template.setContent(content);
     return templateRepository.save(template);

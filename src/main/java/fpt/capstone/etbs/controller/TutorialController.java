@@ -1,6 +1,7 @@
 package fpt.capstone.etbs.controller;
 
 import fpt.capstone.etbs.component.AuthenticationFacade;
+import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Tutorial;
 import fpt.capstone.etbs.payload.ApiResponse;
@@ -58,8 +59,10 @@ public class TutorialController {
   @PostMapping("/tutorial")
   public ResponseEntity<?> createTutorial(@Valid @ModelAttribute TutorialRequest tutorial)
       throws Exception {
+    Authentication auth = authenticationFacade.getAuthentication();
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      Tutorial response = tutorialService.createTutorial(tutorial);
+      Tutorial response = tutorialService.createTutorial(userPrincipal.getId(), tutorial);
       if (tutorial.getThumbnail() != null) {
         response = tutorialService.updateThumbnail(response, tutorial.getThumbnail());
       }
@@ -74,8 +77,10 @@ public class TutorialController {
   public ResponseEntity<?> updateTutorial(
       @PathVariable("id") Integer id, @Valid @ModelAttribute TutorialRequest tutorial)
       throws Exception {
+    Authentication auth = authenticationFacade.getAuthentication();
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      Tutorial response = tutorialService.updateTutorial(id, tutorial);
+      Tutorial response = tutorialService.updateTutorial(userPrincipal.getId(), id, tutorial);
       return ResponseEntity.ok(
           new ApiResponse<>(true, "Tutorial updated", TutorialResponse.setResponse(response)));
     } catch (BadRequestException ex) {

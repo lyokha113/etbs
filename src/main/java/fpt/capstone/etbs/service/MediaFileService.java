@@ -1,6 +1,7 @@
 package fpt.capstone.etbs.service;
 
 import fpt.capstone.etbs.model.MediaFile;
+import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +15,8 @@ public interface MediaFileService {
   List<MediaFile> getInactiveMediaFiles();
 
   List<MediaFile> createMediaFiles(UUID accountId, MultipartFile[] files) throws Exception;
+
+  List<MediaFile> createMediaFiles(UUID accountId, List<URL> files) throws Exception;
 
   void changeActiveMediaFile(UUID accountId, UUID id, boolean isActive, boolean isAdmin);
 

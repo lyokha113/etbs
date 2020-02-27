@@ -2,12 +2,20 @@ package fpt.capstone.etbs.service.impl;
 
 import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.exception.BadRequestException;
+import fpt.capstone.etbs.model.MediaFile;
 import fpt.capstone.etbs.model.Tutorial;
 import fpt.capstone.etbs.payload.TutorialRequest;
 import fpt.capstone.etbs.repository.TutorialRepository;
 import fpt.capstone.etbs.service.FirebaseService;
+import fpt.capstone.etbs.service.MediaFileService;
 import fpt.capstone.etbs.service.TutorialService;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +25,9 @@ public class TutorialServiceImpl implements TutorialService {
 
   @Autowired
   private TutorialRepository tutorialRepository;
+
+  @Autowired
+  private MediaFileService mediaFileService;
 
   @Autowired
   private FirebaseService firebaseService;
@@ -46,7 +57,7 @@ public class TutorialServiceImpl implements TutorialService {
   }
 
   @Override
-  public Tutorial createTutorial(TutorialRequest request) {
+  public Tutorial createTutorial(UUID accountId, TutorialRequest request) throws Exception {
 
     Tutorial tutorial = Tutorial.builder()
         .name(request.getName())
@@ -56,11 +67,13 @@ public class TutorialServiceImpl implements TutorialService {
         .active(true)
         .build();
 
-    return tutorialRepository.save(tutorial);
+    tutorial = tutorialRepository.save(tutorial);
+    tutorial = updateTutorialContentImage(accountId, tutorial);
+    return tutorial;
   }
 
   @Override
-  public Tutorial updateTutorial(Integer id, TutorialRequest request) throws Exception {
+  public Tutorial updateTutorial(UUID accountId, Integer id, TutorialRequest request) throws Exception {
 
     Tutorial tutorial = tutorialRepository.findById(id).orElse(null);
     if (tutorial == null) {
@@ -77,7 +90,9 @@ public class TutorialServiceImpl implements TutorialService {
       tutorial.setThumbnail(thumbnail);
     }
 
-    return tutorialRepository.save(tutorial);
+    tutorial = tutorialRepository.save(tutorial);
+    tutorial = updateTutorialContentImage(accountId, tutorial);
+    return tutorial;
   }
 
   @Override
@@ -96,5 +111,32 @@ public class TutorialServiceImpl implements TutorialService {
         .createTutorialThumbnail(thumbnail, tutorial.getId().toString());
     tutorial.setThumbnail(link);
     return tutorialRepository.save(tutorial);
+  }
+
+  private Tutorial updateTutorialContentImage(UUID accountId, Tutorial tutorial)
+      throws Exception {
+    String content = tutorial.getContent();
+    Document doc = Jsoup.parse(content, "UTF-8");
+    List<URL> externalLinks = new ArrayList<>();
+    for (Element element : doc.select("img")) {
+      String src = element.absUrl("src");
+      if (!src.startsWith("http://storage.googleapis.com/") && !src
+          .contains(AppConstant.USER_IMAGES)) {
+        externalLinks.add(new URL(src));
+      }
+    }
+
+    if (!externalLinks.isEmpty()) {
+      List<MediaFile> files = mediaFileService.createMediaFiles(accountId, externalLinks);
+      for (int i = 0; i < files.size(); i++) {
+        content = content.replace(externalLinks.get(i).toString(), files.get(i).getLink());
+      }
+
+      tutorial.setContent(content);
+      return tutorialRepository.save(tutorial);
+    }
+
+    return tutorial;
+
   }
 }

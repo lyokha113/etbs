@@ -3,6 +3,7 @@ package fpt.capstone.etbs.service;
 import fpt.capstone.etbs.model.Tutorial;
 import fpt.capstone.etbs.payload.TutorialRequest;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface TutorialService {
@@ -15,9 +16,9 @@ public interface TutorialService {
 
   Tutorial getActiveTutorial(Integer id);
 
-  Tutorial createTutorial(TutorialRequest tutorial) throws Exception;
+  Tutorial createTutorial(UUID accountId, TutorialRequest tutorial) throws Exception;
 
-  Tutorial updateTutorial(Integer id, TutorialRequest tutorial) throws Exception;
+  Tutorial updateTutorial(UUID accountId, Integer id, TutorialRequest tutorial) throws Exception;
 
   Tutorial updateStatusTutorial(Integer id, boolean status) throws Exception;
 

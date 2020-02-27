@@ -8,8 +8,11 @@ import com.google.cloud.storage.Storage;
 import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.service.FirebaseService;
+import fpt.capstone.etbs.util.ImageUtils;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
@@ -26,6 +29,12 @@ public class FirebaseServiceImpl implements FirebaseService {
 
   @Override
   public String createUserImage(MultipartFile file, String path, String name) throws Exception {
+    String fbPath = AppConstant.USER_IMAGES + path + "/" + name;
+    return createImage(fbPath, file);
+  }
+
+  @Override
+  public String createUserImage(URL file, String path, String name) throws Exception {
     String fbPath = AppConstant.USER_IMAGES + path + "/" + name;
     return createImage(fbPath, file);
   }
@@ -62,24 +71,18 @@ public class FirebaseServiceImpl implements FirebaseService {
     return createImage(fbPath, file);
   }
 
+  @Override
+  public String createTemplateImages(URL file, String name) throws Exception {
+    String fbPath = AppConstant.TEMPLATE_IMAGE + name;
+    return createImage(fbPath, file);
+  }
+
 
   @Override
   public boolean deleteImage(String fbPath) {
     Storage storage = bucket.getStorage();
     BlobId blobId = BlobId.of(bucket.getName(), fbPath);
     return storage.delete(blobId);
-  }
-
-  private String createImage(String fbPath, BufferedImage image) throws IOException {
-    ByteArrayOutputStream os = new ByteArrayOutputStream();
-    ImageIO.write(image, "png", os);
-    os.flush();
-    Storage storage = bucket.getStorage();
-    BlobId blobId = BlobId.of(bucket.getName(), fbPath);
-    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/png").build();
-    Blob blob = storage.create(blobInfo, os.toByteArray());
-    URL url = blob.signUrl(365, TimeUnit.DAYS);
-    return url.toString();
   }
 
   private String createImage(String fbPath, String image) {
@@ -104,5 +107,24 @@ public class FirebaseServiceImpl implements FirebaseService {
     Blob blob = storage.create(blobInfo, image.getBytes());
     URL url = blob.signUrl(365, TimeUnit.DAYS);
     return url.toString();
+  }
+
+  private String createImage(String fbPath, ByteArrayOutputStream os) {
+    Storage storage = bucket.getStorage();
+    BlobId blobId = BlobId.of(bucket.getName(), fbPath);
+    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/png").build();
+    Blob blob = storage.create(blobInfo, os.toByteArray());
+    URL url = blob.signUrl(365, TimeUnit.DAYS);
+    return url.toString();
+  }
+
+  private String createImage(String fbPath, BufferedImage image) throws IOException {
+    ByteArrayOutputStream os = ImageUtils.writeImageData(image);
+    return createImage(fbPath, os);
+  }
+
+  private String createImage(String fbPath, URL image) throws Exception {
+    ByteArrayOutputStream os = ImageUtils.urlToImage(image);
+    return createImage(fbPath, os);
   }
 }

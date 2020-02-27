@@ -49,7 +49,7 @@ public class UserBlock extends Auditing {
   @Column(nullable = false)
   private String name;
 
-  @Column(nullable = false)
+  @Column(columnDefinition = "longtext")
   private String content;
 
   @Column(nullable = false)

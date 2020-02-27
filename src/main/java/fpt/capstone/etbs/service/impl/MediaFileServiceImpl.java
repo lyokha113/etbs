@@ -8,6 +8,8 @@ import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.MediaFileRepository;
 import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.MediaFileService;
+import fpt.capstone.etbs.util.StringUtils;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -57,6 +59,25 @@ public class MediaFileServiceImpl implements MediaFileService {
       String link = firebaseService.createUserImage(file, accountId.toString(), id.toString());
       results.add(MediaFile.builder()
           .id(id).name(file.getOriginalFilename()).link(link).account(account).active(true)
+          .build());
+    }
+
+    return mediaFileRepository.saveAll(results);
+  }
+
+  @Override
+  public List<MediaFile> createMediaFiles(UUID accountId, List<URL> files) throws Exception {
+    Account account = accountRepository.findById(accountId).orElse(null);
+    if (account == null) {
+      throw new BadRequestException("Account doesn't exist");
+    }
+    List<MediaFile> results = new LinkedList<>();
+    for (URL file : files) {
+      UUID id = UUID.randomUUID();
+      String link = firebaseService.createUserImage(file, accountId.toString(), id.toString());
+      String name = StringUtils.generateRandomString(10);
+      results.add(MediaFile.builder()
+          .id(id).name(name).link(link).account(account).active(true)
           .build());
     }
 

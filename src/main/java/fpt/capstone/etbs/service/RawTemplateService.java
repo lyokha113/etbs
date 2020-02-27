@@ -15,5 +15,7 @@ public interface RawTemplateService {
 
   RawTemplate updateContent(UUID accountId, Integer id, String content) throws Exception;
 
+  RawTemplate updateThumbnail(RawTemplate rawTemplate) throws Exception;
+
   void deleteRawTemplate(UUID accountId, Integer id) throws Exception;
 }

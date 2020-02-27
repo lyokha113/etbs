@@ -23,6 +23,7 @@ import fpt.capstone.etbs.payload.DynamicData;
 import fpt.capstone.etbs.payload.DynamicDataAttrs;
 import fpt.capstone.etbs.payload.SendEmailRequest;
 import fpt.capstone.etbs.service.EmailService;
+import fpt.capstone.etbs.service.HtmlContentService;
 import fpt.capstone.etbs.service.RawTemplateService;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -63,6 +64,9 @@ public class EmailServiceImpl implements EmailService {
   private RawTemplateService rawTemplateService;
 
   @Autowired
+  private HtmlContentService htmlContentService;
+
+  @Autowired
   private GoogleAuthenticator googleAuthenticator;
 
   @Autowired
@@ -94,7 +98,7 @@ public class EmailServiceImpl implements EmailService {
     if (dataSet.stream().anyMatch(data -> !data.getAttrs().isEmpty())) {
       for (DynamicData data : dataSet) {
         String email = data.getEmail();
-        String modifiedContent = setDynamicData(content, data.getAttrs());
+        String modifiedContent = htmlContentService.setDynamicData(data.getAttrs(), content);
         this.balancingSend(email, subject, modifiedContent);
       }
     } else {
@@ -146,26 +150,26 @@ public class EmailServiceImpl implements EmailService {
   @Override
   public void sendConfirmUserEmail(String email, String token)
       throws MessagingException, IOException {
-    String content = setConfirmToken(serverConfirmEmailUri, token, AppConstant.EMAIL_CONFIRM_CONTENT);
+    String content = htmlContentService.setConfirmToken(serverConfirmEmailUri, token, AppConstant.EMAIL_CONFIRM_CONTENT);
     this.balancingSend(email, AppConstant.EMAIL_CONFIRM_SUBJECT, content);
   }
 
   @Override
   public void sendConfirmAccount(String email, String token) throws MessagingException, IOException {
-    String content = setConfirmToken(serverConfirmAccountUri, token, AppConstant.ACCOUNT_CONFIRM_CONTENT);
+    String content = htmlContentService.setConfirmToken(serverConfirmAccountUri, token, AppConstant.ACCOUNT_CONFIRM_CONTENT);
     this.balancingSend(email, AppConstant.ACCOUNT_CONFIRM_SUBJECT, content);
   }
 
   @Override
   public void sendConfirmRecovery(String email, String token)
       throws MessagingException, IOException {
-    String content = setConfirmToken(serverConfirmRecoveryUri, token, AppConstant.RECOVERY_CONFIRM_CONTENT);
+    String content = htmlContentService.setConfirmToken(serverConfirmRecoveryUri, token, AppConstant.RECOVERY_CONFIRM_CONTENT);
     this.balancingSend(email, AppConstant.RECOVERY_CONFIRM_SUBJECT, content);
   }
 
   @Override
   public void sendRecovery(String email, String password) throws MessagingException, IOException {
-    String content = setNewPassword(password, AppConstant.RECOVERY_CONTENT);
+    String content = htmlContentService.setRecoveryPassword(password, AppConstant.RECOVERY_CONTENT);
     this.balancingSend(email, AppConstant.RECOVERY_SUBJECT,  content);
   }
 
@@ -232,47 +236,6 @@ public class EmailServiceImpl implements EmailService {
     helper.setText(content, true);
     return message;
   }
-
-  private String setDynamicData(String content, List<DynamicDataAttrs> attrs) {
-
-    if (attrs.isEmpty()) {
-      return content;
-    }
-
-    Document doc = Jsoup.parse(content, "UTF-8");
-    attrs.forEach(attr -> {
-      String cssQuery =
-          "[datatype=" + attr.getDatatype() + "]"
-              + "[name=" + attr.getName() + "]";
-      Element ele = doc.select(cssQuery).first();
-      if (ele != null) {
-        String value = attr.getValue();
-        if (attr.getDatatype().equalsIgnoreCase("dynamic text")) {
-          ele.text(value);
-        } else if (attr.getDatatype().equalsIgnoreCase("dynamic link")) {
-          ele.attr("href", value);
-        }
-      }
-    });
-    return doc.outerHtml();
-  }
-
-  private String setConfirmToken(String uri, String token, String content) {
-    Document doc = Jsoup.parse(content, "UTF-8");
-    String cssQuery = "#token";
-    Element ele = doc.select(cssQuery).first();
-    ele.attr("href", uri + "?token=" + token);
-    return doc.outerHtml();
-  }
-
-  private String setNewPassword(String password, String content) {
-    Document doc = Jsoup.parse(content, "UTF-8");
-    String cssQuery = "#password";
-    Element ele = doc.select(cssQuery).first();
-    ele.text(password);
-    return doc.outerHtml();
-  }
-
 
   private void sendBySendGrid(String receiver, String subject, String content)
       throws IOException {
