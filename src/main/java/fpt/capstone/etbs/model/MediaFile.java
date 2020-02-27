@@ -50,10 +50,13 @@ public class MediaFile extends Auditing {
   @NotBlank
   private String link;
 
+  @Column(columnDefinition = "TINYINT(1) default 1")
+  private boolean active;
+
+  @Column(columnDefinition = "TINYINT(1) default 1")
+  private boolean open;
+
   @ManyToOne(optional = false)
   @NonNull
   private Account account;
-
-  @Column(columnDefinition = "TINYINT(1) default 1")
-  private boolean active;
 }

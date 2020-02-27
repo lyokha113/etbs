@@ -17,6 +17,7 @@ public class MediaFileResponse {
   private String name;
   private String link;
   private boolean active;
+  private boolean open;
   private UUID accountId;
 
   public static MediaFileResponse setResponse(MediaFile mediaFile) {
@@ -26,6 +27,7 @@ public class MediaFileResponse {
         .link(mediaFile.getLink())
         .accountId(mediaFile.getAccount().getId())
         .active(mediaFile.isActive())
+        .open(mediaFile.isOpen())
         .build();
   }
 }

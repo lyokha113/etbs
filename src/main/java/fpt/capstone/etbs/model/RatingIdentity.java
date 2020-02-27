@@ -24,9 +24,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @Embeddable
 @Builder
-@EqualsAndHashCode(of = {"accountId", "rawId"}, callSuper = false)
+@EqualsAndHashCode(of = {"accountId", "templateId"}, callSuper = false)
 @EntityListeners(AuditingEntityListener.class)
-@ToString(of = {"accountId", "rawId"})
+@ToString(of = {"accountId", "templateId"})
 public class RatingIdentity implements Serializable {
 
   @Column(name = "account_id")
@@ -35,6 +35,6 @@ public class RatingIdentity implements Serializable {
   @Type(type = "uuid-char")
   private UUID accountId;
 
-  @Column(name = "raw_id")
-  private Integer rawId;
+  @Column(name = "template_id")
+  private Integer templateId;
 }

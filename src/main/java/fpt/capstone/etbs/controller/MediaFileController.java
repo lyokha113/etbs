@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -66,14 +67,26 @@ public class MediaFileController {
   }
 
   @PutMapping("/file/{id}")
-  public ResponseEntity<?> changeStatusMediaFile(@PathVariable("id") UUID id,
+  public ResponseEntity<?> changeActiveMediaFile(@PathVariable("id") UUID id,
       @RequestParam("active") boolean active) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       mediaFileService
           .changeActiveMediaFile(userPrincipal.getId(), id, active, RoleUtils.hasAdminRole(auth));
-      return ResponseEntity.ok(new ApiResponse<>(true, "File status changed", null));
+      return ResponseEntity.ok(new ApiResponse<>(true, "File active changed", null));
+    } catch (BadRequestException ex) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
+  }
+
+  @PatchMapping("/file/{id}")
+  public ResponseEntity<?> changeAccessibleMediaFile(@PathVariable("id") UUID id, @RequestParam("open") boolean open) {
+    Authentication auth = authenticationFacade.getAuthentication();
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+    try {
+      mediaFileService.changeSharedMediaFile(userPrincipal.getId(), id, open);
+      return ResponseEntity.ok(new ApiResponse<>(true, "File shared changed", null));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }

@@ -72,7 +72,7 @@ public class EmailServiceImpl implements EmailService {
   @Autowired
   private int sendMailType;
 
-  @Value("${app.serverConfirmEmailUri}")
+  @Value("${app.serverConfirmUri}")
   private String serverConfirmUri;
 
   @Override

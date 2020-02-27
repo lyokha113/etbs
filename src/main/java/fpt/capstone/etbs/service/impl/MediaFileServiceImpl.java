@@ -58,7 +58,7 @@ public class MediaFileServiceImpl implements MediaFileService {
       UUID id = UUID.randomUUID();
       String link = firebaseService.createUserImage(file, accountId.toString(), id.toString());
       results.add(MediaFile.builder()
-          .id(id).name(file.getOriginalFilename()).link(link).account(account).active(true)
+          .id(id).name(file.getOriginalFilename()).link(link).account(account).active(true).open(true)
           .build());
     }
 
@@ -77,7 +77,7 @@ public class MediaFileServiceImpl implements MediaFileService {
       String link = firebaseService.createUserImage(file, accountId.toString(), id.toString());
       String name = StringUtils.generateRandomString(10);
       results.add(MediaFile.builder()
-          .id(id).name(name).link(link).account(account).active(true)
+          .id(id).name(name).link(link).account(account).active(true).open(true)
           .build());
     }
 
@@ -90,7 +90,7 @@ public class MediaFileServiceImpl implements MediaFileService {
   }
 
   @Override
-  public void changeActiveMediaFile(UUID accountId, UUID id, boolean isActive, boolean isAdmin) {
+  public void changeActiveMediaFile(UUID accountId, UUID id, boolean active, boolean isAdmin) {
     MediaFile mediaFile = isAdmin ?
         mediaFileRepository.findById(id).orElse(null) :
         mediaFileRepository.getByIdAndAccount_Id(id, accountId).orElse(null);
@@ -98,7 +98,19 @@ public class MediaFileServiceImpl implements MediaFileService {
       throw new BadRequestException("File doesn't exist");
     }
 
-    mediaFile.setActive(isActive);
+    mediaFile.setActive(active);
+    mediaFileRepository.save(mediaFile);
+  }
+
+  @Override
+  public void changeSharedMediaFile(UUID accountId, UUID id, boolean open) {
+    MediaFile mediaFile =  mediaFileRepository.getByIdAndAccount_Id(id, accountId).orElse(null);
+
+    if (mediaFile == null) {
+      throw new BadRequestException("File doesn't exist");
+    }
+
+    mediaFile.setOpen(open);
     mediaFileRepository.save(mediaFile);
   }
 }
