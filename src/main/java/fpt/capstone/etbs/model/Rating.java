@@ -36,7 +36,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class Rating extends Auditing {
 
   @EmbeddedId
-  RatingIdentity id;
+  private RatingIdentity id;
 
   @ManyToOne(optional = false)
   @MapsId("account_id")

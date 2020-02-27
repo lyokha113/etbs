@@ -48,9 +48,6 @@ public class EmailController {
   @Value("${app.clientGoogleAuthUri}")
   private String clientGoogleUri;
 
-  @Value("${app.clientConfirmUri}")
-  private String clientConfirmUri;
-
   @PostMapping("/email/draft/yahoo")
   public ResponseEntity<?> makeDraftYahoo(@Valid @RequestBody DraftEmailRequest request) {
     Authentication auth = authenticationFacade.getAuthentication();

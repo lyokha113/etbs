@@ -73,13 +73,7 @@ public class EmailServiceImpl implements EmailService {
   private int sendMailType;
 
   @Value("${app.serverConfirmEmailUri}")
-  private String serverConfirmEmailUri;
-
-  @Value("${app.serverConfirmAccountUri}")
-  private String serverConfirmAccountUri;
-
-  @Value("${app.serverConfirmRecoveryUri}")
-  private String serverConfirmRecoveryUri;
+  private String serverConfirmUri;
 
   @Override
   @Async("mailAsyncExecutor")
@@ -150,20 +144,20 @@ public class EmailServiceImpl implements EmailService {
   @Override
   public void sendConfirmUserEmail(String email, String token)
       throws MessagingException, IOException {
-    String content = htmlContentService.setConfirmToken(serverConfirmEmailUri, token, AppConstant.EMAIL_CONFIRM_CONTENT);
+    String content = htmlContentService.setConfirmToken(serverConfirmUri + "/email", token, AppConstant.EMAIL_CONFIRM_CONTENT);
     this.balancingSend(email, AppConstant.EMAIL_CONFIRM_SUBJECT, content);
   }
 
   @Override
   public void sendConfirmAccount(String email, String token) throws MessagingException, IOException {
-    String content = htmlContentService.setConfirmToken(serverConfirmAccountUri, token, AppConstant.ACCOUNT_CONFIRM_CONTENT);
+    String content = htmlContentService.setConfirmToken(serverConfirmUri + "/account", token, AppConstant.ACCOUNT_CONFIRM_CONTENT);
     this.balancingSend(email, AppConstant.ACCOUNT_CONFIRM_SUBJECT, content);
   }
 
   @Override
   public void sendConfirmRecovery(String email, String token)
       throws MessagingException, IOException {
-    String content = htmlContentService.setConfirmToken(serverConfirmRecoveryUri, token, AppConstant.RECOVERY_CONFIRM_CONTENT);
+    String content = htmlContentService.setConfirmToken(serverConfirmUri + "/recovery", token, AppConstant.RECOVERY_CONFIRM_CONTENT);
     this.balancingSend(email, AppConstant.RECOVERY_CONFIRM_SUBJECT, content);
   }
 
