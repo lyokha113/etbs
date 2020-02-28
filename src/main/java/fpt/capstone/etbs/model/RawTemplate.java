@@ -65,4 +65,8 @@ public class RawTemplate extends Auditing {
   @NonNull
   private Workspace workspace;
 
+  @OneToMany(mappedBy = "rawTemplate", cascade = CascadeType.ALL)
+  private Set<SharedTemplate> sharedTemplates;
+
+
 }

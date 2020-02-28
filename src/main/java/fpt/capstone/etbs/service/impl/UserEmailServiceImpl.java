@@ -9,6 +9,7 @@ import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.UserEmailRepository;
 import fpt.capstone.etbs.service.UserEmailService;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ public class UserEmailServiceImpl implements UserEmailService {
 
   @Override
   public UserEmail createUserEmail(UUID accountId, String email) {
+
     Account account = accountRepository.findById(accountId).orElse(null);
     if (account == null) {
       throw new BadRequestException("Account doesn't exist");
@@ -38,9 +40,20 @@ public class UserEmailServiceImpl implements UserEmailService {
       throw new BadRequestException("This is your login email. No need to add.");
     }
 
-    UserEmail userEmail = userEmailRepository
-        .getByAccount_IdAndEmail(accountId, email).orElse(null);
-    if (userEmail != null) {
+    UserEmail userEmail;
+    List<UserEmail> userEmails = userEmailRepository.getByAccount_Id(accountId);
+    if (userEmails.stream()
+        .filter(ue -> ue.getStatus().equals(UserEmailStatus.PENDING)
+            || ue.getStatus().equals(UserEmailStatus.APPROVED))
+        .count() >= AppConstant.MAX_TEST_EMAIL) {
+      throw new BadRequestException("We currently support 5 emails for each user'");
+    }
+
+    Optional<UserEmail> check = userEmails.stream()
+        .filter(ue -> ue.getEmail().equals(email)).findAny();
+
+    if (check.isPresent()) {
+      userEmail = check.get();
 
       if (userEmail.getStatus().equals(UserEmailStatus.DELETED)) {
         userEmail.setStatus(UserEmailStatus.APPROVED);

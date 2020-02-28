@@ -85,6 +85,9 @@ public class Account extends Auditing {
   private Set<Rating> ratings;
 
   @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+  private Set<SharedTemplate> sharedTemplates;
+
+  @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
   private Set<Workspace> workspaces;
 
   @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)

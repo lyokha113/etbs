@@ -38,14 +38,12 @@ public class Rating extends Auditing {
   @EmbeddedId
   private RatingIdentity id;
 
-  @ManyToOne(optional = false)
   @MapsId("account_id")
-  @JoinColumn(name = "account_id")
+  @ManyToOne(optional = false)
   private Account account;
 
-  @ManyToOne(optional = false)
   @MapsId("template_id")
-  @JoinColumn(name = "template_id")
+  @ManyToOne(optional = false)
   private Template template;
 
   @Column(nullable = false)

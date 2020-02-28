@@ -3,7 +3,6 @@ package fpt.capstone.etbs.constant;
 public class AppConstant {
 
   public static final String DEFAULT_WORKSPACE_NAME = "Default workspace";
-  public static final String DEFAULT_SHARED_NAME = "Shared workspace";
   public static final String DEFAULT_AVATAR_URL =
       "https://firebasestorage.googleapis.com/v0/b/etbs-441a1.appspot.com/o/default%2Fdefault_avatar.png?alt=media&token=ebb2ae07-77c1-4dd3-b5b3-985f4fb9eb99";
   public static final String DEFAULT_AVATAR_ADMIN_URL =
@@ -23,6 +22,7 @@ public class AppConstant {
   public static final double MIN_DUPLICATION_RATE = 0.2;
   public static final int TIME_TO_SCORE = 43200;
   public static final int MAX_PENDING_PUBLISH = 3;
+  public static final int MAX_TEST_EMAIL = 5;
 
   public static final String WEB_SOCKET_PUBLISH_TOPIC = "/topic/get-publish";
   public static final String WEB_SOCKET_USER_EMAIL_TOPIC = "/topic/get-useremail";
