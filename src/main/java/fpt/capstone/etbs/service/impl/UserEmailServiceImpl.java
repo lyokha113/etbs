@@ -46,7 +46,7 @@ public class UserEmailServiceImpl implements UserEmailService {
         .filter(ue -> ue.getStatus().equals(UserEmailStatus.PENDING)
             || ue.getStatus().equals(UserEmailStatus.APPROVED))
         .count() >= AppConstant.MAX_TEST_EMAIL) {
-      throw new BadRequestException("We currently support 5 emails for each user'");
+      throw new BadRequestException("We currently support maximum " + AppConstant.MAX_TEST_EMAIL + " emails for each user");
     }
 
     Optional<UserEmail> check = userEmails.stream()

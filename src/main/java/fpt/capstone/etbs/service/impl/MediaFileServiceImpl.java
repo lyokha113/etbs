@@ -48,6 +48,11 @@ public class MediaFileServiceImpl implements MediaFileService {
   }
 
   @Override
+  public List<MediaFile> getOwnerSessionMediaFiles(UUID ownerId) {
+    return mediaFileRepository.getByAccount_IdAndActiveTrueAndOpenTrue(ownerId);
+  }
+
+  @Override
   public List<MediaFile> createMediaFiles(UUID accountId, MultipartFile[] files) throws Exception {
     Account account = accountRepository.findById(accountId).orElse(null);
     if (account == null) {

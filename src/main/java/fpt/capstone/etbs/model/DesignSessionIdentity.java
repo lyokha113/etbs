@@ -26,13 +26,13 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EqualsAndHashCode(of = {"accountId", "rawId"}, callSuper = false)
 @EntityListeners(AuditingEntityListener.class)
 @ToString(of = {"accountId", "rawId"})
-public class SharedTemplateIdentity implements Serializable {
+public class DesignSessionIdentity implements Serializable {
 
-  @Column(name = "account_id")
+  @Column(name = "contributor_id")
   @GeneratedValue(generator = "uuid2")
   @GenericGenerator(name = "uuid2", strategy = "uuid2")
   @Type(type = "uuid-char")
-  private UUID accountId;
+  private UUID contributorId;
 
   @Column(name = "raw_id")
   private Integer rawId;

@@ -22,6 +22,7 @@ public class AppConstant {
   public static final double MIN_DUPLICATION_RATE = 0.2;
   public static final int TIME_TO_SCORE = 43200;
   public static final int MAX_PENDING_PUBLISH = 3;
+  public static final int MAX_DESIGN_SESSION = 4;
   public static final int MAX_TEST_EMAIL = 5;
 
   public static final String WEB_SOCKET_PUBLISH_TOPIC = "/topic/get-publish";

@@ -3,15 +3,13 @@ package fpt.capstone.etbs.model;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import fpt.capstone.etbs.constant.PublishStatus;
-import fpt.capstone.etbs.constant.SharedStatusEnum;
+import fpt.capstone.etbs.constant.DesignSessionStatus;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.Table;
@@ -25,7 +23,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Data
-@Table(name = "shared_template")
+@Table(name = "design_session")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,14 +34,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
     value = {"createdDate", "lastModifiedDate"},
     allowGetters = true)
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id")
-public class SharedTemplate extends Auditing{
+public class DesignSession extends Auditing{
 
   @EmbeddedId
-  private SharedTemplateIdentity id;
+  private DesignSessionIdentity id;
 
-  @MapsId("account_id")
+  @MapsId("contributor_id")
   @ManyToOne(optional = false)
-  private Account account;
+  private Account contributor;
 
   @MapsId("raw_id")
   @ManyToOne(optional = false)
@@ -51,5 +49,5 @@ public class SharedTemplate extends Auditing{
 
   @Enumerated(EnumType.STRING)
   @Column
-  private SharedStatusEnum status;
+  private DesignSessionStatus status;
 }

@@ -2,7 +2,7 @@ package fpt.capstone.etbs.service.impl;
 
 import com.pdfcrowd.Pdfcrowd;
 import fpt.capstone.etbs.component.ChromeDriverEx;
-import fpt.capstone.etbs.service.ImageGenerator;
+import fpt.capstone.etbs.service.ImageGeneratorService;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ImageGeneratorImpl implements ImageGenerator {
+public class ImageGeneratorServiceImpl implements ImageGeneratorService {
 
   @Value("${app.pdfcrowd.username}")
   private String pdfCrowdUserName;

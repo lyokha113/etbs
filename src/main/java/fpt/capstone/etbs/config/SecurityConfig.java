@@ -67,7 +67,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     // All
     http.authorizeRequests()
-        .antMatchers(HttpMethod.GET, "/category", "/template", "/template/*", "/template/author/*", "/tutorial",
+        .antMatchers(HttpMethod.GET, "/category", "/template", "/template/*", "/template/author/*",
+            "/tutorial",
             "/tutorial/*", "/ws-etbs/*", "/ws-etbs/**", "/confirm/*")
         .permitAll()
         .antMatchers(HttpMethod.POST, "/login", "/google/login", "/register", "/email/confirm")
@@ -77,16 +78,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     // User
     http.authorizeRequests()
-        .antMatchers(HttpMethod.GET, "/rating", "/workspace", "/raw/*", "/user", "/useremail", "/userblock", "/google/authorize")
+        .antMatchers(HttpMethod.GET, "/rating", "/workspace", "/raw/*", "/user", "/useremail",
+            "/userblock", "/session/raw/*", "/session/user", "/session/user/*", "/google/authorize")
         .hasRole(RoleEnum.USER.getName())
         .antMatchers(HttpMethod.POST, "/rating", "/template", "/workspace", "/rate", "/raw",
-            "/email/send", "/email/confirm/*", "/email/draft/*", "/publish", "/useremail", "/userblock", "/userblock/sync")
+            "/email/send", "/email/confirm/*", "/email/draft/*", "/publish", "/useremail",
+            "/userblock", "/userblock/sync", "/session/raw")
         .hasRole(RoleEnum.USER.getName())
-        .antMatchers(HttpMethod.PUT, "/rating", "/workspace/*", "/raw/*", "/user", "/userblock/*")
+        .antMatchers(HttpMethod.PUT, "/rating", "/workspace/*", "/raw/*", "/user", "/userblock/*",
+            "/session/raw/**", "/session/user/*")
         .hasRole(RoleEnum.USER.getName())
-        .antMatchers(HttpMethod.PATCH, "/raw/*", "/userblock/*", "/file/*")
+        .antMatchers(HttpMethod.PATCH, "/raw/*", "/userblock/*", "/file/*", "/session/raw/**")
         .hasRole(RoleEnum.USER.getName())
-        .antMatchers(HttpMethod.DELETE, "/rating", "/workspace/*", "/raw/*", "/useremail/*", "/userblock/*")
+        .antMatchers(HttpMethod.DELETE, "/rating", "/workspace/*", "/raw/*", "/useremail/*",
+            "/userblock/*")
         .hasRole(RoleEnum.USER.getName());
 
     // Administrator

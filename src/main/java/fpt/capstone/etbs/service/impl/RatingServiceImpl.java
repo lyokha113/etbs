@@ -46,9 +46,12 @@ public class RatingServiceImpl implements RatingService {
             .orElse(null);
 
     if (rating == null) {
+      RatingIdentity identity = RatingIdentity.builder()
+          .accountId(accountId).templateId(template.getId())
+          .build();
       rating = Rating.builder()
-          .id(RatingIdentity.builder().accountId(accountId).templateId(template.getId()).build())
-          .account(account).template(template).vote(request.isVote()).build();
+          .id(identity).account(account).template(template).vote(request.isVote())
+          .build();
       template.getRatings().add(rating);
     } else if (rating.isVote() != request.isVote()) {
       rating.setVote(request.isVote());

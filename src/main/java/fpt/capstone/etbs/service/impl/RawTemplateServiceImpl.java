@@ -13,14 +13,11 @@ import fpt.capstone.etbs.repository.DeletingMediaFileRepository;
 import fpt.capstone.etbs.repository.RawTemplateRepository;
 import fpt.capstone.etbs.repository.WorkspaceRepository;
 import fpt.capstone.etbs.service.FirebaseService;
-import fpt.capstone.etbs.service.ImageGenerator;
+import fpt.capstone.etbs.service.ImageGeneratorService;
 import fpt.capstone.etbs.service.RawTemplateService;
 import fpt.capstone.etbs.service.TemplateService;
 import java.awt.image.BufferedImage;
 import java.util.UUID;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -47,7 +44,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
   private FirebaseService firebaseService;
 
   @Autowired
-  private ImageGenerator imageGenerator;
+  private ImageGeneratorService imageGeneratorService;
 
   @Override
   public RawTemplate getRawTemplate(Integer id, UUID accountId) {
@@ -142,7 +139,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
       throw new BadRequestException("Raw template doesn't exist");
     }
 
-    BufferedImage file = imageGenerator.generateImageFromHtml(content);
+    BufferedImage file = imageGeneratorService.generateImageFromHtml(content);
     String thumbnail = firebaseService.createRawThumbnail(file, rawTemplate.getId().toString());
     rawTemplate.setThumbnail(thumbnail);
 
@@ -152,7 +149,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
 
   @Override
   public RawTemplate updateThumbnail(RawTemplate rawTemplate) throws Exception {
-    BufferedImage file = imageGenerator.generateImageFromHtml(rawTemplate.getContent());
+    BufferedImage file = imageGeneratorService.generateImageFromHtml(rawTemplate.getContent());
     String thumbnail = firebaseService.createRawThumbnail(file, rawTemplate.getId().toString());
     rawTemplate.setThumbnail(thumbnail);
     return rawTemplateRepository.save(rawTemplate);

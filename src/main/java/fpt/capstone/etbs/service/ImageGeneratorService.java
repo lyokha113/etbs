@@ -2,7 +2,7 @@ package fpt.capstone.etbs.service;
 
 import java.awt.image.BufferedImage;
 
-public interface ImageGenerator {
+public interface ImageGeneratorService {
 
   BufferedImage generateImageFromHtml(String html) throws Exception;
 

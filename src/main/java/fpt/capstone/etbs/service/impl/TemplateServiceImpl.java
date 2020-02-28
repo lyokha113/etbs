@@ -5,7 +5,6 @@ import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Category;
 import fpt.capstone.etbs.model.DeletingMediaFile;
-import fpt.capstone.etbs.model.Rating;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.TemplateRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
@@ -13,12 +12,10 @@ import fpt.capstone.etbs.repository.CategoryRepository;
 import fpt.capstone.etbs.repository.DeletingMediaFileRepository;
 import fpt.capstone.etbs.repository.TemplateRepository;
 import fpt.capstone.etbs.service.FirebaseService;
-import fpt.capstone.etbs.service.ImageGenerator;
+import fpt.capstone.etbs.service.ImageGeneratorService;
 import fpt.capstone.etbs.service.TemplateService;
 import java.awt.image.BufferedImage;
 import java.net.URL;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -50,7 +47,7 @@ public class TemplateServiceImpl implements TemplateService {
   private FirebaseService firebaseService;
 
   @Autowired
-  private ImageGenerator imageGenerator;
+  private ImageGeneratorService imageGeneratorService;
 
   @Override
   public List<Template> getTemplates() {
@@ -154,7 +151,7 @@ public class TemplateServiceImpl implements TemplateService {
 
   @Override
   public Template updateThumbnail(Template template) throws Exception {
-    BufferedImage bufferedImage = imageGenerator.generateImageFromHtml(template.getContent());
+    BufferedImage bufferedImage = imageGeneratorService.generateImageFromHtml(template.getContent());
     String url = firebaseService
         .createTemplateThumbnail(bufferedImage, String.valueOf(template.getId()));
     template.setThumbnail(url);
