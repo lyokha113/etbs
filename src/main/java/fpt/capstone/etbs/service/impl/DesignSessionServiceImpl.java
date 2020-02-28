@@ -55,7 +55,8 @@ public class DesignSessionServiceImpl implements DesignSessionService {
 
   @Override
   public DesignSession getSessionForUser(UUID contributorId, Integer rawId) {
-    return designSessionRepository.getById_ContributorIdAndId_RawId(contributorId, rawId)
+    return designSessionRepository
+        .getById_ContributorIdAndId_RawIdAndStatus(contributorId, rawId, DesignSessionStatus.JOINED)
         .orElse(null);
   }
 
@@ -94,11 +95,11 @@ public class DesignSessionServiceImpl implements DesignSessionService {
   public void updateContent(UUID contributorId, Integer rawId, String content)
       throws Exception {
     DesignSession session = designSessionRepository
-        .getById_ContributorIdAndId_RawId(contributorId, rawId)
+        .getById_ContributorIdAndId_RawIdAndStatus(contributorId, rawId, DesignSessionStatus.JOINED)
         .orElse(null);
 
     if (session == null) {
-      throw new BadRequestException("Session doesn't exist");
+      throw new BadRequestException("Session doesn't exist or was closed");
     }
 
     RawTemplate rawTemplate = session.getRawTemplate();
@@ -115,15 +116,15 @@ public class DesignSessionServiceImpl implements DesignSessionService {
       throws Exception {
 
     DesignSession session = designSessionRepository
-        .getById_ContributorIdAndId_RawId(contributorId, rawId)
+        .getById_ContributorIdAndId_RawIdAndStatus(contributorId, rawId, DesignSessionStatus.JOINED)
         .orElse(null);
 
     if (session == null) {
-      throw new BadRequestException("Session doesn't exist");
+      throw new BadRequestException("Session doesn't exist or was closed");
     }
 
     Account owner = session.getRawTemplate().getWorkspace().getAccount();
-    mediaFileService.createMediaFiles(owner.getId(),files);
+    mediaFileService.createMediaFiles(owner.getId(), files);
   }
 
   @Override
@@ -132,8 +133,8 @@ public class DesignSessionServiceImpl implements DesignSessionService {
         .getById_ContributorIdAndId_RawId(contributorId, rawId)
         .orElse(null);
 
-    if (session == null) {
-      throw new BadRequestException("Session doesn't exist");
+    if (session == null || session.getStatus().equals(DesignSessionStatus.CLOSED)) {
+      throw new BadRequestException("Session doesn't exist or was closed");
     }
 
     session.setStatus(status ? DesignSessionStatus.JOINED : DesignSessionStatus.REJECTED);

@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -67,35 +66,7 @@ public class DesignSessionController {
     }
   }
 
-  @PutMapping("/session/raw/{rawId}/content")
-  public ResponseEntity<?> updateContent(
-      @PathVariable("rawId") Integer rawId,
-      @Valid @RequestBody StringWrapperRequest request) throws Exception {
-    Authentication auth = authenticationFacade.getAuthentication();
-    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-    try {
-      designSessionService.updateContent(userPrincipal.getId(), rawId, request.getString());
-      return ResponseEntity.ok(new ApiResponse<>(true, "Template was updated", null));
-    } catch (BadRequestException ex) {
-      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
-    }
-  }
-
-  @PutMapping("/session/raw/{rawId}/file")
-  public ResponseEntity<?> uploadFileToOwner(
-      @PathVariable("rawId") Integer rawId,
-      @RequestPart MultipartFile[] files) throws Exception {
-    Authentication auth = authenticationFacade.getAuthentication();
-    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-    try {
-      designSessionService.uploadFileToOwner(userPrincipal.getId(), rawId, files);
-      return ResponseEntity.ok(new ApiResponse<>(true, "Files was uploaded", null));
-    } catch (BadRequestException ex) {
-      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
-    }
-  }
-
-  @PatchMapping("/session/raw/{rawId}")
+  @PutMapping("/session/raw/{rawId}")
   public ResponseEntity<?> cancelJoin(@PathVariable("rawId") Integer rawId) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
@@ -108,7 +79,7 @@ public class DesignSessionController {
 
   }
 
-  @PatchMapping("/session/raw/{rawId}/{contributorId}")
+  @PutMapping("/session/raw/{rawId}/{contributorId}")
   public ResponseEntity<?> cancelJoin(
       @PathVariable("rawId") Integer rawId,
       @PathVariable("contributorId") UUID contributorId) {
@@ -161,7 +132,34 @@ public class DesignSessionController {
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
+  }
 
+  @PutMapping("/session/user/{rawId}/content")
+  public ResponseEntity<?> updateContent(
+      @PathVariable("rawId") Integer rawId,
+      @Valid @RequestBody StringWrapperRequest request) throws Exception {
+    Authentication auth = authenticationFacade.getAuthentication();
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+    try {
+      designSessionService.updateContent(userPrincipal.getId(), rawId, request.getString());
+      return ResponseEntity.ok(new ApiResponse<>(true, "Template was updated", null));
+    } catch (BadRequestException ex) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
+  }
+
+  @PutMapping("/session/user/{rawId}/file")
+  public ResponseEntity<?> uploadFileToOwner(
+      @PathVariable("rawId") Integer rawId,
+      @RequestPart MultipartFile[] files) throws Exception {
+    Authentication auth = authenticationFacade.getAuthentication();
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+    try {
+      designSessionService.uploadFileToOwner(userPrincipal.getId(), rawId, files);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Files was uploaded", null));
+    } catch (BadRequestException ex) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
   }
 
 }
