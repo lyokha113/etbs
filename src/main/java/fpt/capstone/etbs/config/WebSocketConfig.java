@@ -14,11 +14,38 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   public void configureMessageBroker(MessageBrokerRegistry config) {
     config.enableSimpleBroker("/topic");
     config.setApplicationDestinationPrefixes("/app");
+    config.setUserDestinationPrefix("/user");
   }
 
   @Override
   public void registerStompEndpoints(StompEndpointRegistry registry) {
-    registry.addEndpoint("/ws-etbs").setAllowedOrigins("*");
-    registry.addEndpoint("/ws-etbs").setAllowedOrigins("*").withSockJS();
+    registry.addEndpoint("/ws").setAllowedOrigins("*");
+    registry.addEndpoint("/ws").setAllowedOrigins("*").withSockJS();
   }
+
+//  @Override
+//  public void configureClientInboundChannel(ChannelRegistration registration) {
+//    registration.interceptors(new ChannelInterceptor() {
+//
+//      @Override
+//      public Message<?> preSend(@NotNull Message<?> message, MessageChannel channel) {
+//
+//        StompHeaderAccessor accessor =
+//            MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+//
+//        if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+//          String token = accessor.getFirstNativeHeader("Token");
+//          if (!StringUtils.isEmpty(token)) {
+//            List<GrantedAuthority> authorities = new ArrayList<>();
+//            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+//            Authentication auth = new UsernamePasswordAuthenticationToken(user, user, authorities);
+//            SecurityContextHolder.getContext().setAuthentication(auth);
+//            accessor.setUser(auth);
+//          }
+//        }
+//
+//        return message;
+//      }
+//    });
+//  }
 }

@@ -48,6 +48,11 @@ public class UserBlockServiceImpl implements UserBlockService {
   }
 
   @Override
+  public UserBlock getUserBlock(UUID accountId, Integer id) {
+    return userBlockRepository.getByAccount_IdAndId(accountId, id).orElse(null);
+  }
+
+  @Override
   public UserBlock createUserBlock(UUID accountId, UserBlockRequest request) {
 
     Account account = accountRepository.findById(accountId).orElse(null);

@@ -19,16 +19,17 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.transaction.Transactional;
-import org.apache.commons.text.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.JaroWinklerSimilarity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PublishServiceImpl implements PublishService {
@@ -59,23 +60,15 @@ public class PublishServiceImpl implements PublishService {
   }
 
   @Override
-  public boolean checkPublishPolicy(UUID authorId) {
-    LocalDateTime now = LocalDateTime.now();
-    LocalDateTime startDay = now.toLocalDate().atTime(LocalTime.MIN);
-    LocalDateTime endDay = now.toLocalDate().atTime(LocalTime.MAX);
-    List<PublishStatus> statuses = Arrays
-        .asList(PublishStatus.PENDING, PublishStatus.PROCESSING, PublishStatus.DENIED);
-    long count = publishRepository.countByAuthor_IdAndStatusInAndCreatedDateBetween(
-        authorId, statuses, startDay, endDay);
-    return count < AppConstant.MAX_PENDING_PUBLISH;
-  }
-
-  @Override
   public Publish createPublish(UUID authorId, String content) {
 
     Account author = accountRepository.findById(authorId).orElse(null);
     if (author == null) {
       throw new BadRequestException("Account doesn't exited");
+    }
+
+    if (StringUtils.isBlank(content)) {
+      throw new BadRequestException("Content mustn't blank");
     }
 
     if (!checkPublishPolicy(authorId)) {
@@ -109,17 +102,58 @@ public class PublishServiceImpl implements PublishService {
 
     publish.setStatus(status);
     publish = publishRepository.save(publish);
-
-    List<Publish> publishes = getPublishes();
-    List<PublishResponse> responses = publishes.stream().map(PublishResponse::setResponse)
-        .collect(Collectors.toList());
-    messagingTemplate.convertAndSend(AppConstant.WEB_SOCKET_PUBLISH_TOPIC, responses);
-
+    sendMessageWS();
     return publish;
   }
 
   @Override
-  public void checkDuplicate(Publish publish) {
+  @Async("checkDuplicateAsyncExecutor")
+  public void checkDuplicateAsync(Publish publish) {
+    checkDuplicate(publish);
+    sendMessageWS();
+  }
+
+  @Override
+  @Async("approvePublishAsyncExecutor")
+  @Transactional
+  public void approve(ApprovePublishRequest approveRequest, Publish publish) {
+    try {
+
+      TemplateRequest request = new TemplateRequest(approveRequest, publish.getContent(),
+          publish.getAuthor().getId());
+      Template template = templateService.createTemplate(request);
+      template = templateService.updateContentImage(template);
+      templateService.updateThumbnail(template);
+      publish.setStatus(PublishStatus.PUBLISHED);
+      publishRepository.save(publish);
+
+      checkDuplicate();
+      sendMessageWS();
+    } catch (Exception e) {
+      publish.setStatus(PublishStatus.ERROR);
+      publishRepository.save(publish);
+    }
+  }
+
+  private boolean checkPublishPolicy(UUID authorId) {
+    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime startDay = now.toLocalDate().atTime(LocalTime.MIN);
+    LocalDateTime endDay = now.toLocalDate().atTime(LocalTime.MAX);
+    List<PublishStatus> statuses = Arrays
+        .asList(PublishStatus.PENDING, PublishStatus.PROCESSING, PublishStatus.DENIED);
+    long count = publishRepository.countByAuthor_IdAndStatusInAndCreatedDateBetween(
+        authorId, statuses, startDay, endDay);
+    return count < AppConstant.MAX_PENDING_PUBLISH;
+  }
+
+  private void checkDuplicate() {
+    List<Publish> publishes = publishRepository.getByStatusEquals(PublishStatus.PENDING);
+    for (Publish publish : publishes) {
+      checkDuplicate(publish);
+    }
+  }
+
+  private void checkDuplicate(Publish publish) {
     List<Template> templates = templateRepository.findAll();
     double maxRate = AppConstant.MIN_DUPLICATION_RATE;
     Template duplicate = null;
@@ -152,50 +186,11 @@ public class PublishServiceImpl implements PublishService {
     publishRepository.save(publish);
   }
 
-  @Override
-  @Async("checkDuplicateAsyncExecutor")
-  public void checkDuplicateAsync(Publish publish) {
-    checkDuplicate(publish);
+  private void sendMessageWS() {
     List<Publish> publishes = getPublishes();
     List<PublishResponse> responses = publishes.stream().map(PublishResponse::setResponse)
+        .sorted(Comparator.comparing(PublishResponse::getRequestDate).reversed())
         .collect(Collectors.toList());
     messagingTemplate.convertAndSend(AppConstant.WEB_SOCKET_PUBLISH_TOPIC, responses);
-  }
-
-  @Override
-  public void checkDuplicate() {
-    List<Publish> publishes = publishRepository.findAll();
-    publishes = publishes.stream().filter(
-        p -> p.getStatus().equals(PublishStatus.PENDING)).
-        collect(Collectors.toList());
-    for (Publish publish : publishes) {
-      checkDuplicate(publish);
-    }
-  }
-
-  @Override
-  @Async("approvePublishAsyncExecutor")
-  @Transactional
-  public void approve(ApprovePublishRequest approveRequest, Publish publish) {
-    try {
-
-      TemplateRequest request = new TemplateRequest(approveRequest, publish.getContent(),
-          publish.getAuthor().getId());
-      Template template = templateService.createTemplate(request);
-      template = templateService.updateContentImage(template);
-      templateService.updateThumbnail(template);
-      publish.setStatus(PublishStatus.PUBLISHED);
-      publishRepository.save(publish);
-
-      checkDuplicate();
-      List<Publish> publishes = getPublishes();
-      List<PublishResponse> responses = publishes.stream().map(PublishResponse::setResponse)
-          .collect(Collectors.toList());
-      messagingTemplate.convertAndSend(AppConstant.WEB_SOCKET_PUBLISH_TOPIC, responses);
-
-    } catch (Exception e) {
-      publish.setStatus(PublishStatus.ERROR);
-      publishRepository.save(publish);
-    }
   }
 }

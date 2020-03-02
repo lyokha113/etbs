@@ -5,11 +5,13 @@ import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Category;
 import fpt.capstone.etbs.model.DeletingMediaFile;
+import fpt.capstone.etbs.model.Publish;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.TemplateRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.CategoryRepository;
 import fpt.capstone.etbs.repository.DeletingMediaFileRepository;
+import fpt.capstone.etbs.repository.PublishRepository;
 import fpt.capstone.etbs.repository.TemplateRepository;
 import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.ImageGeneratorService;
@@ -27,6 +29,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TemplateServiceImpl implements TemplateService {
@@ -39,6 +42,9 @@ public class TemplateServiceImpl implements TemplateService {
 
   @Autowired
   private CategoryRepository categoryRepository;
+
+  @Autowired
+  private PublishRepository publishRepository;
 
   @Autowired
   private DeletingMediaFileRepository deletingMediaFileRepository;
@@ -135,7 +141,8 @@ public class TemplateServiceImpl implements TemplateService {
       String src = element.absUrl("src");
       String order = template.getId() + "/" + count;
       String replace = "";
-      if (src.startsWith("http://storage.googleapis.com/") && src.contains(AppConstant.USER_IMAGES)) {
+      if (src.startsWith("http://storage.googleapis.com/") && src
+          .contains(AppConstant.USER_IMAGES)) {
         src = src.substring(0, src.indexOf("?"));
         replace = firebaseService.createTemplateImages(src, order);
       } else {
@@ -149,15 +156,7 @@ public class TemplateServiceImpl implements TemplateService {
   }
 
 
-  @Override
-  public Template updateThumbnail(Template template) throws Exception {
-    BufferedImage bufferedImage = imageGeneratorService.generateImageFromHtml(template.getContent());
-    String url = firebaseService
-        .createTemplateThumbnail(bufferedImage, String.valueOf(template.getId()));
-    template.setThumbnail(url);
-    return templateRepository.save(template);
-  }
-
+  @Transactional
   @Override
   public void deleteTemplate(Integer id) throws Exception {
     Template template = templateRepository.findById(id).orElse(null);
@@ -178,11 +177,26 @@ public class TemplateServiceImpl implements TemplateService {
       }
     }
     files.add(DeletingMediaFile.builder().link(AppConstant.TEMPLATE_IMAGE + id).build());
+    firebaseService.deleteImage(AppConstant.TEMPLATE_THUMBNAIL + id);
+    deletingMediaFileRepository.saveAll(files);
+
+    List<Publish> publishes = publishRepository
+        .getByDuplicateTemplate_Id(template.getId());
+    publishes.forEach(p -> p.setDuplicateTemplate(null));
+    publishRepository.saveAll(publishes);
 
     template.setCategories(null);
-    firebaseService.deleteImage(AppConstant.TEMPLATE_THUMBNAIL + id);
     templateRepository.delete(template);
-    deletingMediaFileRepository.saveAll(files);
+  }
+
+  @Override
+  public Template updateThumbnail(Template template) throws Exception {
+    BufferedImage bufferedImage = imageGeneratorService
+        .generateImageFromHtml(template.getContent());
+    String url = firebaseService
+        .createTemplateThumbnail(bufferedImage, String.valueOf(template.getId()));
+    template.setThumbnail(url);
+    return templateRepository.save(template);
   }
 
   private boolean isDuplicateName(String name) {

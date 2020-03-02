@@ -3,23 +3,16 @@ package fpt.capstone.etbs.controller;
 
 import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.component.UserPrincipal;
-import fpt.capstone.etbs.constant.UserEmailStatus;
 import fpt.capstone.etbs.exception.BadRequestException;
-import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.UserBlock;
-import fpt.capstone.etbs.model.UserEmail;
-import fpt.capstone.etbs.payload.AccountResponse;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.StringWrapperRequest;
 import fpt.capstone.etbs.payload.SynchronizeContentRequest;
 import fpt.capstone.etbs.payload.UserBlockRequest;
 import fpt.capstone.etbs.payload.UserBlockResponse;
-import fpt.capstone.etbs.payload.UserEmailResponse;
 import fpt.capstone.etbs.service.UserBlockService;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.mail.MessagingException;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -44,17 +37,25 @@ public class UserBlockController {
   private AuthenticationFacade authenticationFacade;
 
   @GetMapping("/userblock")
-  public ResponseEntity<?> getUserBlock() {
-    try {
-      Authentication auth = authenticationFacade.getAuthentication();
-      UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-      List<UserBlock> blocks = userBlockService.getUserBlocks(userPrincipal.getId());
-      List<UserBlockResponse> responses = blocks.stream().map(UserBlockResponse::setResponseWithContent)
-          .collect(Collectors.toList());
-      return ResponseEntity.ok(new ApiResponse<>(true, "", responses));
-    } catch (BadRequestException ex) {
-      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
-    }
+  public ResponseEntity<?> getUserBlocks() {
+    Authentication auth = authenticationFacade.getAuthentication();
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+    List<UserBlock> blocks = userBlockService.getUserBlocks(userPrincipal.getId());
+    List<UserBlockResponse> responses = blocks.stream().map(UserBlockResponse::setResponse)
+        .collect(Collectors.toList());
+    return ResponseEntity.ok(new ApiResponse<>(true, "", responses));
+
+  }
+
+  @GetMapping("/userblock/{id}")
+  public ResponseEntity<?> getUserBlock(@PathVariable("id") Integer id) {
+    Authentication auth = authenticationFacade.getAuthentication();
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+    UserBlock block = userBlockService.getUserBlock(userPrincipal.getId(), id);
+    return block != null ?
+        ResponseEntity.ok(new ApiResponse<>(true, "",
+            UserBlockResponse.setResponseWithContent(block))) :
+        ResponseEntity.badRequest().body(new ApiResponse<>(false, "Not found", null));
   }
 
   @PostMapping("/userblock")
@@ -72,7 +73,8 @@ public class UserBlockController {
   }
 
   @PostMapping("/userblock/sync")
-  private ResponseEntity<?> synchronizeContent(@Valid @RequestBody SynchronizeContentRequest request)
+  private ResponseEntity<?> synchronizeContent(
+      @Valid @RequestBody SynchronizeContentRequest request)
       throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
@@ -108,7 +110,8 @@ public class UserBlockController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      UserBlock block = userBlockService.updateUserBlockContent(userPrincipal.getId(), id, request.getString());
+      UserBlock block = userBlockService
+          .updateUserBlockContent(userPrincipal.getId(), id, request.getString());
       UserBlockResponse response = UserBlockResponse.setResponse(block);
       return ResponseEntity.ok(new ApiResponse<>(true, "Block content was updated", response));
     } catch (BadRequestException ex) {

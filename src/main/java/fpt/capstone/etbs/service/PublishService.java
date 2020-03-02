@@ -12,17 +12,11 @@ public interface PublishService {
 
   List<Publish> getPublishes(UUID authorId);
 
-  boolean checkPublishPolicy(UUID authorId);
-
   Publish createPublish(UUID authorId, String content);
 
   Publish updatePublishStatus(Integer id, PublishStatus status, String name);
 
-  void checkDuplicate(Publish publish);
-
   void checkDuplicateAsync(Publish publish);
-
-  void checkDuplicate();
 
   void approve(ApprovePublishRequest approveRequest, Publish publish) throws Exception;
 }

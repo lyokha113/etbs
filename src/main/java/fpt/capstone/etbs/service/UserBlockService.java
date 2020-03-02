@@ -11,6 +11,8 @@ public interface UserBlockService {
 
   List<UserBlock> getUserBlocks(UUID accountId);
 
+  UserBlock getUserBlock(UUID accountId, Integer id);
+
   UserBlock createUserBlock(UUID accountId, UserBlockRequest request);
 
   UserBlock updateUserBlock(UUID accountId, Integer id, UserBlockRequest request);

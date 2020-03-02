@@ -69,7 +69,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     http.authorizeRequests()
         .antMatchers(HttpMethod.GET, "/category", "/template", "/template/*", "/template/author/*",
             "/tutorial",
-            "/tutorial/*", "/ws-etbs/*", "/ws-etbs/**", "/confirm/*")
+            "/tutorial/*", "/ws/*", "/ws/**", "/confirm/*")
         .permitAll()
         .antMatchers(HttpMethod.POST, "/login", "/google/login", "/register", "/email/confirm")
         .permitAll()
@@ -79,7 +79,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     // User
     http.authorizeRequests()
         .antMatchers(HttpMethod.GET, "/rating", "/workspace", "/raw/*", "/user", "/useremail",
-            "/userblock", "/session/raw/*", "/session/user", "/session/user/*", "/google/authorize")
+            "/userblock", "/userblock/*", "/session/raw/*", "/session/user", "/session/user/*", "/google/authorize")
         .hasRole(RoleEnum.USER.getName())
         .antMatchers(HttpMethod.POST, "/rating", "/template", "/workspace", "/rate", "/raw",
             "/email/send", "/email/confirm/*", "/email/draft/*", "/publish", "/useremail",

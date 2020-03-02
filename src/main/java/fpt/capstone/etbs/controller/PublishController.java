@@ -11,6 +11,7 @@ import fpt.capstone.etbs.payload.PublishResponse;
 import fpt.capstone.etbs.payload.StringWrapperRequest;
 import fpt.capstone.etbs.service.PublishService;
 import fpt.capstone.etbs.util.RoleUtils;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -38,18 +39,16 @@ public class PublishController {
 
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-    List<Publish> publishes =
-        RoleUtils.hasAdminRole(auth)
-            ? publishService.getPublishes()
-            : publishService.getPublishes(userPrincipal.getId());
-    List<PublishResponse> response =
-        publishes.stream().map(PublishResponse::setResponse).collect(Collectors.toList());
+    List<Publish> publishes = RoleUtils.hasAdminRole(auth) ? publishService.getPublishes()
+        : publishService.getPublishes(userPrincipal.getId());
+    List<PublishResponse> response = publishes.stream().map(PublishResponse::setResponse)
+        .sorted(Comparator.comparing(PublishResponse::getRequestDate).reversed())
+        .collect(Collectors.toList());
     return ResponseEntity.ok(new ApiResponse<>(true, "", response));
   }
 
   @PostMapping("/publish")
-  public ResponseEntity<?> createPublish(
-      @Valid @RequestBody StringWrapperRequest wrapper) {
+  public ResponseEntity<?> createPublish(@Valid @RequestBody StringWrapperRequest wrapper) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
@@ -63,8 +62,7 @@ public class PublishController {
   }
 
   @PutMapping("/publish/approve/{id}")
-  public ResponseEntity<?> approvePublish(
-      @PathVariable("id") Integer id,
+  public ResponseEntity<?> approvePublish(@PathVariable("id") Integer id,
       @RequestBody ApprovePublishRequest request) throws Exception {
     try {
       Publish publish = publishService
