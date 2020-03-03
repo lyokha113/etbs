@@ -25,9 +25,9 @@ public class AppConstant {
   public static final int MAX_DESIGN_SESSION = 4;
   public static final int MAX_TEST_EMAIL = 5;
 
-  public static final String WEB_SOCKET_PUBLISH_TOPIC = "/topic/get-publish";
-  public static final String WEB_SOCKET_USER_EMAIL_TOPIC = "/topic/get-useremail";
-  public static final String WEB_SOCKET_RAW = "/topic/get-raw";
+  public static final String WEB_SOCKET_PUBLISH_TOPIC = "/topic/publish";
+  public static final String WEB_SOCKET_USER_EMAIL_TOPIC = "/topic/useremail";
+  public static final String WEB_SOCKET_RAW = "/topic/raw";
 
   public static final String BLANK_CONTENT = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\"><html xmlns=\"http://www.w3.org/1999/xhtml\"> <head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"> <meta name=\"format-detection\" content=\"telephone=no\"> <meta name=\"viewport\" content=\"width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no;\"> <meta http-equiv=\"X-UA-Compatible\" content=\"IE=9; IE=8; IE=7; IE=EDGE\"/> <title>ETBS</title> </head> <body style=\"margin: 0; padding: 0; min-width: 100%!important;\"> </body></html>";
   public static final String ACCOUNT_CONFIRM_SUBJECT = "Welcome to ETBS";

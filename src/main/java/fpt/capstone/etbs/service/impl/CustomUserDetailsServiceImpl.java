@@ -4,6 +4,7 @@ import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.service.CustomUserDetailsService;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,11 +27,8 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService, U
   }
 
   @Override
-  public UserDetails loadUserFromAccount(Account account) {
-    if (account == null) {
-      throw new UsernameNotFoundException("User not found");
-    }
-    account = accountRepository.findById(account.getId())
+  public UserDetails loadUserFromID(UUID id) {
+    Account account = accountRepository.findById(id)
         .orElseThrow(() -> new UsernameNotFoundException("User not found\""));
     return UserPrincipal.create(account);
   }

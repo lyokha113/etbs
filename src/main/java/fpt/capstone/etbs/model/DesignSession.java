@@ -3,7 +3,6 @@ package fpt.capstone.etbs.model;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import fpt.capstone.etbs.constant.DesignSessionStatus;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -47,7 +46,4 @@ public class DesignSession extends Auditing{
   @ManyToOne(optional = false)
   private RawTemplate rawTemplate;
 
-  @Enumerated(EnumType.STRING)
-  @Column
-  private DesignSessionStatus status;
 }

@@ -83,7 +83,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
     if (request.getTemplateId() != null) {
       Template template = templateService.getTemplate(request.getTemplateId());
       if (template != null) {
-        updateContent(accountId, rawTemplate.getId(), template.getContent());
+        updateContent(accountId, rawTemplate.getId(), template.getContent(), false);
       }
     }
 
@@ -129,7 +129,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
   }
 
   @Override
-  public RawTemplate updateContent(UUID accountId, Integer id, String content) throws Exception {
+  public RawTemplate updateContent(UUID accountId, Integer id, String content, boolean autoSave) throws Exception {
 
     RawTemplate rawTemplate = rawTemplateRepository
         .getByIdAndWorkspace_Account_Id(id, accountId)
@@ -139,9 +139,11 @@ public class RawTemplateServiceImpl implements RawTemplateService {
       throw new BadRequestException("Raw template doesn't exist");
     }
 
-    BufferedImage file = imageGeneratorService.generateImageFromHtml(content);
-    String thumbnail = firebaseService.createRawThumbnail(file, rawTemplate.getId().toString());
-    rawTemplate.setThumbnail(thumbnail);
+    if (!autoSave) {
+      BufferedImage file = imageGeneratorService.generateImageFromHtml(content);
+      String thumbnail = firebaseService.createRawThumbnail(file, rawTemplate.getId().toString());
+      rawTemplate.setThumbnail(thumbnail);
+    }
 
     rawTemplate.setContent(content);
     return rawTemplateRepository.save(rawTemplate);

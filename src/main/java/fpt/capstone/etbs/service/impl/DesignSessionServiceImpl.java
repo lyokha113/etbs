@@ -1,7 +1,6 @@
 package fpt.capstone.etbs.service.impl;
 
 import fpt.capstone.etbs.constant.AppConstant;
-import fpt.capstone.etbs.constant.DesignSessionStatus;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.DesignSession;
@@ -56,7 +55,7 @@ public class DesignSessionServiceImpl implements DesignSessionService {
   @Override
   public DesignSession getSessionForUser(UUID contributorId, Integer rawId) {
     return designSessionRepository
-        .getById_ContributorIdAndId_RawIdAndStatus(contributorId, rawId, DesignSessionStatus.JOINED)
+        .getById_ContributorIdAndId_RawId(contributorId, rawId)
         .orElse(null);
   }
 
@@ -68,45 +67,53 @@ public class DesignSessionServiceImpl implements DesignSessionService {
       throw new BadRequestException("Owner doesn't exist");
     }
 
-    List<DesignSession> currentSessions = designSessionRepository
-        .getByRawTemplate_Workspace_Account_IdAndId_RawId(ownerId, request.getRawId());
-
-    if (currentSessions.size() >= AppConstant.MAX_DESIGN_SESSION) {
-      throw new BadRequestException("We currently support maximum " + AppConstant.MAX_DESIGN_SESSION
-          + " user to edit at the same time");
-    }
-
     Account contributor = accountRepository.getByEmail(request.getContributorEmail()).orElse(null);
     if (contributor == null) {
       throw new BadRequestException("Contributor doesn't exist");
     }
 
+    if (!contributor.isAllowInvite()) {
+      throw new BadRequestException("Contributor isn't allowed to invite");
+    }
+
+    RawTemplate raw = rawTemplateRepository.findById(request.getRawId()).orElse(null);
+    if (raw == null) {
+      throw new BadRequestException("Raw template doesn't exist");
+    }
+
+    List<DesignSession> sessions = designSessionRepository
+        .getByRawTemplate_Workspace_Account_IdAndId_RawId(ownerId, request.getRawId());
+    if (sessions.size() >= AppConstant.MAX_DESIGN_SESSION) {
+      throw new BadRequestException("We currently support maximum " + AppConstant.MAX_DESIGN_SESSION
+          + " contributor at the same time");
+    }
+
+    DesignSession session = designSessionRepository
+        .getByContributor_EmailAndId_RawId(request.getContributorEmail(), request.getRawId())
+        .orElse(null);
+
+    if (session != null) {
+      throw new BadRequestException("This user has been invited.");
+    }
+
     DesignSessionIdentity identity = DesignSessionIdentity.builder()
         .contributorId(contributor.getId()).rawId(request.getRawId())
         .build();
-    DesignSession session = DesignSession.builder()
-        .id(identity).status(DesignSessionStatus.PENDING)
-        .build();
-
+    session = DesignSession.builder().id(identity).build();
     return designSessionRepository.save(session);
   }
 
   @Override
-  public void updateContent(UUID contributorId, Integer rawId, String content)
-      throws Exception {
+  public void updateContent(UUID contributorId, Integer rawId, String content) {
     DesignSession session = designSessionRepository
-        .getById_ContributorIdAndId_RawIdAndStatus(contributorId, rawId, DesignSessionStatus.JOINED)
+        .getById_ContributorIdAndId_RawId(contributorId, rawId)
         .orElse(null);
 
     if (session == null) {
-      throw new BadRequestException("Session doesn't exist or was closed");
+      throw new BadRequestException("Session doesn't exist");
     }
 
     RawTemplate rawTemplate = session.getRawTemplate();
-    BufferedImage file = imageGeneratorService.generateImageFromHtml(content);
-    String thumbnail = firebaseService.createRawThumbnail(file, rawTemplate.getId().toString());
-    rawTemplate.setThumbnail(thumbnail);
-
     rawTemplate.setContent(content);
     rawTemplateRepository.save(rawTemplate);
   }
@@ -116,11 +123,11 @@ public class DesignSessionServiceImpl implements DesignSessionService {
       throws Exception {
 
     DesignSession session = designSessionRepository
-        .getById_ContributorIdAndId_RawIdAndStatus(contributorId, rawId, DesignSessionStatus.JOINED)
+        .getById_ContributorIdAndId_RawId(contributorId, rawId)
         .orElse(null);
 
     if (session == null) {
-      throw new BadRequestException("Session doesn't exist or was closed");
+      throw new BadRequestException("Session doesn't exist");
     }
 
     Account owner = session.getRawTemplate().getWorkspace().getAccount();
@@ -128,21 +135,14 @@ public class DesignSessionServiceImpl implements DesignSessionService {
   }
 
   @Override
-  public DesignSession changeStatus(UUID contributorId, Integer rawId, Boolean status) {
-    DesignSession session = designSessionRepository
-        .getById_ContributorIdAndId_RawId(contributorId, rawId)
-        .orElse(null);
-
-    if (session == null || session.getStatus().equals(DesignSessionStatus.CLOSED)) {
-      throw new BadRequestException("Session doesn't exist or was closed");
-    }
-
-    session.setStatus(status ? DesignSessionStatus.JOINED : DesignSessionStatus.REJECTED);
-    return designSessionRepository.save(session);
+  public void deleteSession(UUID ownerId, Integer rawId) {
+    List<DesignSession> sessions = designSessionRepository
+        .getByRawTemplate_Workspace_Account_IdAndId_RawId(ownerId, rawId);
+    designSessionRepository.deleteAll(sessions);
   }
 
   @Override
-  public void closeJoin(UUID ownerId, UUID contributorId, Integer rawId) {
+  public void deleteSession(UUID ownerId, UUID contributorId, Integer rawId) {
     DesignSession session = designSessionRepository
         .getById_ContributorIdAndId_RawId(contributorId, rawId)
         .orElse(null);
@@ -155,17 +155,7 @@ public class DesignSessionServiceImpl implements DesignSessionService {
       throw new BadRequestException("Permission denied");
     }
 
-    session.setStatus(DesignSessionStatus.CLOSED);
-    designSessionRepository.save(session);
-  }
-
-  @Override
-  public void closeJoin(UUID ownerId, Integer rawId) {
-    List<DesignSession> sessions = designSessionRepository
-        .getByRawTemplate_Workspace_Account_IdAndId_RawId(ownerId, rawId);
-
-    sessions.forEach(s -> s.setStatus(DesignSessionStatus.CLOSED));
-    designSessionRepository.saveAll(sessions);
+    designSessionRepository.delete(session);
   }
 
 }

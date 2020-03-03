@@ -46,9 +46,9 @@ public class DesignSessionController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     List<DesignSession> sessions = designSessionService.getSessionsOfRaw(userPrincipal.getId(), id);
-    List<DesignSessionResponse> response =
-        sessions.stream().map(DesignSessionResponse::setResponseContributor)
-            .collect(Collectors.toList());
+    List<DesignSessionResponse> response = sessions.stream()
+        .map(DesignSessionResponse::setResponseContributor)
+        .collect(Collectors.toList());
     return ResponseEntity.ok(new ApiResponse<>(true, "", response));
   }
 
@@ -71,7 +71,7 @@ public class DesignSessionController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      designSessionService.closeJoin(userPrincipal.getId(), rawId);
+      designSessionService.deleteSession(userPrincipal.getId(), rawId);
       return ResponseEntity.ok(new ApiResponse<>(true, "Session was closed", null));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
@@ -86,12 +86,13 @@ public class DesignSessionController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      designSessionService.closeJoin(userPrincipal.getId(), contributorId, rawId);
+      designSessionService.deleteSession(userPrincipal.getId(), contributorId, rawId);
       return ResponseEntity.ok(new ApiResponse<>(true, "Session was closed", null));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
   }
+
 
   @GetMapping("/session/user")
   public ResponseEntity<?> getSessionsForUser() {
@@ -117,21 +118,6 @@ public class DesignSessionController {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, "Session not found", null));
     }
 
-  }
-
-  @PutMapping("/session/user/{rawId}")
-  public ResponseEntity<?> changeStatus(@PathVariable("rawId") Integer rawId,
-      @RequestParam("status") boolean status) {
-    Authentication auth = authenticationFacade.getAuthentication();
-    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-    try {
-      DesignSession session = designSessionService
-          .changeStatus(userPrincipal.getId(), rawId, status);
-      return ResponseEntity.ok(new ApiResponse<>(true, "Status was changed",
-          DesignSessionResponse.setResponse(session)));
-    } catch (BadRequestException ex) {
-      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
-    }
   }
 
   @PutMapping("/session/user/{rawId}/content")

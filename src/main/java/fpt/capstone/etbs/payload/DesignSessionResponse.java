@@ -1,7 +1,6 @@
 package fpt.capstone.etbs.payload;
 
 
-import fpt.capstone.etbs.constant.DesignSessionStatus;
 import fpt.capstone.etbs.model.DesignSession;
 import fpt.capstone.etbs.model.MediaFile;
 import java.util.List;
@@ -28,7 +27,6 @@ public class DesignSessionResponse {
   private String rawThumbnail;
   private String rawDescription;
   private String rawDate;
-  private DesignSessionStatus status;
 
   public static DesignSessionResponse setResponse(DesignSession session) {
     return DesignSessionResponse.builder()
@@ -38,7 +36,6 @@ public class DesignSessionResponse {
         .rawThumbnail(session.getRawTemplate().getThumbnail())
         .rawDescription(session.getRawTemplate().getDescription())
         .rawDate(session.getRawTemplate().getLastModifiedDate().toString())
-        .status(session.getStatus())
         .build();
   }
 
@@ -46,7 +43,6 @@ public class DesignSessionResponse {
     return DesignSessionResponse.builder()
         .contributorId(session.getContributor().getId())
         .contributorEmail(session.getContributor().getEmail())
-        .status(session.getStatus())
         .build();
   }
 

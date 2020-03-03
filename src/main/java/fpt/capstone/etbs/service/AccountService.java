@@ -23,6 +23,8 @@ public interface AccountService {
 
   Account updateProfile(UUID uuid, AccountRequest request) throws IOException;
 
+  Account updateInvite(UUID uuid, Boolean allow) throws IOException;
+
   Account updateAccountStatus(UUID uuid, Boolean active);
 
   Account setGoogleAccount(String email, String name, String avatar);

@@ -80,6 +80,19 @@ public class UserController {
     }
   }
 
+  @PutMapping("/user/invite")
+  public ResponseEntity<?> updateUserInvite(@Valid @RequestParam("allow") boolean allow) {
+    try {
+      Authentication auth = authenticationFacade.getAuthentication();
+      UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+      Account account = accountService.updateInvite(userPrincipal.getId(), allow);
+      AccountResponse response = AccountResponse.setResponse(account);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Account updated", response));
+    } catch (BadRequestException | IOException ex) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
+  }
+
   @PostMapping("/login")
   public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest)
       throws Exception {

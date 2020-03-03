@@ -1,6 +1,5 @@
 package fpt.capstone.etbs.repository;
 
-import fpt.capstone.etbs.constant.DesignSessionStatus;
 import fpt.capstone.etbs.model.DesignSession;
 import fpt.capstone.etbs.model.DesignSessionIdentity;
 import java.util.List;
@@ -19,6 +18,6 @@ public interface DesignSessionRepository extends
 
   Optional<DesignSession> getById_ContributorIdAndId_RawId(UUID contributorId, Integer rawId);
 
-  Optional<DesignSession> getById_ContributorIdAndId_RawIdAndStatus(UUID contributorId,
-      Integer rawId, DesignSessionStatus status);
+  Optional<DesignSession> getByContributor_EmailAndId_RawId(String contributorEmail, Integer rawId);
+
 }

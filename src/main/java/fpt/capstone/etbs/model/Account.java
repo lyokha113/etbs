@@ -67,6 +67,9 @@ public class Account extends Auditing {
   @Column(columnDefinition = "TINYINT(1) default 1")
   private boolean approved;
 
+  @Column(columnDefinition = "TINYINT(1) default 0")
+  private boolean allowInvite;
+
   @Column(nullable = false)
   @NotBlank
   private String fullName;

@@ -28,6 +28,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation group: 'org.springframework.security', name: 'spring-security-messaging', version: '5.2.2.RELEASE'
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.0.0-alpha-3'
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-remote-driver', version: '4.0.0-alpha-3'
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: '4.0.0-alpha-3'

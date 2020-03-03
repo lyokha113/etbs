@@ -7,6 +7,7 @@ import fpt.capstone.etbs.service.impl.CustomUserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
@@ -23,6 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
+@Order(1)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
@@ -68,8 +70,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     // All
     http.authorizeRequests()
         .antMatchers(HttpMethod.GET, "/category", "/template", "/template/*", "/template/author/*",
-            "/tutorial",
-            "/tutorial/*", "/ws/*", "/ws/**", "/confirm/*")
+            "/tutorial", "/tutorial/*", "/confirm/*")
         .permitAll()
         .antMatchers(HttpMethod.POST, "/login", "/google/login", "/register", "/email/confirm")
         .permitAll()
@@ -85,7 +86,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/email/send", "/email/confirm/*", "/email/draft/*", "/publish", "/useremail",
             "/userblock", "/userblock/sync", "/session/raw")
         .hasRole(RoleEnum.USER.getName())
-        .antMatchers(HttpMethod.PUT, "/rating", "/workspace/*", "/raw/*", "/user", "/userblock/*",
+        .antMatchers(HttpMethod.PUT, "/rating", "/workspace/*", "/raw/*", "/user", "/user/invite", "/userblock/*",
             "/session/raw/**", "/session/user/**")
         .hasRole(RoleEnum.USER.getName())
         .antMatchers(HttpMethod.PATCH, "/raw/*", "/userblock/*", "/file/*")
@@ -109,7 +110,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .hasRole(RoleEnum.ADMINISTRATOR.getName());
 
     // Logged
-    http.authorizeRequests().antMatchers(HttpMethod.GET, "/user", "/file", "/publish")
+    http.authorizeRequests().antMatchers(HttpMethod.GET, "/user", "/file", "/publish", "/ws/*", "/ws/**")
         .authenticated()
         .antMatchers(HttpMethod.POST, "/file")
         .authenticated()

@@ -23,8 +23,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+
   @Autowired
   private JwtTokenProvider tokenProvider;
+
   @Autowired
   private CustomUserDetailsService customUserDetailsService;
 
@@ -37,15 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
       if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
         AccountResponse json = tokenProvider.getTokenValue(jwt, AccountResponse.class);
-        Role role = Role.builder().id(json.getRoleId()).name(json.getRoleName()).build();
-        Account account =
-            Account.builder()
-                .id(json.getId())
-                .fullName(json.getFullName())
-                .email(json.getEmail())
-                .role(role)
-                .build();
-        UserDetails userDetails = customUserDetailsService.loadUserFromAccount(account);
+        UserDetails userDetails = customUserDetailsService.loadUserFromID(json.getId());
         UsernamePasswordAuthenticationToken authentication =
             new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());

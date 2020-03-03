@@ -105,7 +105,7 @@ public class AccountServiceImpl implements AccountService {
   public Account updateProfile(UUID uuid, AccountRequest request) throws IOException {
 
     Account account = getAccount(uuid);
-    if (account == null) {
+    if (account == null || account.getRole().getId().equals(RoleEnum.ADMINISTRATOR.getId())) {
       throw new BadRequestException("Account doesn't existed");
     }
 
@@ -124,6 +124,15 @@ public class AccountServiceImpl implements AccountService {
     if (!StringUtils.isEmpty(request.getPassword())) {
       account.setPassword(passwordEncoder.encode(request.getPassword()));
     }
+    return accountRepository.save(account);
+  }
+
+  @Override public Account updateInvite(UUID uuid, Boolean allow) {
+    Account account = getAccount(uuid);
+    if (account == null || account.getRole().getId().equals(RoleEnum.ADMINISTRATOR.getId())) {
+      throw new BadRequestException("Account doesn't existed");
+    }
+    account.setAllowInvite(allow);
     return accountRepository.save(account);
   }
 
@@ -206,6 +215,7 @@ public class AccountServiceImpl implements AccountService {
     account.setEmail(request.getEmail());
     account.setFullName(request.getFullName());
     account.setActive(true);
+    account.setAllowInvite(false);
 
     if (!StringUtils.isEmpty(request.getPassword())) {
       account.setPassword(passwordEncoder.encode(request.getPassword()));
