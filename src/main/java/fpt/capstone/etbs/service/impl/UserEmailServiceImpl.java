@@ -7,6 +7,7 @@ import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.UserEmail;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.UserEmailRepository;
+import fpt.capstone.etbs.service.CustomUserDetailsService;
 import fpt.capstone.etbs.service.UserEmailService;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +15,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,6 +26,9 @@ public class UserEmailServiceImpl implements UserEmailService {
 
   @Autowired
   private AccountRepository accountRepository;
+
+  @Autowired
+  private CustomUserDetailsService customUserDetailsService;
 
   @Autowired
   private SimpMessageSendingOperations messagingTemplate;
@@ -46,7 +51,8 @@ public class UserEmailServiceImpl implements UserEmailService {
         .filter(ue -> ue.getStatus().equals(UserEmailStatus.PENDING)
             || ue.getStatus().equals(UserEmailStatus.APPROVED))
         .count() >= AppConstant.MAX_TEST_EMAIL) {
-      throw new BadRequestException("We currently support maximum " + AppConstant.MAX_TEST_EMAIL + " emails for each user");
+      throw new BadRequestException(
+          "We currently support maximum " + AppConstant.MAX_TEST_EMAIL + " emails for each user");
     }
 
     Optional<UserEmail> check = userEmails.stream()
@@ -86,7 +92,9 @@ public class UserEmailServiceImpl implements UserEmailService {
 
     userEmail.setStatus(UserEmailStatus.APPROVED);
     userEmail = userEmailRepository.save(userEmail);
-    messagingTemplate.convertAndSend(AppConstant.WEB_SOCKET_USER_EMAIL_TOPIC, userEmail);
+
+    UserDetails principal = customUserDetailsService.loadUserFromID((userEmail.getAccount().getId()));
+    messagingTemplate.convertAndSendToUser(userEmail.getAccount().getId().toString(), AppConstant.WEB_SOCKET_USER_EMAIL_QUEUE, userEmail);
   }
 
 

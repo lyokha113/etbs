@@ -23,9 +23,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @Embeddable
 @Builder
-@EqualsAndHashCode(of = {"accountId", "rawId"}, callSuper = false)
+@EqualsAndHashCode(of = {"contributorId", "rawId"}, callSuper = false)
 @EntityListeners(AuditingEntityListener.class)
-@ToString(of = {"accountId", "rawId"})
+@ToString(of = {"contributorId", "rawId"})
 public class DesignSessionIdentity implements Serializable {
 
   @Column(name = "contributor_id")

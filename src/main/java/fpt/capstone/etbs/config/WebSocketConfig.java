@@ -60,11 +60,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
           String token = accessor.getFirstNativeHeader("AccessToken");
           if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
-            AccountResponse json = tokenProvider.getTokenValue(token, AccountResponse.class);
-            UserDetails userDetails = customUserDetailsService.loadUserFromID(json.getId());
+            AccountResponse account = tokenProvider.getTokenValue(token, AccountResponse.class);
+            UserDetails userDetails = customUserDetailsService.loadUserFromID(account.getId());
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities());
-//              authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                account.getId(), account.getId(), userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
             accessor.setUser(authentication);
           }

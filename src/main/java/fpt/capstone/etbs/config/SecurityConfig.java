@@ -70,7 +70,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     // All
     http.authorizeRequests()
         .antMatchers(HttpMethod.GET, "/category", "/template", "/template/*", "/template/author/*",
-            "/tutorial", "/tutorial/*", "/confirm/*")
+            "/tutorial", "/tutorial/*", "/confirm/*", "/ws/*", "/ws/**")
         .permitAll()
         .antMatchers(HttpMethod.POST, "/login", "/google/login", "/register", "/email/confirm")
         .permitAll()
@@ -110,7 +110,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .hasRole(RoleEnum.ADMINISTRATOR.getName());
 
     // Logged
-    http.authorizeRequests().antMatchers(HttpMethod.GET, "/user", "/file", "/publish", "/ws/*", "/ws/**")
+    http.authorizeRequests().antMatchers(HttpMethod.GET, "/user", "/file", "/publish")
         .authenticated()
         .antMatchers(HttpMethod.POST, "/file")
         .authenticated()
