@@ -12,6 +12,8 @@ import org.springframework.stereotype.Repository;
 public interface DesignSessionRepository extends
     JpaRepository<DesignSession, DesignSessionIdentity> {
 
+  List<DesignSession> getByRawTemplate_Workspace_Account_Id(UUID ownerId);
+
   List<DesignSession> getByRawTemplate_Workspace_Account_IdAndId_RawId(UUID ownerId, Integer rawId);
 
   List<DesignSession> getById_ContributorId(UUID contributorId);

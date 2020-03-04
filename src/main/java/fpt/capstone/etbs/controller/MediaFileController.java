@@ -57,7 +57,7 @@ public class MediaFileController {
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       List<MediaFile> result = mediaFileService
-          .createMediaFiles(userPrincipal.getId(), files);
+          .createMediaFiles(userPrincipal.getId(), files, false);
       List<MediaFileResponse> response = result.stream().map(MediaFileResponse::setResponse)
           .collect(Collectors.toList());
       return ResponseEntity.ok(new ApiResponse<>(true, "Files created", response));
@@ -108,7 +108,7 @@ public class MediaFileController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      List<MediaFile> result = mediaFileService.createMediaFiles(userPrincipal.getId(), files);
+      List<MediaFile> result = mediaFileService.createMediaFiles(userPrincipal.getId(), files, false);
       Map<String, String> response = new HashMap<>();
       response.put("link", result.get(0).getLink());
       return ResponseEntity.ok(response);

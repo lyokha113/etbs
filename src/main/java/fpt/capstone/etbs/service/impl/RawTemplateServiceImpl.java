@@ -4,6 +4,7 @@ import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.DeletingMediaFile;
+import fpt.capstone.etbs.model.DesignSession;
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.model.Workspace;
@@ -12,13 +13,16 @@ import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.DeletingMediaFileRepository;
 import fpt.capstone.etbs.repository.RawTemplateRepository;
 import fpt.capstone.etbs.repository.WorkspaceRepository;
+import fpt.capstone.etbs.service.DesignSessionService;
 import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.ImageGeneratorService;
 import fpt.capstone.etbs.service.RawTemplateService;
 import fpt.capstone.etbs.service.TemplateService;
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -38,6 +42,9 @@ public class RawTemplateServiceImpl implements RawTemplateService {
   private DeletingMediaFileRepository deletingMediaFileRepository;
 
   @Autowired
+  private DesignSessionService designSessionService;
+
+  @Autowired
   private TemplateService templateService;
 
   @Autowired
@@ -45,6 +52,9 @@ public class RawTemplateServiceImpl implements RawTemplateService {
 
   @Autowired
   private ImageGeneratorService imageGeneratorService;
+
+  @Autowired
+  private SimpMessageSendingOperations messagingTemplate;
 
   @Override
   public RawTemplate getRawTemplate(Integer id, UUID accountId) {
@@ -129,7 +139,8 @@ public class RawTemplateServiceImpl implements RawTemplateService {
   }
 
   @Override
-  public RawTemplate updateContent(UUID accountId, Integer id, String content, boolean autoSave) throws Exception {
+  public RawTemplate updateContent(UUID accountId, Integer id, String content, boolean autoSave)
+      throws Exception {
 
     RawTemplate rawTemplate = rawTemplateRepository
         .getByIdAndWorkspace_Account_Id(id, accountId)
@@ -146,7 +157,13 @@ public class RawTemplateServiceImpl implements RawTemplateService {
     }
 
     rawTemplate.setContent(content);
-    return rawTemplateRepository.save(rawTemplate);
+    rawTemplate = rawTemplateRepository.save(rawTemplate);
+
+    List<DesignSession> sessions = designSessionService.getSessionsOfRaw(accountId, id);
+    sessions.forEach(s -> messagingTemplate.convertAndSendToUser(
+        s.getId().toString(), AppConstant.WEB_SOCKET_RAW_QUEUE, s.getRawTemplate().getContent()));
+
+    return rawTemplate;
   }
 
   @Override

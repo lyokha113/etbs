@@ -1,11 +1,14 @@
 package fpt.capstone.etbs.service.impl;
 
+import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
+import fpt.capstone.etbs.model.DesignSession;
 import fpt.capstone.etbs.model.MediaFile;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.MediaFileRepository;
+import fpt.capstone.etbs.service.DesignSessionService;
 import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.MediaFileService;
 import fpt.capstone.etbs.util.StringUtils;
@@ -15,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,6 +33,12 @@ public class MediaFileServiceImpl implements MediaFileService {
 
   @Autowired
   private FirebaseService firebaseService;
+
+  @Autowired
+  private DesignSessionService designSessionService;
+
+  @Autowired
+  private SimpMessageSendingOperations messagingTemplate;
 
   @Override
   public List<MediaFile> getMediaFilesOfAccount(UUID accountId) {
@@ -53,7 +63,7 @@ public class MediaFileServiceImpl implements MediaFileService {
   }
 
   @Override
-  public List<MediaFile> createMediaFiles(UUID accountId, MultipartFile[] files) throws Exception {
+  public List<MediaFile> createMediaFiles(UUID accountId, MultipartFile[] files, boolean notify) throws Exception {
     Account account = accountRepository.findById(accountId).orElse(null);
     if (account == null) {
       throw new BadRequestException("Account doesn't exist");
@@ -67,7 +77,16 @@ public class MediaFileServiceImpl implements MediaFileService {
           .build());
     }
 
-    return mediaFileRepository.saveAll(results);
+    results = mediaFileRepository.saveAll(results);
+
+    if (notify) {
+      List<DesignSession> sessions = designSessionService.getSessions(accountId);
+      for (DesignSession session : sessions) {
+        messagingTemplate.convertAndSendToUser(session.getId().toString(),
+            AppConstant.WEB_SOCKET_FILE_QUEUE, results);
+      }
+    }
+    return  results;
   }
 
   @Override

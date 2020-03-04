@@ -3,6 +3,7 @@ package fpt.capstone.etbs.service.impl;
 import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
+import fpt.capstone.etbs.model.DesignSession;
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.model.UserBlock;
 import fpt.capstone.etbs.payload.SynchronizeContentRequest;
@@ -10,6 +11,7 @@ import fpt.capstone.etbs.payload.UserBlockRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.RawTemplateRepository;
 import fpt.capstone.etbs.repository.UserBlockRepository;
+import fpt.capstone.etbs.service.DesignSessionService;
 import fpt.capstone.etbs.service.HtmlContentService;
 import fpt.capstone.etbs.service.RawTemplateService;
 import fpt.capstone.etbs.service.UserBlockService;
@@ -31,6 +33,9 @@ public class UserBlockServiceImpl implements UserBlockService {
 
   @Autowired
   private RawTemplateRepository rawTemplateRepository;
+
+  @Autowired
+  private DesignSessionService designSessionService;
 
   @Autowired
   private RawTemplateService rawTemplateService;
@@ -135,7 +140,13 @@ public class UserBlockServiceImpl implements UserBlockService {
 
     synchronizedRaws = rawTemplateRepository.saveAll(synchronizedRaws);
     for (RawTemplate rt : synchronizedRaws) {
-      messagingTemplate.convertAndSend(AppConstant.WEB_SOCKET_RAW + "/" + rt.getId(), rt.getContent());
+      UUID ownerId = rt.getWorkspace().getAccount().getId();
+      List<DesignSession> sessions = designSessionService.getSessionsOfRaw(ownerId, rt.getId());
+      sessions.forEach(s -> messagingTemplate
+          .convertAndSendToUser(s.getId().toString(), AppConstant.WEB_SOCKET_RAW_QUEUE, rt.getContent()));
+    }
+
+    for (RawTemplate rt : synchronizedRaws) {
       rawTemplateService.updateThumbnail(rt);
     }
   }

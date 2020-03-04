@@ -16,7 +16,7 @@ public interface MediaFileService {
 
   List<MediaFile> getOwnerSessionMediaFiles(UUID ownerId);
 
-  List<MediaFile> createMediaFiles(UUID accountId, MultipartFile[] files) throws Exception;
+  List<MediaFile> createMediaFiles(UUID accountId, MultipartFile[] files, boolean notify) throws Exception;
 
   List<MediaFile> createMediaFiles(UUID accountId, List<URL> files) throws Exception;
 

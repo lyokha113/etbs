@@ -43,6 +43,11 @@ public class DesignSessionServiceImpl implements DesignSessionService {
   private ImageGeneratorService imageGeneratorService;
 
   @Override
+  public List<DesignSession> getSessions(UUID ownerId) {
+    return designSessionRepository.getByRawTemplate_Workspace_Account_Id(ownerId);
+  }
+
+  @Override
   public List<DesignSession> getSessionsOfRaw(UUID ownerId, Integer rawId) {
     return designSessionRepository.getByRawTemplate_Workspace_Account_IdAndId_RawId(ownerId, rawId);
   }
@@ -104,7 +109,7 @@ public class DesignSessionServiceImpl implements DesignSessionService {
   }
 
   @Override
-  public void updateContent(UUID contributorId, Integer rawId, String content) {
+  public void updateContent(UUID contributorId, Integer rawId, String content) throws Exception {
     DesignSession session = designSessionRepository
         .getById_ContributorIdAndId_RawId(contributorId, rawId)
         .orElse(null);
@@ -114,6 +119,10 @@ public class DesignSessionServiceImpl implements DesignSessionService {
     }
 
     RawTemplate rawTemplate = session.getRawTemplate();
+
+    BufferedImage file = imageGeneratorService.generateImageFromHtml(content);
+    String thumbnail = firebaseService.createRawThumbnail(file, rawTemplate.getId().toString());
+    rawTemplate.setThumbnail(thumbnail);
     rawTemplate.setContent(content);
     rawTemplateRepository.save(rawTemplate);
   }
@@ -131,7 +140,7 @@ public class DesignSessionServiceImpl implements DesignSessionService {
     }
 
     Account owner = session.getRawTemplate().getWorkspace().getAccount();
-    mediaFileService.createMediaFiles(owner.getId(), files);
+    mediaFileService.createMediaFiles(owner.getId(), files, true);
   }
 
   @Override

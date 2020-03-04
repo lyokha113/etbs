@@ -8,6 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface DesignSessionService {
 
+  List<DesignSession> getSessions(UUID ownerId);
+
   List<DesignSession> getSessionsOfRaw(UUID ownerId, Integer rawId);
 
   List<DesignSession> getSessionsForUser(UUID contributorId);

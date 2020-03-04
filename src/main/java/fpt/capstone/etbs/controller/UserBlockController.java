@@ -41,7 +41,7 @@ public class UserBlockController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     List<UserBlock> blocks = userBlockService.getUserBlocks(userPrincipal.getId());
-    List<UserBlockResponse> responses = blocks.stream().map(UserBlockResponse::setResponse)
+    List<UserBlockResponse> responses = blocks.stream().map(UserBlockResponse::setResponseWithContent)
         .collect(Collectors.toList());
     return ResponseEntity.ok(new ApiResponse<>(true, "", responses));
 
