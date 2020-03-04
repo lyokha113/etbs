@@ -128,7 +128,7 @@ public class EmailServiceImpl implements EmailService {
     String redirectUri;
     try {
       byte[] decodedState = java.util.Base64.getUrlDecoder().decode(state);
-      Map mapState = JSON_MAPPER.readValue(decodedState, Map.class);
+      Map<String, Object> mapState = JSON_MAPPER.readValue(decodedState, Map.class);
       accountId = UUID.fromString(String.valueOf(mapState.get("accountId")));
       rawId = Integer.parseInt(String.valueOf(mapState.get("rawId")));
       redirectUri = String.valueOf(mapState.get("redirectUri"));
@@ -142,6 +142,7 @@ public class EmailServiceImpl implements EmailService {
   }
 
   @Override
+  @Async("mailAsyncExecutor")
   public void sendConfirmUserEmail(String email, String token)
       throws MessagingException, IOException {
     String content = htmlContentService.setConfirmToken(serverConfirmUri + "/email", token, AppConstant.EMAIL_CONFIRM_CONTENT);
@@ -149,12 +150,14 @@ public class EmailServiceImpl implements EmailService {
   }
 
   @Override
+  @Async("mailAsyncExecutor")
   public void sendConfirmAccount(String email, String token) throws MessagingException, IOException {
     String content = htmlContentService.setConfirmToken(serverConfirmUri + "/account", token, AppConstant.ACCOUNT_CONFIRM_CONTENT);
     this.balancingSend(email, AppConstant.ACCOUNT_CONFIRM_SUBJECT, content);
   }
 
   @Override
+  @Async("mailAsyncExecutor")
   public void sendConfirmRecovery(String email, String token)
       throws MessagingException, IOException {
     String content = htmlContentService.setConfirmToken(serverConfirmUri + "/recovery", token, AppConstant.RECOVERY_CONFIRM_CONTENT);
@@ -162,6 +165,7 @@ public class EmailServiceImpl implements EmailService {
   }
 
   @Override
+  @Async("mailAsyncExecutor")
   public void sendRecovery(String email, String password) throws MessagingException, IOException {
     String content = htmlContentService.setRecoveryPassword(password, AppConstant.RECOVERY_CONTENT);
     this.balancingSend(email, AppConstant.RECOVERY_SUBJECT,  content);
