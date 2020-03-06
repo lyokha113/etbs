@@ -28,9 +28,6 @@ public class UserEmailServiceImpl implements UserEmailService {
   private AccountRepository accountRepository;
 
   @Autowired
-  private CustomUserDetailsService customUserDetailsService;
-
-  @Autowired
   private SimpMessageSendingOperations messagingTemplate;
 
   @Override
@@ -93,8 +90,8 @@ public class UserEmailServiceImpl implements UserEmailService {
     userEmail.setStatus(UserEmailStatus.APPROVED);
     userEmail = userEmailRepository.save(userEmail);
 
-    UserDetails principal = customUserDetailsService.loadUserFromID((userEmail.getAccount().getId()));
-    messagingTemplate.convertAndSendToUser(userEmail.getAccount().getId().toString(), AppConstant.WEB_SOCKET_USER_EMAIL_QUEUE, userEmail);
+    messagingTemplate.convertAndSendToUser(userEmail.getAccount().getId().toString(),
+            AppConstant.WEB_SOCKET_USER_EMAIL_QUEUE, userEmail);
   }
 
 

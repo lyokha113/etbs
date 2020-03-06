@@ -22,6 +22,8 @@ public interface DesignSessionService {
 
   void uploadFileToOwner(UUID contributorId, Integer rawId, MultipartFile[] files) throws Exception;
 
+  void leaveSession(UUID contributorId, Integer rawId) throws Exception;
+
   void deleteSession(UUID ownerId, Integer rawId);
 
   void deleteSession(UUID ownerId, UUID contributorId, Integer rawId);

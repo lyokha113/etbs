@@ -42,7 +42,7 @@ public class DesignSession extends Auditing{
   @ManyToOne(optional = false)
   private Account contributor;
 
-  @MapsId("raw_id")
+  @MapsId("raw_template_id")
   @ManyToOne(optional = false)
   private RawTemplate rawTemplate;
 

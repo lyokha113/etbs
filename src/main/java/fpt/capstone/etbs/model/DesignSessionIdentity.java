@@ -23,9 +23,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @Embeddable
 @Builder
-@EqualsAndHashCode(of = {"contributorId", "rawId"}, callSuper = false)
+@EqualsAndHashCode(of = {"contributorId", "rawTemplateId"}, callSuper = false)
 @EntityListeners(AuditingEntityListener.class)
-@ToString(of = {"contributorId", "rawId"})
+@ToString(of = {"contributorId", "rawTemplateId"})
 public class DesignSessionIdentity implements Serializable {
 
   @Column(name = "contributor_id")
@@ -34,6 +34,6 @@ public class DesignSessionIdentity implements Serializable {
   @Type(type = "uuid-char")
   private UUID contributorId;
 
-  @Column(name = "raw_id")
-  private Integer rawId;
+  @Column(name = "raw_template_id")
+  private Integer rawTemplateId;
 }

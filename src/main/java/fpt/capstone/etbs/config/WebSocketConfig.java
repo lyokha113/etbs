@@ -63,7 +63,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             AccountResponse account = tokenProvider.getTokenValue(token, AccountResponse.class);
             UserDetails userDetails = customUserDetailsService.loadUserFromID(account.getId());
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                account.getId(), account.getId(), userDetails.getAuthorities());
+                account.getId(), null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
             accessor.setUser(authentication);
           }

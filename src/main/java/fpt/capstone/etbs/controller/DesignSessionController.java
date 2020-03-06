@@ -12,6 +12,7 @@ import fpt.capstone.etbs.payload.DesignSessionResponse;
 import fpt.capstone.etbs.payload.StringWrapperRequest;
 import fpt.capstone.etbs.service.DesignSessionService;
 import fpt.capstone.etbs.service.MediaFileService;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -24,7 +25,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,7 +42,7 @@ public class DesignSessionController {
   private AuthenticationFacade authenticationFacade;
 
   @GetMapping("/session/raw/{id}")
-  public ResponseEntity<?> getAccounts(@PathVariable("id") Integer id) {
+  public ResponseEntity<?> getContributors(@PathVariable("id") Integer id) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     List<DesignSession> sessions = designSessionService.getSessionsOfRaw(userPrincipal.getId(), id);
@@ -60,14 +60,14 @@ public class DesignSessionController {
       DesignSession session = designSessionService
           .createDesignSession(userPrincipal.getId(), request);
       return ResponseEntity
-          .ok(new ApiResponse<>(true, "", DesignSessionResponse.setResponse(session)));
+          .ok(new ApiResponse<>(true, "", DesignSessionResponse.setResponseContributor(session)));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
   }
 
   @PutMapping("/session/raw/{rawId}")
-  public ResponseEntity<?> cancelJoin(@PathVariable("rawId") Integer rawId) {
+  public ResponseEntity<?> kickContributors(@PathVariable("rawId") Integer rawId) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
@@ -80,14 +80,14 @@ public class DesignSessionController {
   }
 
   @PutMapping("/session/raw/{rawId}/{contributorId}")
-  public ResponseEntity<?> cancelJoin(
+  public ResponseEntity<?> kickContributor(
       @PathVariable("rawId") Integer rawId,
       @PathVariable("contributorId") UUID contributorId) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       designSessionService.deleteSession(userPrincipal.getId(), contributorId, rawId);
-      return ResponseEntity.ok(new ApiResponse<>(true, "Session was closed", null));
+      return ResponseEntity.ok(new ApiResponse<>(true, "Sessions were closed", null));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
@@ -99,8 +99,11 @@ public class DesignSessionController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     List<DesignSession> sessions = designSessionService.getSessionsForUser(userPrincipal.getId());
-    List<DesignSessionResponse> response =
-        sessions.stream().map(DesignSessionResponse::setResponse).collect(Collectors.toList());
+    List<DesignSessionResponse> response = sessions.stream()
+        .map(DesignSessionResponse::setResponse)
+        .sorted(Comparator.comparing(DesignSessionResponse::getInvitedDate)
+            .thenComparing(DesignSessionResponse::getModifiedDate).reversed())
+        .collect(Collectors.toList());
     return ResponseEntity.ok(new ApiResponse<>(true, "", response));
   }
 
@@ -118,6 +121,19 @@ public class DesignSessionController {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, "Session not found", null));
     }
 
+  }
+
+  @PutMapping("/session/user/{rawId}")
+  public ResponseEntity<?> leaveSession(
+      @PathVariable("rawId") Integer rawId) throws Exception {
+    Authentication auth = authenticationFacade.getAuthentication();
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+    try {
+      designSessionService.leaveSession(userPrincipal.getId(), rawId);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Session was close", null));
+    } catch (BadRequestException ex) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
   }
 
   @PutMapping("/session/user/{rawId}/content")
@@ -147,5 +163,6 @@ public class DesignSessionController {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
   }
+
 
 }
