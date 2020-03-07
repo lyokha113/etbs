@@ -25,6 +25,7 @@ public class AppConstant {
   public static final int MAX_DESIGN_SESSION = 4;
   public static final int MAX_TEST_EMAIL = 5;
 
+  public static final String WEB_SOCKET_CONTENT_APP = "/content/";
   public static final String WEB_SOCKET_CONTRIBUTOR_APP = "/contributor/";
   public static final String WEB_SOCKET_PUBLISH_TOPIC = "/topic/publish/";
   public static final String WEB_SOCKET_USER_EMAIL_QUEUE = "/queue/useremail/";

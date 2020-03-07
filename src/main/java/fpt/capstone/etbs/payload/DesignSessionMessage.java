@@ -2,6 +2,7 @@ package fpt.capstone.etbs.payload;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +18,7 @@ public class DesignSessionMessage {
   private Integer rawId;
   private String ownerId;
   private String contributorId;
+  private List<String> contributors;
   private Boolean online;
   private String content;
 }
