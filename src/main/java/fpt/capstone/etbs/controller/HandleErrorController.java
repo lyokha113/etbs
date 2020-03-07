@@ -18,6 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HandleErrorController implements ErrorController {
 
+  @RequestMapping("/")
+  public String index() {
+    return "ETBS Server page";
+  }
+
   @RequestMapping(value = "/error", method = {RequestMethod.GET, RequestMethod.POST,
       RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH})
   public String handleError(HttpServletRequest request) throws JsonProcessingException {
