@@ -3,6 +3,7 @@ package fpt.capstone.etbs.config;
 import fpt.capstone.etbs.component.JwtTokenProvider;
 import fpt.capstone.etbs.payload.AccountResponse;
 import fpt.capstone.etbs.service.CustomUserDetailsService;
+import java.util.List;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,10 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.converter.ByteArrayMessageConverter;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.converter.MessageConverter;
+import org.springframework.messaging.converter.StringMessageConverter;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -71,6 +76,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         return message;
       }
     });
+  }
+
+  @Override
+  public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
+    messageConverters.add(new StringMessageConverter());
+    messageConverters.add(new ByteArrayMessageConverter());
+    messageConverters.add(new MappingJackson2MessageConverter());
+    return false;
   }
 
 }

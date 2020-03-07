@@ -1,8 +1,8 @@
 package fpt.capstone.etbs.service.impl;
 
 import static fpt.capstone.etbs.constant.AppConstant.MAX_DESIGN_SESSION;
-import static fpt.capstone.etbs.constant.AppConstant.WEB_SOCKET_CONTRIBUTOR_QUEUE;
 import static fpt.capstone.etbs.constant.AppConstant.WEB_SOCKET_INVITATION_QUEUE;
+import static fpt.capstone.etbs.constant.AppConstant.WEB_SOCKET_RAW_QUEUE;
 
 import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.exception.BadRequestException;
@@ -182,12 +182,13 @@ public class DesignSessionServiceImpl implements DesignSessionService {
     }
 
     Account owner = session.getRawTemplate().getWorkspace().getAccount();
-
     designSessionRepository.delete(session);
+
+    Map<String, Object> message = new HashMap<>();
+    message.put("data", contributorId.toString());
+    message.put("command", "leave");
     messagingTemplate.convertAndSendToUser(
-        owner.getId().toString(),
-        WEB_SOCKET_CONTRIBUTOR_QUEUE + rawId,
-        contributorId.toString());
+        owner.getId().toString(), WEB_SOCKET_RAW_QUEUE + rawId, message);
   }
 
   @Override
