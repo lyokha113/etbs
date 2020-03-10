@@ -19,6 +19,7 @@ import fpt.capstone.etbs.service.DesignSessionService;
 import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.ImageGeneratorService;
 import fpt.capstone.etbs.service.MediaFileService;
+import fpt.capstone.etbs.service.MessagePublish;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +54,9 @@ public class DesignSessionServiceImpl implements DesignSessionService {
 
   @Autowired
   private SimpMessageSendingOperations messagingTemplate;
+
+  @Autowired
+  private MessagePublish messagePublish;
 
   @Override
   public List<DesignSession> getSessions(UUID ownerId) {
@@ -184,11 +188,10 @@ public class DesignSessionServiceImpl implements DesignSessionService {
     Account owner = session.getRawTemplate().getWorkspace().getAccount();
     designSessionRepository.delete(session);
 
-    Map<String, Object> message = new HashMap<>();
-    message.put("data", contributorId.toString());
-    message.put("command", "leave");
-    messagingTemplate.convertAndSendToUser(
-        owner.getId().toString(), WEB_SOCKET_RAW_QUEUE + rawId, message);
+    messagePublish.sendLeaveSession(owner.getId().toString(),
+        WEB_SOCKET_RAW_QUEUE + rawId,
+        contributorId.toString());
+
   }
 
   @Override
@@ -201,12 +204,10 @@ public class DesignSessionServiceImpl implements DesignSessionService {
         .collect(Collectors.toList());
 
     designSessionRepository.deleteAll(sessions);
-
-    Map<String, Object> message = new HashMap<>();
-    message.put("command", "remove");
-    message.put("data", rawId);
-    contributors.forEach(
-        c -> messagingTemplate.convertAndSendToUser(c, WEB_SOCKET_INVITATION_QUEUE, message));
+    contributors.forEach(contributor -> {
+      messagePublish.sendRemoveInvitation(contributor, rawId);
+      messagePublish.sendKickSession(contributor, WEB_SOCKET_RAW_QUEUE + rawId);
+    });
   }
 
   @Override
@@ -224,11 +225,8 @@ public class DesignSessionServiceImpl implements DesignSessionService {
     }
 
     designSessionRepository.delete(session);
-    Map<String, Object> message = new HashMap<>();
-    message.put("command", "remove");
-    message.put("data", rawId);
-    messagingTemplate
-        .convertAndSendToUser(contributorId.toString(), WEB_SOCKET_INVITATION_QUEUE, message);
+    messagePublish.sendRemoveInvitation(contributorId.toString(), rawId);
+    messagePublish.sendKickSession(contributorId.toString(), WEB_SOCKET_RAW_QUEUE + rawId);
   }
 
 }

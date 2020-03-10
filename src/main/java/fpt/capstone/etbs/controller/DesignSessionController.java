@@ -53,7 +53,7 @@ public class DesignSessionController {
   }
 
   @PostMapping("/session/raw")
-  public ResponseEntity<?> createSession(@Valid @RequestBody DesignSessionRequest request) {
+  public ResponseEntity<?> createContributor(@Valid @RequestBody DesignSessionRequest request) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {

@@ -18,7 +18,6 @@ public class DesignSessionMessage {
   private Integer rawId;
   private String ownerId;
   private String contributorId;
-  private List<String> contributors;
   private Boolean online;
   private String content;
 }
