@@ -6,12 +6,14 @@ import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.DesignSession;
 import fpt.capstone.etbs.model.MediaFile;
+import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.DesignSessionRequest;
 import fpt.capstone.etbs.payload.DesignSessionResponse;
 import fpt.capstone.etbs.payload.StringWrapperRequest;
 import fpt.capstone.etbs.service.DesignSessionService;
 import fpt.capstone.etbs.service.MediaFileService;
+import fpt.capstone.etbs.service.RawTemplateService;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -34,6 +36,9 @@ public class DesignSessionController {
 
   @Autowired
   private DesignSessionService designSessionService;
+
+  @Autowired
+  private RawTemplateService rawTemplateService;
 
   @Autowired
   private MediaFileService mediaFileService;
@@ -143,7 +148,9 @@ public class DesignSessionController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      designSessionService.updateContent(userPrincipal.getId(), rawId, request.getString());
+      RawTemplate rawTemplate = designSessionService
+          .updateContent(userPrincipal.getId(), rawId, request.getString());
+      rawTemplateService.updateThumbnail(rawTemplate);
       return ResponseEntity.ok(new ApiResponse<>(true, "Template was updated", null));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));

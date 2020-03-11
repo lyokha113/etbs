@@ -1,9 +1,9 @@
 package fpt.capstone.etbs.service.impl;
 
-import fpt.capstone.etbs.constant.AppConstant;
+import static fpt.capstone.etbs.constant.AppConstant.CURRENT_ONLINE_CACHE;
+
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
-import fpt.capstone.etbs.model.DesignSession;
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.model.UserBlock;
 import fpt.capstone.etbs.payload.SynchronizeContentRequest;
@@ -11,15 +11,18 @@ import fpt.capstone.etbs.payload.UserBlockRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.RawTemplateRepository;
 import fpt.capstone.etbs.repository.UserBlockRepository;
-import fpt.capstone.etbs.service.DesignSessionService;
 import fpt.capstone.etbs.service.HtmlContentService;
 import fpt.capstone.etbs.service.RawTemplateService;
+import fpt.capstone.etbs.service.RedisService;
 import fpt.capstone.etbs.service.UserBlockService;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,17 +38,13 @@ public class UserBlockServiceImpl implements UserBlockService {
   private RawTemplateRepository rawTemplateRepository;
 
   @Autowired
-  private DesignSessionService designSessionService;
-
-  @Autowired
   private RawTemplateService rawTemplateService;
 
   @Autowired
   private HtmlContentService htmlContentService;
 
   @Autowired
-  private SimpMessageSendingOperations messagingTemplate;
-
+  private RedisService redisService;
 
   @Override
   public List<UserBlock> getUserBlocks(UUID accountId) {
@@ -117,7 +116,8 @@ public class UserBlockServiceImpl implements UserBlockService {
   }
 
   @Override
-  public void synchronizeContent(UUID accountId, SynchronizeContentRequest request)
+  public Map<String, List<Integer>> synchronizeContent(UUID accountId,
+      SynchronizeContentRequest request)
       throws Exception {
     UserBlock userBlock = userBlockRepository.getByAccount_IdAndId(accountId, request.getBlockId())
         .orElse(null);
@@ -127,28 +127,33 @@ public class UserBlockServiceImpl implements UserBlockService {
 
     List<RawTemplate> rawTemplates = rawTemplateRepository
         .getByWorkspace_Account_IdAndIdIn(accountId, request.getRawIds());
-
-    List<RawTemplate> synchronizedRaws = new ArrayList<>();
-
+    List<RawTemplate> syncs = new ArrayList<>();
+    List<RawTemplate> errors = new ArrayList<>();
     for (RawTemplate rt : rawTemplates) {
       String content = htmlContentService.setSynchronizeContent(userBlock, rt.getContent());
       if (content != null) {
-        rt.setContent(content);
-        synchronizedRaws.add(rt);
+        String currentOnlineKey = CURRENT_ONLINE_CACHE + rt.getId();
+        Set<Object> onlineSessions = redisService.getOnlineSessions(currentOnlineKey);
+        if (onlineSessions != null && onlineSessions.size() > 0) {
+          errors.add(rt);
+        } else {
+          rt.setContent(content);
+          syncs.add(rt);
+        }
+
       }
     }
+    syncs = rawTemplateRepository.saveAll(syncs);
 
-    synchronizedRaws = rawTemplateRepository.saveAll(synchronizedRaws);
-    for (RawTemplate rt : synchronizedRaws) {
-      UUID ownerId = rt.getWorkspace().getAccount().getId();
-      List<DesignSession> sessions = designSessionService.getSessionsOfRaw(ownerId, rt.getId());
-      sessions.forEach(s -> messagingTemplate
-          .convertAndSendToUser(s.getId().toString(), AppConstant.WEB_SOCKET_RAW_QUEUE, rt.getContent()));
-    }
-
-    for (RawTemplate rt : synchronizedRaws) {
+    for (RawTemplate rt : syncs) {
       rawTemplateService.updateThumbnail(rt);
     }
+
+    Map<String, List<Integer>> result = new HashMap<>();
+    result.put("syncs", syncs.stream().map(RawTemplate::getId).collect(Collectors.toList()));
+    result.put("errors", errors.stream().map(RawTemplate::getId).collect(Collectors.toList()));
+    return result;
+
   }
 
   private boolean isDuplicateName(String name, UUID accountId, Integer id) {

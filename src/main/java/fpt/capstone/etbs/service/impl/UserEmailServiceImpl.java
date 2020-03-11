@@ -7,15 +7,13 @@ import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.UserEmail;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.UserEmailRepository;
-import fpt.capstone.etbs.service.CustomUserDetailsService;
+import fpt.capstone.etbs.service.MessagePublisherService;
 import fpt.capstone.etbs.service.UserEmailService;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,7 +26,7 @@ public class UserEmailServiceImpl implements UserEmailService {
   private AccountRepository accountRepository;
 
   @Autowired
-  private SimpMessageSendingOperations messagingTemplate;
+  private MessagePublisherService messagePublisherService;
 
   @Override
   public UserEmail createUserEmail(UUID accountId, String email) {
@@ -90,8 +88,8 @@ public class UserEmailServiceImpl implements UserEmailService {
     userEmail.setStatus(UserEmailStatus.APPROVED);
     userEmail = userEmailRepository.save(userEmail);
 
-    messagingTemplate.convertAndSendToUser(userEmail.getAccount().getId().toString(),
-            AppConstant.WEB_SOCKET_USER_EMAIL_QUEUE, userEmail);
+    messagePublisherService
+        .sendUserEmailApproved(userEmail.getAccount().getId().toString(), userEmail);
   }
 
 

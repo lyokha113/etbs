@@ -34,12 +34,6 @@ public class MediaFileServiceImpl implements MediaFileService {
   @Autowired
   private FirebaseService firebaseService;
 
-  @Autowired
-  private DesignSessionService designSessionService;
-
-  @Autowired
-  private SimpMessageSendingOperations messagingTemplate;
-
   @Override
   public List<MediaFile> getMediaFilesOfAccount(UUID accountId) {
     return mediaFileRepository.getByAccount_Id(accountId);
@@ -63,7 +57,7 @@ public class MediaFileServiceImpl implements MediaFileService {
   }
 
   @Override
-  public List<MediaFile> createMediaFiles(UUID accountId, MultipartFile[] files, boolean notify) throws Exception {
+  public List<MediaFile> createMediaFiles(UUID accountId, MultipartFile[] files) throws Exception {
     Account account = accountRepository.findById(accountId).orElse(null);
     if (account == null) {
       throw new BadRequestException("Account doesn't exist");
@@ -78,14 +72,6 @@ public class MediaFileServiceImpl implements MediaFileService {
     }
 
     results = mediaFileRepository.saveAll(results);
-
-    if (notify) {
-      List<DesignSession> sessions = designSessionService.getSessions(accountId);
-      for (DesignSession session : sessions) {
-        messagingTemplate.convertAndSendToUser(session.getId().toString(),
-            AppConstant.WEB_SOCKET_FILE_QUEUE, results);
-      }
-    }
     return  results;
   }
 

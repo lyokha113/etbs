@@ -14,10 +14,22 @@ public class ThreadConfig {
   public TaskExecutor mailAsyncExecutor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
     executor.setCorePoolSize(10);
+    executor.setMaxPoolSize(10);
+    executor.setQueueCapacity(20);
+    executor.setWaitForTasksToCompleteOnShutdown(true);
+    executor.setThreadNamePrefix("Email-");
+    executor.initialize();
+    return executor;
+  }
+
+  @Bean("generateImageAsyncExecutor")
+  public TaskExecutor generateImageAsyncExecutor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setCorePoolSize(10);
     executor.setMaxPoolSize(20);
     executor.setQueueCapacity(50);
     executor.setWaitForTasksToCompleteOnShutdown(true);
-    executor.setThreadNamePrefix("Email-");
+    executor.setThreadNamePrefix("GenerateImage-");
     executor.initialize();
     return executor;
   }

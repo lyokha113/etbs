@@ -1,7 +1,7 @@
 package fpt.capstone.etbs.service.impl;
 
+import static fpt.capstone.etbs.constant.AppConstant.CURRENT_ONLINE_CACHE;
 import static fpt.capstone.etbs.constant.AppConstant.MAX_DESIGN_SESSION;
-import static fpt.capstone.etbs.constant.AppConstant.WEB_SOCKET_INVITATION_QUEUE;
 import static fpt.capstone.etbs.constant.AppConstant.WEB_SOCKET_RAW_QUEUE;
 
 import fpt.capstone.etbs.constant.RoleEnum;
@@ -12,6 +12,7 @@ import fpt.capstone.etbs.model.DesignSessionIdentity;
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.payload.DesignSessionRequest;
 import fpt.capstone.etbs.payload.DesignSessionResponse;
+import fpt.capstone.etbs.payload.MediaFileResponse;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.DesignSessionRepository;
 import fpt.capstone.etbs.repository.RawTemplateRepository;
@@ -19,15 +20,13 @@ import fpt.capstone.etbs.service.DesignSessionService;
 import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.ImageGeneratorService;
 import fpt.capstone.etbs.service.MediaFileService;
-import fpt.capstone.etbs.service.MessagePublish;
-import java.awt.image.BufferedImage;
-import java.util.HashMap;
+import fpt.capstone.etbs.service.MessagePublisherService;
+import fpt.capstone.etbs.service.RedisService;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,10 +52,10 @@ public class DesignSessionServiceImpl implements DesignSessionService {
   private ImageGeneratorService imageGeneratorService;
 
   @Autowired
-  private SimpMessageSendingOperations messagingTemplate;
+  private MessagePublisherService messagePublisherService;
 
   @Autowired
-  private MessagePublish messagePublish;
+  private RedisService redisService;
 
   @Override
   public List<DesignSession> getSessions(UUID ownerId) {
@@ -132,16 +131,13 @@ public class DesignSessionServiceImpl implements DesignSessionService {
         .build();
     session = designSessionRepository.save(session);
 
-    Map<String, Object> message = new HashMap<>();
-    message.put("data", DesignSessionResponse.setResponse(session));
-    message.put("command", "add");
-    messagingTemplate
-        .convertAndSendToUser(contributor.getId().toString(), WEB_SOCKET_INVITATION_QUEUE, message);
+    messagePublisherService.sendAddInvitation(contributor.getId().toString(),
+        DesignSessionResponse.setResponse(session));
     return session;
   }
 
   @Override
-  public void updateContent(UUID contributorId, Integer rawId, String content) throws Exception {
+  public RawTemplate updateContent(UUID contributorId, Integer rawId, String content) {
     DesignSession session = designSessionRepository
         .getById_ContributorIdAndId_RawTemplateId(contributorId, rawId)
         .orElse(null);
@@ -151,12 +147,8 @@ public class DesignSessionServiceImpl implements DesignSessionService {
     }
 
     RawTemplate rawTemplate = session.getRawTemplate();
-
-    BufferedImage file = imageGeneratorService.generateImageFromHtml(content);
-    String thumbnail = firebaseService.createRawThumbnail(file, rawTemplate.getId().toString());
-    rawTemplate.setThumbnail(thumbnail);
     rawTemplate.setContent(content);
-    rawTemplateRepository.save(rawTemplate);
+    return rawTemplateRepository.save(rawTemplate);
   }
 
   @Override
@@ -172,7 +164,19 @@ public class DesignSessionServiceImpl implements DesignSessionService {
     }
 
     Account owner = session.getRawTemplate().getWorkspace().getAccount();
-    mediaFileService.createMediaFiles(owner.getId(), files, true);
+    mediaFileService.createMediaFiles(owner.getId(), files);
+
+    String currentOnlineKey = CURRENT_ONLINE_CACHE + rawId;
+    String dest = WEB_SOCKET_RAW_QUEUE + rawId;
+    List<MediaFileResponse> ownerFiles = mediaFileService.getOwnerSessionMediaFiles(owner.getId())
+        .stream().map(MediaFileResponse::setResponse)
+        .collect(Collectors.toList());
+
+    Set<Object> currentOnline = redisService.getOnlineSessions(currentOnlineKey);
+    currentOnline.forEach(user -> {
+      String receiverId = String.valueOf(user);
+      messagePublisherService.sendDesignContent(receiverId, dest, ownerFiles);
+    });
   }
 
   @Override
@@ -188,7 +192,8 @@ public class DesignSessionServiceImpl implements DesignSessionService {
     Account owner = session.getRawTemplate().getWorkspace().getAccount();
     designSessionRepository.delete(session);
 
-    messagePublish.sendLeaveSession(owner.getId().toString(),
+    redisService.setOfflineSession(CURRENT_ONLINE_CACHE + rawId, contributorId.toString());
+    messagePublisherService.sendLeaveSession(owner.getId().toString(),
         WEB_SOCKET_RAW_QUEUE + rawId,
         contributorId.toString());
 
@@ -205,8 +210,9 @@ public class DesignSessionServiceImpl implements DesignSessionService {
 
     designSessionRepository.deleteAll(sessions);
     contributors.forEach(contributor -> {
-      messagePublish.sendRemoveInvitation(contributor, rawId);
-      messagePublish.sendKickSession(contributor, WEB_SOCKET_RAW_QUEUE + rawId);
+      messagePublisherService.sendRemoveInvitation(contributor, rawId);
+      messagePublisherService.sendKickSession(contributor, WEB_SOCKET_RAW_QUEUE + rawId);
+      redisService.setOfflineSession(CURRENT_ONLINE_CACHE + rawId, contributor);
     });
   }
 
@@ -225,8 +231,9 @@ public class DesignSessionServiceImpl implements DesignSessionService {
     }
 
     designSessionRepository.delete(session);
-    messagePublish.sendRemoveInvitation(contributorId.toString(), rawId);
-    messagePublish.sendKickSession(contributorId.toString(), WEB_SOCKET_RAW_QUEUE + rawId);
+    messagePublisherService.sendRemoveInvitation(contributorId.toString(), rawId);
+    messagePublisherService.sendKickSession(contributorId.toString(), WEB_SOCKET_RAW_QUEUE + rawId);
+    redisService.setOfflineSession(CURRENT_ONLINE_CACHE + rawId, contributorId.toString());
   }
 
 }

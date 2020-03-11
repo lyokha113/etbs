@@ -56,8 +56,7 @@ public class MediaFileController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      List<MediaFile> result = mediaFileService
-          .createMediaFiles(userPrincipal.getId(), files, false);
+      List<MediaFile> result = mediaFileService.createMediaFiles(userPrincipal.getId(), files);
       List<MediaFileResponse> response = result.stream().map(MediaFileResponse::setResponse)
           .collect(Collectors.toList());
       return ResponseEntity.ok(new ApiResponse<>(true, "Files created", response));
@@ -81,7 +80,8 @@ public class MediaFileController {
   }
 
   @PatchMapping("/file/{id}")
-  public ResponseEntity<?> changeAccessibleMediaFile(@PathVariable("id") UUID id, @RequestParam("open") boolean open) {
+  public ResponseEntity<?> changeAccessibleMediaFile(@PathVariable("id") UUID id,
+      @RequestParam("open") boolean open) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
@@ -108,7 +108,7 @@ public class MediaFileController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      List<MediaFile> result = mediaFileService.createMediaFiles(userPrincipal.getId(), files, false);
+      List<MediaFile> result = mediaFileService.createMediaFiles(userPrincipal.getId(), files);
       Map<String, String> response = new HashMap<>();
       response.put("link", result.get(0).getLink());
       return ResponseEntity.ok(response);

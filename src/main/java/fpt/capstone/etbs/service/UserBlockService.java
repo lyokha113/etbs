@@ -5,6 +5,7 @@ import fpt.capstone.etbs.model.UserBlock;
 import fpt.capstone.etbs.payload.SynchronizeContentRequest;
 import fpt.capstone.etbs.payload.UserBlockRequest;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface UserBlockService {
@@ -19,7 +20,7 @@ public interface UserBlockService {
 
   UserBlock updateUserBlockContent(UUID accountId, Integer id, String content);
 
-  void deleteUserBlock(UUID accountId, Integer id);
+  Map<String, List<Integer>> synchronizeContent(UUID accountId, SynchronizeContentRequest request) throws Exception;
 
-  void synchronizeContent(UUID accountId, SynchronizeContentRequest request) throws Exception;
+  void deleteUserBlock(UUID accountId, Integer id);
 }

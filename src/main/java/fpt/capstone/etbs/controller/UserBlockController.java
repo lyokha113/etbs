@@ -12,6 +12,7 @@ import fpt.capstone.etbs.payload.UserBlockRequest;
 import fpt.capstone.etbs.payload.UserBlockResponse;
 import fpt.capstone.etbs.service.UserBlockService;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,8 +80,8 @@ public class UserBlockController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      userBlockService.synchronizeContent(userPrincipal.getId(), request);
-      return ResponseEntity.ok(new ApiResponse<>(true, "Content was synchronized", null));
+      Map<String, List<Integer>> response = userBlockService.synchronizeContent(userPrincipal.getId(), request);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Content was synchronized", response));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
 

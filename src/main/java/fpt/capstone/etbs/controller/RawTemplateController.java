@@ -22,7 +22,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 public class RawTemplateController {
@@ -75,16 +77,33 @@ public class RawTemplateController {
     }
   }
 
-  @PatchMapping("/raw/{id}")
+  @PatchMapping("/raw/{id}/content")
   private ResponseEntity<?> updateContent(
       @PathVariable("id") Integer id,
       @Valid @RequestBody SaveContentRequest request) throws Exception {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      RawTemplate template = rawTemplateService.updateContent(userPrincipal.getId(), id, request.getContent(), request.isAutoSave());
+      RawTemplate template = rawTemplateService.updateContent(userPrincipal.getId(), id, request.getContent());
+      if (!request.isAutoSave()) {
+        rawTemplateService.updateThumbnail(template);
+      }
       RawTemplateResponse response = RawTemplateResponse.setResponseWithContent(template);
       return ResponseEntity.ok(new ApiResponse<>(true, "Raw template version changed", response));
+    } catch (BadRequestException ex) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
+  }
+
+  @PatchMapping("/raw/{id}/file")
+  private ResponseEntity<?> uploadFiles(
+      @PathVariable("id") Integer id,
+      @RequestPart MultipartFile[] files) throws Exception {
+    Authentication auth = authenticationFacade.getAuthentication();
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+    try {
+      rawTemplateService.uploadFiles(userPrincipal.getId(), id, files);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Files was uploaded", null));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }

@@ -5,9 +5,10 @@ import static fpt.capstone.etbs.constant.AppConstant.WEB_SOCKET_RAW_QUEUE;
 
 import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.payload.DesignSessionMessage;
-import fpt.capstone.etbs.service.DesignSessionService;
-import fpt.capstone.etbs.service.MessagePublish;
+import fpt.capstone.etbs.service.MessagePublisherService;
 import fpt.capstone.etbs.service.RedisService;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +20,12 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class WebsocketController {
 
-  @Autowired
-  private DesignSessionService designSessionService;
 
   @Autowired
   private RedisService redisService;
 
   @Autowired
-  private MessagePublish messagePublish;
+  private MessagePublisherService messagePublisherService;
 
   @MessageMapping(AppConstant.WEB_SOCKET_CONTRIBUTOR_APP)
   public void online(@Payload DesignSessionMessage payload,
@@ -44,51 +43,29 @@ public class WebsocketController {
     String dest = WEB_SOCKET_RAW_QUEUE + payload.getRawId();
     if (senderId.equals(payload.getOwnerId())) {
       Set<Object> currentOnline = redisService.getOnlineSessions(currentOnlineKey);
-      messagePublish.sendOnlineMessage(receiver, dest, currentOnline);
+      messagePublisherService.sendOnlineMessage(receiver, dest, currentOnline);
     } else {
       payload.setContributorId(senderId);
-      messagePublish.sendOnlineMessage(receiver, dest, payload);
+      messagePublisherService.sendOnlineMessage(receiver, dest, payload);
     }
 
   }
 
-//  @MessageMapping(AppConstant.WEB_SOCKET_CONTENT_APP)
-//  public void design(@Payload DesignSessionMessage payload,
-//      SimpMessageHeaderAccessor headerAccessor) {
-//    String senderId = Objects.requireNonNull(headerAccessor.getUser()).getName();
-//    payload.setContributorId(senderId);
-//
-//    Map<String, String> data = new HashMap<>();
-//    data.put("owner", payload.getOwnerId());
-//    data.put("content", payload.getContent());
-//
-//    Map<String, Object> message = new HashMap<>();
-//    message.put("data", data);
-//    message.put("command", "edit");
-//
-//    if (!senderId.equals(payload.getOwnerId())) {
-//      messagingTemplate.convertAndSendToUser(
-//          payload.getOwnerId(),
-//          WEB_SOCKET_RAW_QUEUE + payload.getRawId(),
-//          message);
-//    }
-//
-//    List<String> contributors = payload.getContributors();
-//    if (contributors == null || contributors.isEmpty()) {
-//      contributors = designSessionService
-//          .getSessionsOfRaw(UUID.fromString(payload.getOwnerId()), payload.getRawId())
-//          .stream().map(c -> c.getContributor().getId().toString())
-//          .collect(Collectors.toList());
-//    }
-//
-//    contributors.forEach(contributor -> {
-//      if (!senderId.equals(contributor)) {
-//        messagingTemplate.convertAndSendToUser(
-//            contributor,
-//            WEB_SOCKET_RAW_QUEUE + payload.getRawId(),
-//            message);
-//      }
-//    });
-//
-//  }
+  @MessageMapping(AppConstant.WEB_SOCKET_CONTENT_APP)
+  public void design(@Payload DesignSessionMessage payload,
+      SimpMessageHeaderAccessor headerAccessor) {
+    String senderId = Objects.requireNonNull(headerAccessor.getUser()).getName();
+    payload.setContributorId(senderId);
+
+    String currentOnlineKey = CURRENT_ONLINE_CACHE + payload.getRawId();
+    String dest = WEB_SOCKET_RAW_QUEUE + payload.getRawId();
+
+    Set<Object> currentOnline = redisService.getOnlineSessions(currentOnlineKey);
+    currentOnline.forEach(user -> {
+      String receiverId = String.valueOf(user);
+      if (!senderId.equals(receiverId)) {
+        messagePublisherService.sendDesignContent(receiverId, dest, payload.getContent());
+      }
+    });
+  }
 }
