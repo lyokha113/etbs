@@ -1,13 +1,26 @@
 package fpt.capstone.etbs.config;
 
+import static fpt.capstone.etbs.constant.AppConstant.PIVOT_DATE;
+import static fpt.capstone.etbs.constant.AppConstant.TIME_TO_SCORE;
+
 import fpt.capstone.etbs.constant.AppConstant;
+import fpt.capstone.etbs.model.Category;
 import fpt.capstone.etbs.model.DeletingMediaFile;
 import fpt.capstone.etbs.model.MediaFile;
+import fpt.capstone.etbs.model.Rating;
+import fpt.capstone.etbs.model.Template;
+import fpt.capstone.etbs.repository.CategoryRepository;
 import fpt.capstone.etbs.repository.DeletingMediaFileRepository;
+import fpt.capstone.etbs.repository.RatingRepository;
+import fpt.capstone.etbs.repository.TemplateRepository;
 import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.MediaFileService;
+import fpt.capstone.etbs.service.TemplateService;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -33,6 +46,9 @@ public class FileSchedule {
 
   @Autowired
   private MediaFileService mediaFileService;
+
+  @Autowired
+  private TemplateService templateService;
 
   @Autowired
   private DeletingMediaFileRepository deletingMediaFileRepository;
@@ -66,7 +82,7 @@ public class FileSchedule {
     logger.info("Finished delete inactive user file - " + deletedFiles.size() + " files deleted");
   }
 
-  @Scheduled(initialDelay = 1000 * 60 * 5, fixedDelay = 1000 * 60 * 5)
+  @Scheduled(initialDelay = 1000 * 60, fixedDelay = 1000 * 60 * 5)
   public void deleteDeletingMediaFile() {
     logger.info("Start to delete DeletingMediaFile");
     List<DeletingMediaFile> files = deletingMediaFileRepository.findAll();
@@ -82,6 +98,12 @@ public class FileSchedule {
     }
     deletingMediaFileRepository.deleteAll(deletedFiles);
     logger.info("Finished delete DeletingMediaFile - " + deletedFiles.size() + " files deleted");
+  }
+
+  @Scheduled(initialDelay = 1000 * 60 * 3, fixedDelay = 1000 * 60 * 60)
+  public void calculateTemplateScore() {
+    logger.info("Start to calculate template score");
+    templateService.calculateScore();
   }
 
 }

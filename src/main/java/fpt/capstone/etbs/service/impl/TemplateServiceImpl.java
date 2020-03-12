@@ -1,24 +1,33 @@
 package fpt.capstone.etbs.service.impl;
 
+import static fpt.capstone.etbs.constant.AppConstant.PIVOT_DATE;
+import static fpt.capstone.etbs.constant.AppConstant.TIME_TO_SCORE;
+
 import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Category;
 import fpt.capstone.etbs.model.DeletingMediaFile;
 import fpt.capstone.etbs.model.Publish;
+import fpt.capstone.etbs.model.Rating;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.TemplateRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.CategoryRepository;
 import fpt.capstone.etbs.repository.DeletingMediaFileRepository;
 import fpt.capstone.etbs.repository.PublishRepository;
+import fpt.capstone.etbs.repository.RatingRepository;
 import fpt.capstone.etbs.repository.TemplateRepository;
 import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.ImageGeneratorService;
 import fpt.capstone.etbs.service.TemplateService;
 import java.awt.image.BufferedImage;
+import java.math.BigDecimal;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -46,6 +55,9 @@ public class TemplateServiceImpl implements TemplateService {
 
   @Autowired
   private PublishRepository publishRepository;
+
+  @Autowired
+  private RatingRepository ratingRepository;
 
   @Autowired
   private DeletingMediaFileRepository deletingMediaFileRepository;
@@ -96,7 +108,7 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     Set<Category> categories = new HashSet<>(
-        categoryRepository.getAllByIdIn(request.getCategoryIds()));
+        categoryRepository.getByIdIn(request.getCategoryIds()));
 
     template.setName(request.getName());
     template.setDescription(request.getDescription());
@@ -117,7 +129,7 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     Set<Category> categories = new HashSet<>(
-        categoryRepository.getAllByIdIn(request.getCategoryIds()));
+        categoryRepository.getByIdIn(request.getCategoryIds()));
 
     Template template = Template.builder()
         .name(request.getName())
@@ -142,8 +154,7 @@ public class TemplateServiceImpl implements TemplateService {
       String src = element.absUrl("src");
       String order = template.getId() + "/" + count;
       String replace = "";
-      if (src.startsWith("http://storage.googleapis.com/") && src
-          .contains(AppConstant.USER_IMAGES)) {
+      if (src.startsWith("http://storage.googleapis.com/") && src.contains(AppConstant.USER_IMAGES)) {
         src = src.substring(0, src.indexOf("?"));
         replace = firebaseService.createTemplateImages(src, order);
       } else {
@@ -169,11 +180,9 @@ public class TemplateServiceImpl implements TemplateService {
     List<DeletingMediaFile> files = new ArrayList<>();
     Document doc = Jsoup.parse(template.getContent(), "UTF-8");
     for (Element element : doc.select("img")) {
-      String imgSrc = element.absUrl("src");
-      if (imgSrc.startsWith("http://storage.googleapis.com/") && imgSrc
-          .contains(AppConstant.TEMPLATE_IMAGE)) {
-        String link = imgSrc
-            .substring(imgSrc.indexOf(AppConstant.TEMPLATE_IMAGE), imgSrc.indexOf("?"));
+      String src = element.absUrl("src");
+      if (src.startsWith("http://storage.googleapis.com/") && src.contains(AppConstant.TEMPLATE_IMAGE)) {
+        String link = src.substring(src.indexOf(AppConstant.TEMPLATE_IMAGE), src.indexOf("?"));
         files.add(DeletingMediaFile.builder().link(link).build());
       }
     }
@@ -198,6 +207,36 @@ public class TemplateServiceImpl implements TemplateService {
         .createTemplateThumbnail(bufferedImage, String.valueOf(template.getId()));
     template.setThumbnail(url);
     return templateRepository.save(template);
+  }
+
+  @Override
+  @Async("calculateScoreAsyncExecutor")
+  public void calculateScore() {
+    List<Template> templates = templateRepository.findAll();
+    for (Template template : templates) {
+
+      List<Rating> ratings = ratingRepository.getByTemplate_Id(template.getId());
+      long up = ratings.stream().filter(Rating::isVote).count();
+      long down = ratings.stream().filter(r -> !r.isVote()).count();
+      long sign = up - down;
+      double voteScore = Math.log((Math.max(Math.abs(sign), 1))) / Math.log(2);
+      sign = Long.compare(sign, 0);
+
+      long pivot = LocalDateTime.parse(PIVOT_DATE).toEpochSecond(ZoneOffset.UTC);
+      List<Category> categories = categoryRepository.getByTemplatesIn(
+          Collections.singletonList(template));
+      boolean isTrending = categories.stream().anyMatch(c -> c.isTrending() && c.isActive());
+      long timeElapsed = isTrending ?
+          LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) - pivot :
+          template.getCreatedDate().toEpochSecond(ZoneOffset.UTC) - pivot;
+      double timeScore = (double) (sign * timeElapsed) / TIME_TO_SCORE;
+
+      BigDecimal score = new BigDecimal(voteScore + timeScore)
+          .setScale(6, BigDecimal.ROUND_CEILING);
+      template.setScore(score.doubleValue());
+    }
+
+    templateRepository.saveAll(templates);
   }
 
   private boolean isDuplicateName(String name) {

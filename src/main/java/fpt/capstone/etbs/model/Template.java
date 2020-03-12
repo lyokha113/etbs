@@ -67,6 +67,9 @@ public class Template extends Auditing {
   @Column(columnDefinition = "text")
   private String thumbnail;
 
+  @Column
+  private Double score;
+
   @ManyToMany(cascade = CascadeType.ALL)
   @JoinTable(
       name = "category_templates",

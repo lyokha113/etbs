@@ -9,6 +9,7 @@ import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.DesignSession;
 import fpt.capstone.etbs.model.DesignSessionIdentity;
+import fpt.capstone.etbs.model.MediaFile;
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.payload.DesignSessionRequest;
 import fpt.capstone.etbs.payload.DesignSessionResponse;
@@ -152,7 +153,7 @@ public class DesignSessionServiceImpl implements DesignSessionService {
   }
 
   @Override
-  public void uploadFileToOwner(UUID contributorId, Integer rawId, MultipartFile[] files)
+  public List<MediaFile>  uploadFileToOwner(UUID contributorId, Integer rawId, MultipartFile[] files)
       throws Exception {
 
     DesignSession session = designSessionRepository
@@ -164,7 +165,7 @@ public class DesignSessionServiceImpl implements DesignSessionService {
     }
 
     Account owner = session.getRawTemplate().getWorkspace().getAccount();
-    mediaFileService.createMediaFiles(owner.getId(), files);
+    List<MediaFile> uploaded = mediaFileService.createMediaFiles(owner.getId(), files);
 
     String currentOnlineKey = CURRENT_ONLINE_CACHE + rawId;
     String dest = WEB_SOCKET_RAW_QUEUE + rawId;
@@ -175,8 +176,10 @@ public class DesignSessionServiceImpl implements DesignSessionService {
     Set<Object> currentOnline = redisService.getOnlineSessions(currentOnlineKey);
     currentOnline.forEach(user -> {
       String receiverId = String.valueOf(user);
-      messagePublisherService.sendDesignContent(receiverId, dest, ownerFiles);
+      messagePublisherService.sendDesignFiles(receiverId, dest, ownerFiles);
     });
+
+    return uploaded;
   }
 
   @Override

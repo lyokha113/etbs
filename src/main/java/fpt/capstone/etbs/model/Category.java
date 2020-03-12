@@ -48,6 +48,9 @@ public class Category extends Auditing {
   @NotBlank
   private String name;
 
+  @Column(columnDefinition = "TINYINT(1) default 0")
+  private boolean trending;
+
   @Column(columnDefinition = "TINYINT(1) default 1")
   private boolean active;
 

@@ -10,6 +10,7 @@ import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.DesignSessionRequest;
 import fpt.capstone.etbs.payload.DesignSessionResponse;
+import fpt.capstone.etbs.payload.MediaFileResponse;
 import fpt.capstone.etbs.payload.StringWrapperRequest;
 import fpt.capstone.etbs.service.DesignSessionService;
 import fpt.capstone.etbs.service.MediaFileService;
@@ -106,8 +107,7 @@ public class DesignSessionController {
     List<DesignSession> sessions = designSessionService.getSessionsForUser(userPrincipal.getId());
     List<DesignSessionResponse> response = sessions.stream()
         .map(DesignSessionResponse::setResponse)
-        .sorted(Comparator.comparing(DesignSessionResponse::getInvitedDate)
-            .thenComparing(DesignSessionResponse::getModifiedDate).reversed())
+        .sorted(Comparator.comparing(DesignSessionResponse::getInvitedDate).reversed())
         .collect(Collectors.toList());
     return ResponseEntity.ok(new ApiResponse<>(true, "", response));
   }
@@ -164,8 +164,8 @@ public class DesignSessionController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      designSessionService.uploadFileToOwner(userPrincipal.getId(), rawId, files);
-      return ResponseEntity.ok(new ApiResponse<>(true, "Files was uploaded", null));
+      List<MediaFile> uploaded = designSessionService.uploadFileToOwner(userPrincipal.getId(), rawId, files);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Files was uploaded", MediaFileResponse.setResponse(uploaded.get(0))));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }

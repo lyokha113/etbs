@@ -120,8 +120,7 @@ public class TutorialServiceImpl implements TutorialService {
     List<URL> externalLinks = new ArrayList<>();
     for (Element element : doc.select("img")) {
       String src = element.absUrl("src");
-      if (!src.startsWith("http://storage.googleapis.com/") && !src
-          .contains(AppConstant.USER_IMAGES)) {
+      if (!src.startsWith("http://storage.googleapis.com/") && !src.contains(AppConstant.USER_IMAGES)) {
         externalLinks.add(new URL(src));
       }
     }

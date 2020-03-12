@@ -1,5 +1,7 @@
 package fpt.capstone.etbs.config;
 
+import static fpt.capstone.etbs.constant.RoleEnum.*;
+
 import fpt.capstone.etbs.component.JwtAuthenticationEntryPoint;
 import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.filter.JwtAuthenticationFilter;
@@ -81,33 +83,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     http.authorizeRequests()
         .antMatchers(HttpMethod.GET, "/rating", "/workspace", "/raw/*", "/user", "/useremail",
             "/userblock", "/userblock/*", "/session/raw/*", "/session/user", "/session/user/*", "/google/authorize")
-        .hasRole(RoleEnum.USER.getName())
+        .hasRole(USER.getName())
         .antMatchers(HttpMethod.POST, "/rating", "/template", "/workspace", "/rate", "/raw",
             "/email/send", "/email/confirm/*", "/email/draft/*", "/publish", "/useremail",
             "/userblock", "/userblock/sync", "/session/raw")
-        .hasRole(RoleEnum.USER.getName())
+        .hasRole(USER.getName())
         .antMatchers(HttpMethod.PUT, "/rating", "/workspace/*", "/raw/*", "/user", "/user/invite", "/userblock/*",
             "/session/raw/**", "/session/user/**")
-        .hasRole(RoleEnum.USER.getName())
+        .hasRole(USER.getName())
         .antMatchers(HttpMethod.PATCH, "/raw/**", "/userblock/*", "/file/*")
-        .hasRole(RoleEnum.USER.getName())
+        .hasRole(USER.getName())
         .antMatchers(HttpMethod.DELETE, "/workspace/*", "/raw/*", "/useremail/*",
             "/userblock/*")
-        .hasRole(RoleEnum.USER.getName());
+        .hasRole(USER.getName());
 
     // Administrator
     http.authorizeRequests().antMatchers(HttpMethod.GET, "/account", "/editor/file")
-        .hasRole(RoleEnum.ADMINISTRATOR.getName())
+        .hasRole(ADMINISTRATOR.getName())
         .antMatchers(HttpMethod.POST, "/category", "/account", "/tutorial", "/template",
             "/editor/file")
-        .hasRole(RoleEnum.ADMINISTRATOR.getName())
+        .hasRole(ADMINISTRATOR.getName())
         .antMatchers(HttpMethod.PUT, "/category/*", "/template/*", "/account/*", "/tutorial/*",
             "/publish/approve/*", "/publish/deny/*")
-        .hasRole(RoleEnum.ADMINISTRATOR.getName())
+        .hasRole(ADMINISTRATOR.getName())
         .antMatchers(HttpMethod.PATCH, "/account/*", "/tutorial/*")
-        .hasRole(RoleEnum.ADMINISTRATOR.getName())
+        .hasRole(ADMINISTRATOR.getName())
         .antMatchers(HttpMethod.DELETE, "/template/*", "/editor/file")
-        .hasRole(RoleEnum.ADMINISTRATOR.getName());
+        .hasRole(ADMINISTRATOR.getName());
 
     // Logged
     http.authorizeRequests().antMatchers(HttpMethod.GET, "/user", "/file", "/publish")

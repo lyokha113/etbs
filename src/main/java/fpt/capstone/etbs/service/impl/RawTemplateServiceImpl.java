@@ -169,14 +169,14 @@ public class RawTemplateServiceImpl implements RawTemplateService {
   }
 
   @Override
-  public void uploadFiles(UUID accountId, Integer rawId, MultipartFile[] files) throws Exception {
+  public List<MediaFile> uploadFiles(UUID accountId, Integer rawId, MultipartFile[] files) throws Exception {
 
     Account account = accountRepository.findById(accountId).orElse(null);
     if (account == null) {
       throw new BadRequestException("Account doesn't exist");
     }
 
-    mediaFileService.createMediaFiles(account.getId(), files);
+    List<MediaFile> uploaded = mediaFileService.createMediaFiles(account.getId(), files);
 
     String currentOnlineKey = CURRENT_ONLINE_CACHE + rawId;
     String dest = WEB_SOCKET_RAW_QUEUE + rawId;
@@ -187,8 +187,10 @@ public class RawTemplateServiceImpl implements RawTemplateService {
     Set<Object> currentOnline = redisService.getOnlineSessions(currentOnlineKey);
     currentOnline.forEach(user -> {
       String receiverId = String.valueOf(user);
-      messagePublisherService.sendDesignContent(receiverId, dest, ownerFiles);
+      messagePublisherService.sendDesignFiles(receiverId, dest, ownerFiles);
     });
+
+    return uploaded;
   }
 
   @Override

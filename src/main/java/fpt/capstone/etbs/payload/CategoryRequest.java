@@ -13,4 +13,5 @@ public class CategoryRequest {
 
   private String name;
   private boolean active;
+  private boolean trending;
 }

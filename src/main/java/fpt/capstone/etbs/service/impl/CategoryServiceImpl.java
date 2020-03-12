@@ -2,9 +2,11 @@ package fpt.capstone.etbs.service.impl;
 
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Category;
+import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.CategoryRequest;
 import fpt.capstone.etbs.repository.CategoryRepository;
 import fpt.capstone.etbs.service.CategoryService;
+import fpt.capstone.etbs.service.TemplateService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,9 @@ public class CategoryServiceImpl implements CategoryService {
 
   @Autowired
   private CategoryRepository categoryRepository;
+
+  @Autowired
+  private TemplateService templateService;
 
   @Override
   public List<Category> getCategories() {
@@ -32,7 +37,9 @@ public class CategoryServiceImpl implements CategoryService {
       throw new BadRequestException("Workspace name is existed");
     }
 
-    Category category = Category.builder().name(request.getName()).active(true).build();
+    Category category = Category.builder()
+        .name(request.getName()).active(true).trending(false)
+        .build();
 
     return categoryRepository.save(category);
   }
@@ -51,7 +58,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     category.setName(request.getName());
     category.setActive(request.isActive());
-    return categoryRepository.save(category);
+    category.setTrending(request.isTrending());
+    category = categoryRepository.save(category);
+
+    templateService.calculateScore();
+    return category;
   }
 
   private boolean isDuplicateName(String name) {

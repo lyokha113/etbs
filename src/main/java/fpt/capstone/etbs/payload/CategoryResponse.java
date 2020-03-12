@@ -23,6 +23,7 @@ public class CategoryResponse {
   private List<TemplateOfCategory> templates;
   private int noOfTemplates;
   private boolean active;
+  private boolean trending;
 
   public static CategoryResponse setResponse(Category category) {
     Set<Template> templates = category.getTemplates();
@@ -31,6 +32,7 @@ public class CategoryResponse {
         .name(category.getName())
         .noOfTemplates(templates == null ? 0 : templates.size())
         .active(category.isActive())
+        .trending(category.isTrending())
         .build();
   }
 
@@ -45,6 +47,7 @@ public class CategoryResponse {
         .name(category.getName())
         .templates(templatesOfCategory)
         .active(category.isActive())
+        .trending(category.isTrending())
         .build();
   }
 }

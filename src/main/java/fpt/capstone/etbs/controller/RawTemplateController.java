@@ -3,13 +3,16 @@ package fpt.capstone.etbs.controller;
 import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.exception.BadRequestException;
+import fpt.capstone.etbs.model.MediaFile;
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.payload.ApiResponse;
+import fpt.capstone.etbs.payload.MediaFileResponse;
 import fpt.capstone.etbs.payload.RawTemplateRequest;
 import fpt.capstone.etbs.payload.RawTemplateResponse;
 import fpt.capstone.etbs.payload.SaveContentRequest;
 import fpt.capstone.etbs.payload.StringWrapperRequest;
 import fpt.capstone.etbs.service.RawTemplateService;
+import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -102,8 +105,8 @@ public class RawTemplateController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      rawTemplateService.uploadFiles(userPrincipal.getId(), id, files);
-      return ResponseEntity.ok(new ApiResponse<>(true, "Files was uploaded", null));
+      List<MediaFile> uploaded = rawTemplateService.uploadFiles(userPrincipal.getId(), id, files);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Files was uploaded", MediaFileResponse.setResponse(uploaded.get(0))));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }

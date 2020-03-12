@@ -18,6 +18,7 @@ public class AccountResponse {
   private String email;
   private String imageUrl;
   private boolean active;
+  private boolean allowInvite;
   private String provider;
   private int roleId;
   private String roleName;
@@ -30,6 +31,7 @@ public class AccountResponse {
         .imageUrl(account.getImageUrl())
         .provider(account.getProvider().name())
         .active(account.isActive())
+        .allowInvite(account.isAllowInvite())
         .roleId(account.getRole().getId())
         .roleName(account.getRole().getName())
         .build();

@@ -42,9 +42,9 @@ public class TemplateController {
             : templateService.getTemplatesForUser();
     List<TemplateResponse> response =
         templates.stream()
-            .sorted(Comparator.comparing(Template::getCreatedDate).reversed())
+            .sorted(Comparator.comparingDouble(Template::getScore)
+                .thenComparing(Template::getCreatedDate).reversed())
             .map(TemplateResponse::setResponse)
-            .sorted(Comparator.comparingDouble(TemplateResponse::getScore).reversed())
             .collect(Collectors.toList());
     return ResponseEntity.ok(new ApiResponse<>(true, "", response));
   }
@@ -63,9 +63,9 @@ public class TemplateController {
     List<Template> templates = templateService.getTemplatesByAuthor(uuid);
     List<TemplateResponse> response =
         templates.stream()
-            .sorted(Comparator.comparing(Template::getCreatedDate).reversed())
+            .sorted(Comparator.comparingDouble(Template::getScore)
+                .thenComparing(Template::getCreatedDate).reversed())
             .map(TemplateResponse::setResponse)
-            .sorted(Comparator.comparingDouble(TemplateResponse::getScore).reversed())
             .collect(Collectors.toList());
     return ResponseEntity.ok(new ApiResponse<>(true, "", response));
   }

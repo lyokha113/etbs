@@ -34,6 +34,17 @@ public class ThreadConfig {
     return executor;
   }
 
+  @Bean("calculateScoreAsyncExecutor")
+  public TaskExecutor calculateScoreAsyncExecutor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setCorePoolSize(1);
+    executor.setMaxPoolSize(1);
+    executor.setQueueCapacity(1);
+    executor.setThreadNamePrefix("CalculateScore-");
+    executor.initialize();
+    return executor;
+  }
+
 
   @Bean("checkDuplicateAsyncExecutor")
   public TaskExecutor checkDuplicateAsyncExecutor() {

@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,10 +36,12 @@ public class HandleErrorController implements ErrorController {
   }
 
   @MessageExceptionHandler
-  public String handleWebsocketException(IllegalArgumentException ex)
+  @SendToUser("/queue/error")
+  public String handleWebsocketException(Exception ex)
       throws JsonProcessingException {
-    Map<String, WebSocketCloseStatus> error = new HashMap<>();
-    error.put("Error", WebSocketCloseStatus.POLICY_VIOLATION);
+    Map<String, String> error = new HashMap<>();
+    error.put("Error", ex.getMessage());
+    System.out.println("Catch");
     return new ObjectMapper().writeValueAsString(error);
   }
 

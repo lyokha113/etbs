@@ -1,8 +1,10 @@
 package fpt.capstone.etbs.repository;
 
 import fpt.capstone.etbs.model.Category;
+import fpt.capstone.etbs.model.Template;
 import java.util.List;
 import java.util.Optional;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -14,8 +16,10 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
   Optional<Category> getByNameAndIdNot(String name, Integer id);
 
-  List<Category> getAllByIdIn(List<Integer> ids);
+  List<Category> getByIdIn(List<Integer> ids);
 
   List<Category> getByActiveTrue();
+
+  List<Category> getByTemplatesIn(List<Template> templates);
 
 }

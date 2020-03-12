@@ -42,8 +42,8 @@ public class TemplateResponse  {
             ? new ArrayList<>()
             : categories.stream().map(CategoryOfTemplate::setResponse).collect(Collectors.toList());
     Set<Rating> ratings = template.getRatings();
-    int up = ratings != null ? (int) template.getRatings().stream().filter(Rating::isVote).count() : 0;
-    int down = ratings != null ? (int) template.getRatings().stream().filter(r -> !r.isVote()).count() : 0;
+    int up = ratings != null ? (int) ratings.stream().filter(Rating::isVote).count() : 0;
+    int down = ratings != null ? (int) ratings.stream().filter(r -> !r.isVote()).count() : 0;
     return TemplateResponse.builder()
         .id(template.getId())
         .name(template.getName())
@@ -53,7 +53,7 @@ public class TemplateResponse  {
         .thumbnail(template.getThumbnail())
         .upVote(up)
         .downVote(down)
-        .score(TemplateService.calculateScore(up, down, template.getCreatedDate()))
+        .score(template.getScore())
         .description(template.getDescription())
         .categories(categoryOfTemplates)
         .build();

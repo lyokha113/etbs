@@ -1,6 +1,7 @@
 package fpt.capstone.etbs.service;
 
 import fpt.capstone.etbs.model.DesignSession;
+import fpt.capstone.etbs.model.MediaFile;
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.payload.DesignSessionRequest;
 import java.util.List;
@@ -21,7 +22,7 @@ public interface DesignSessionService {
 
   RawTemplate updateContent(UUID contributorId, Integer rawId, String content) throws Exception;
 
-  void uploadFileToOwner(UUID contributorId, Integer rawId, MultipartFile[] files) throws Exception;
+  List<MediaFile>  uploadFileToOwner(UUID contributorId, Integer rawId, MultipartFile[] files) throws Exception;
 
   void leaveSession(UUID contributorId, Integer rawId) throws Exception;
 
