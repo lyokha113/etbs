@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.service.impl;
 
+import de.uni_jena.cs.fusion.similarity.jarowinkler.JaroWinklerSimilarity;
 import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.constant.PublishStatus;
 import fpt.capstone.etbs.exception.BadRequestException;
@@ -7,11 +8,14 @@ import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Publish;
 import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.ApprovePublishRequest;
+import fpt.capstone.etbs.payload.PublishRequest;
 import fpt.capstone.etbs.payload.PublishResponse;
 import fpt.capstone.etbs.payload.TemplateRequest;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.PublishRepository;
 import fpt.capstone.etbs.repository.TemplateRepository;
+import fpt.capstone.etbs.service.HtmlContentService;
+import fpt.capstone.etbs.service.MessagePublisherService;
 import fpt.capstone.etbs.service.PublishService;
 import fpt.capstone.etbs.service.TemplateService;
 import java.math.BigDecimal;
@@ -19,14 +23,17 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.similarity.JaroWinklerSimilarity;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +54,10 @@ public class PublishServiceImpl implements PublishService {
   private TemplateService templateService;
 
   @Autowired
-  private SimpMessageSendingOperations messagingTemplate;
+  private HtmlContentService htmlContentService;
+
+  @Autowired
+  private MessagePublisherService messagePublisherService;
 
   @Override
   public List<Publish> getPublishes() {
@@ -60,15 +70,11 @@ public class PublishServiceImpl implements PublishService {
   }
 
   @Override
-  public Publish createPublish(UUID authorId, String content) {
+  public Publish createPublish(UUID authorId, PublishRequest request) {
 
     Account author = accountRepository.findById(authorId).orElse(null);
     if (author == null) {
       throw new BadRequestException("Account doesn't exited");
-    }
-
-    if (StringUtils.isBlank(content)) {
-      throw new BadRequestException("Content mustn't blank");
     }
 
     if (!checkPublishPolicy(authorId)) {
@@ -77,7 +83,9 @@ public class PublishServiceImpl implements PublishService {
     }
 
     Publish publish = Publish.builder()
-        .content(content)
+        .content(request.getContent())
+        .name(request.getName())
+        .description(request.getDescription())
         .author(author)
         .status(PublishStatus.PENDING)
         .build();
@@ -86,53 +94,109 @@ public class PublishServiceImpl implements PublishService {
   }
 
   @Override
-  public Publish updatePublishStatus(Integer id, PublishStatus status, String name) {
+  public Publish approve(Integer id, ApprovePublishRequest approveRequest) throws Exception {
 
-    if (status.equals(PublishStatus.PROCESSING)) {
-      Template template = templateRepository.getByName(name).orElse(null);
-      if (template != null) {
-        throw new BadRequestException("Template name is existed");
+      Publish publish = publishRepository.findById(id).orElse(null);
+      if (publish == null) {
+        throw new BadRequestException("Publish isn't existed");
       }
-    }
 
+      TemplateRequest request = new TemplateRequest(approveRequest, publish.getContent(), publish.getAuthor().getId());
+      templateService.createTemplate(request);
+
+      publish.setStatus(PublishStatus.PUBLISHED);
+      return publishRepository.save(publish);
+  }
+
+  @Override
+  public Publish deny(Integer id) {
     Publish publish = publishRepository.findById(id).orElse(null);
     if (publish == null) {
       throw new BadRequestException("Publish isn't existed");
     }
 
-    publish.setStatus(status);
-    publish = publishRepository.save(publish);
-    sendMessageWS();
-    return publish;
+    publish.setStatus(PublishStatus.PUBLISHED);
+    return publishRepository.save(publish);
   }
 
   @Override
   @Async("checkDuplicateAsyncExecutor")
-  public void checkDuplicateAsync(Publish publish) {
-    checkDuplicate(publish);
-    sendMessageWS();
+  public void checkDuplicate() {
+    List<Publish> publishes = publishRepository.getByStatusEquals(PublishStatus.PENDING);
+    checkDuplicate(publishes);
+
+    publishes = getPublishes();
+    List<PublishResponse> responses = publishes.stream().map(PublishResponse::setResponse)
+        .sorted(Comparator.comparing(PublishResponse::getRequestDate).reversed())
+        .collect(Collectors.toList());
+    messagePublisherService.sendPublishesAdmin(responses);
   }
 
   @Override
-  @Async("approvePublishAsyncExecutor")
-  @Transactional
-  public void approve(ApprovePublishRequest approveRequest, Publish publish) {
-    try {
+  @Async("checkDuplicateSingleAsyncExecutor")
+  public void checkDuplicate(UUID authorId, Publish publish) {
+    List<Publish> publishes = Collections.singletonList(publish);
+    checkDuplicate(publishes);
 
-      TemplateRequest request = new TemplateRequest(approveRequest, publish.getContent(),
-          publish.getAuthor().getId());
-      Template template = templateService.createTemplate(request);
-      template = templateService.updateContentImage(template);
-      templateService.updateThumbnail(template);
-      publish.setStatus(PublishStatus.PUBLISHED);
-      publishRepository.save(publish);
+    publishes = getPublishes(authorId);
+    List<PublishResponse> responses = publishes.stream().map(PublishResponse::setResponse)
+        .sorted(Comparator.comparing(PublishResponse::getRequestDate).reversed())
+        .collect(Collectors.toList());
+    messagePublisherService.sendPublishes(authorId.toString(), responses);
+  }
 
-      checkDuplicate();
-      sendMessageWS();
-    } catch (Exception e) {
-      publish.setStatus(PublishStatus.ERROR);
-      publishRepository.save(publish);
+  private void checkDuplicate(List<Publish> publishes) {
+    List<Template> templates = templateRepository.findAll();
+
+    Map<Template, Double> onlyTextResult, removedTextResult, finalResult;
+
+    Map<String, Template> onlyText = new HashMap<>();
+    templates.forEach(t -> {
+      onlyText.put(htmlContentService.getOnlyText(t.getContent()), t);
+    });
+
+    Map<String, Template> removedText = new HashMap<>();
+    templates.forEach(t -> {
+      removedText.put(htmlContentService.removeAllText(t.getContent()), t);
+    });
+
+    JaroWinklerSimilarity<Template> jws1 = JaroWinklerSimilarity
+        .with(onlyText, AppConstant.MIN_DUPLICATION_RATE);
+    JaroWinklerSimilarity<Template> jws2 = JaroWinklerSimilarity
+        .with(removedText, AppConstant.MIN_DUPLICATION_RATE);
+
+    for (Publish publish : publishes) {
+      String content = publish.getContent();
+      onlyTextResult = jws1.apply(htmlContentService.getOnlyText(content));
+      removedTextResult = jws2.apply(htmlContentService.removeAllText(content));
+      finalResult = Stream
+          .concat(onlyTextResult.entrySet().stream(), removedTextResult.entrySet().stream())
+          .collect(Collectors.toMap(
+              Entry::getKey,
+              Entry::getValue,
+              (v1, v2) -> ((v2 * 3) + v1) / 4,
+              HashMap::new));
+
+      Optional<Entry<Template, Double>> maxRate = finalResult.entrySet().stream()
+          .max(Entry.comparingByValue());
+
+      if (maxRate.isPresent()) {
+        Entry<Template, Double> max = maxRate.get();
+        BigDecimal rate = BigDecimal.valueOf(max.getValue() * 100).setScale(3, RoundingMode.DOWN);
+        publish.setDuplicateTemplate(max.getKey());
+        publish.setDuplicateRate(rate.doubleValue());
+
+        if (max.getValue() >= AppConstant.MAX_DUPLICATION_RATE) {
+          publish.setStatus(PublishStatus.DENIED);
+        }
+
+      } else {
+        publish.setDuplicateTemplate(null);
+        publish.setDuplicateRate(0.0);
+      }
     }
+
+    publishRepository.saveAll(publishes);
   }
 
   private boolean checkPublishPolicy(UUID authorId) {
@@ -144,53 +208,5 @@ public class PublishServiceImpl implements PublishService {
     long count = publishRepository.countByAuthor_IdAndStatusInAndCreatedDateBetween(
         authorId, statuses, startDay, endDay);
     return count < AppConstant.MAX_PENDING_PUBLISH;
-  }
-
-  private void checkDuplicate() {
-    List<Publish> publishes = publishRepository.getByStatusEquals(PublishStatus.PENDING);
-    for (Publish publish : publishes) {
-      checkDuplicate(publish);
-    }
-  }
-
-  private void checkDuplicate(Publish publish) {
-    List<Template> templates = templateRepository.findAll();
-    double maxRate = AppConstant.MIN_DUPLICATION_RATE;
-    Template duplicate = null;
-    for (Template template : templates) {
-      JaroWinklerSimilarity jws = new JaroWinklerSimilarity();
-      Double duplicationRate = jws.apply(publish.getContent(), template.getContent());
-
-      if (duplicationRate >= AppConstant.MAX_DUPLICATION_RATE) {
-        BigDecimal rate = new BigDecimal(duplicationRate * 100).setScale(3, RoundingMode.DOWN);
-        publish.setStatus(PublishStatus.DENIED);
-        publish.setDuplicateTemplate(duplicate);
-        publish.setDuplicateRate(rate.doubleValue());
-        publishRepository.save(publish);
-      }
-
-      if (duplicationRate > maxRate) {
-        maxRate = duplicationRate;
-        duplicate = template;
-      }
-    }
-
-    if (duplicate != null) {
-      BigDecimal rate = new BigDecimal(maxRate * 100).setScale(3, RoundingMode.DOWN);
-      publish.setDuplicateRate(rate.doubleValue());
-    } else {
-      publish.setDuplicateRate(0.0);
-    }
-
-    publish.setDuplicateTemplate(duplicate);
-    publishRepository.save(publish);
-  }
-
-  private void sendMessageWS() {
-    List<Publish> publishes = getPublishes();
-    List<PublishResponse> responses = publishes.stream().map(PublishResponse::setResponse)
-        .sorted(Comparator.comparing(PublishResponse::getRequestDate).reversed())
-        .collect(Collectors.toList());
-    messagingTemplate.convertAndSend(AppConstant.WEB_SOCKET_PUBLISH_TOPIC, responses);
   }
 }

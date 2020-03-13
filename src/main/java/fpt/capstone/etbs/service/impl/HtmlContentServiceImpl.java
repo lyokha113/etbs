@@ -7,6 +7,7 @@ import java.util.List;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +48,8 @@ public class HtmlContentServiceImpl implements HtmlContentService {
           ele.text(value);
         } else if (attr.getDatatype().equalsIgnoreCase("dynamic link")) {
           ele.attr("href", value);
+        } else if (attr.getDatatype().equalsIgnoreCase("dynamic image")) {
+          ele.attr("src", value);
         }
       }
     });
@@ -69,5 +72,22 @@ public class HtmlContentServiceImpl implements HtmlContentService {
     Element ele = doc.select(cssQuery).first();
     ele.text(password);
     return doc.outerHtml();
+  }
+
+  @Override
+  public String removeAllText(String content) {
+    Document doc = Jsoup.parse(content);
+    Elements elements = doc.getAllElements();
+    elements.forEach(e -> {
+      List<TextNode> textNodes = e.textNodes();
+      textNodes.forEach(tn -> tn.text(""));
+    });
+    return doc.outerHtml();
+  }
+
+  @Override
+  public String getOnlyText(String content) {
+    Document doc = Jsoup.parse(content);
+    return doc.text();
   }
 }

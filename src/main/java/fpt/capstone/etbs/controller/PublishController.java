@@ -7,8 +7,8 @@ import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Publish;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.ApprovePublishRequest;
+import fpt.capstone.etbs.payload.PublishRequest;
 import fpt.capstone.etbs.payload.PublishResponse;
-import fpt.capstone.etbs.payload.StringWrapperRequest;
 import fpt.capstone.etbs.service.PublishService;
 import fpt.capstone.etbs.util.RoleUtils;
 import java.util.Comparator;
@@ -48,13 +48,13 @@ public class PublishController {
   }
 
   @PostMapping("/publish")
-  public ResponseEntity<?> createPublish(@Valid @RequestBody StringWrapperRequest wrapper) {
+  public ResponseEntity<?> createPublish(@Valid @RequestBody PublishRequest request) {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      Publish publish = publishService.createPublish(userPrincipal.getId(), wrapper.getString());
+      Publish publish = publishService.createPublish(userPrincipal.getId(), request);
       PublishResponse response = PublishResponse.setResponse(publish);
-      publishService.checkDuplicateAsync(publish);
+      publishService.checkDuplicate(userPrincipal.getId(), publish);
       return ResponseEntity.ok(new ApiResponse<>(true, "Request sent", response));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
@@ -65,10 +65,9 @@ public class PublishController {
   public ResponseEntity<?> approvePublish(@PathVariable("id") Integer id,
       @RequestBody ApprovePublishRequest request) throws Exception {
     try {
-      Publish publish = publishService
-          .updatePublishStatus(id, PublishStatus.PROCESSING, request.getName());
+      Publish publish = publishService.approve(id, request);
       PublishResponse response = PublishResponse.setResponse(publish);
-      publishService.approve(request, publish);
+      publishService.checkDuplicate();
       return ResponseEntity.ok(new ApiResponse<>(true, "Request sent", response));
     } catch (BadRequestException | IllegalArgumentException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
@@ -78,7 +77,7 @@ public class PublishController {
   @PutMapping("/publish/deny/{id}")
   public ResponseEntity<?> denyPublish(@PathVariable("id") Integer id) {
     try {
-      Publish publish = publishService.updatePublishStatus(id, PublishStatus.DENIED, null);
+      Publish publish = publishService.deny(id);
       PublishResponse response = PublishResponse.setResponse(publish);
       return ResponseEntity.ok(new ApiResponse<>(true, "Request sent", response));
     } catch (BadRequestException | IllegalArgumentException ex) {

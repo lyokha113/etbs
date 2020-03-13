@@ -47,6 +47,12 @@ public class Publish extends Auditing {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
+  @Column
+  private String name;
+
+  @Column(columnDefinition = "text")
+  private String description;
+
   @Column(columnDefinition = "text")
   private String content;
 

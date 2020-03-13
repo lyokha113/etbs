@@ -75,7 +75,6 @@ public class TemplateController {
       throws Exception {
     try {
       Template template = templateService.createTemplate(request);
-      template = templateService.updateThumbnail(template);
       TemplateResponse response = TemplateResponse.setResponse(template);
       return ResponseEntity.ok(new ApiResponse<>(true, "Template created", response));
     } catch (BadRequestException ex) {

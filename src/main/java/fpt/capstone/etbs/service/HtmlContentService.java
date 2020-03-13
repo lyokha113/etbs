@@ -13,4 +13,8 @@ public interface HtmlContentService {
   String setConfirmToken(String uri, String token, String content);
 
   String setRecoveryPassword(String password, String content);
+
+  String removeAllText(String content);
+
+  String getOnlyText(String content);
 }

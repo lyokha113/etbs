@@ -1,5 +1,6 @@
 package fpt.capstone.etbs.config;
 
+import java.util.concurrent.Executors;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
@@ -14,8 +15,8 @@ public class ThreadConfig {
   public TaskExecutor mailAsyncExecutor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
     executor.setCorePoolSize(10);
-    executor.setMaxPoolSize(10);
-    executor.setQueueCapacity(20);
+    executor.setMaxPoolSize(20);
+    executor.setQueueCapacity(50);
     executor.setWaitForTasksToCompleteOnShutdown(true);
     executor.setThreadNamePrefix("Email-");
     executor.initialize();
@@ -39,33 +40,32 @@ public class ThreadConfig {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
     executor.setCorePoolSize(1);
     executor.setMaxPoolSize(1);
-    executor.setQueueCapacity(1);
+    executor.setQueueCapacity(10);
     executor.setThreadNamePrefix("CalculateScore-");
     executor.initialize();
     return executor;
   }
 
-
   @Bean("checkDuplicateAsyncExecutor")
   public TaskExecutor checkDuplicateAsyncExecutor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-    executor.setCorePoolSize(5);
-    executor.setMaxPoolSize(5);
-    executor.setQueueCapacity(20);
+    executor.setCorePoolSize(1);
+    executor.setMaxPoolSize(1);
+    executor.setQueueCapacity(10);
     executor.setWaitForTasksToCompleteOnShutdown(true);
     executor.setThreadNamePrefix("CheckDuplicate-");
     executor.initialize();
     return executor;
   }
 
-  @Bean("approvePublishAsyncExecutor")
-  public TaskExecutor approvePublishAsyncExecutor() {
+  @Bean("checkDuplicateSingleAsyncExecutor")
+  public TaskExecutor checkDuplicateSingleAsyncExecutor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-    executor.setCorePoolSize(5);
-    executor.setMaxPoolSize(5);
+    executor.setCorePoolSize(10);
+    executor.setMaxPoolSize(20);
     executor.setQueueCapacity(20);
     executor.setWaitForTasksToCompleteOnShutdown(true);
-    executor.setThreadNamePrefix("ApprovePublish-");
+    executor.setThreadNamePrefix("CheckDuplicateSingle-");
     executor.initialize();
     return executor;
   }

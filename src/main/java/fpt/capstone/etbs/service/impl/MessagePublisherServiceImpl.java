@@ -1,6 +1,8 @@
 package fpt.capstone.etbs.service.impl;
 
 import static fpt.capstone.etbs.constant.AppConstant.WEB_SOCKET_INVITATION_QUEUE;
+import static fpt.capstone.etbs.constant.AppConstant.WEB_SOCKET_PUBLISH_QUEUE;
+import static fpt.capstone.etbs.constant.AppConstant.WEB_SOCKET_PUBLISH_TOPIC;
 import static fpt.capstone.etbs.constant.AppConstant.WEB_SOCKET_USER_EMAIL_QUEUE;
 
 import fpt.capstone.etbs.service.MessagePublisherService;
@@ -74,5 +76,15 @@ public class MessagePublisherServiceImpl implements MessagePublisherService {
     message.put("command", "file");
     message.put("data", data);
     messagingTemplate.convertAndSendToUser(receiver, dest, message);
+  }
+
+  @Override
+  public void sendPublishesAdmin(Object data) {
+    messagingTemplate.convertAndSend(WEB_SOCKET_PUBLISH_TOPIC, data);
+  }
+
+  @Override
+  public void sendPublishes(String receiver, Object data) {
+    messagingTemplate.convertAndSendToUser(receiver, WEB_SOCKET_PUBLISH_QUEUE, data);
   }
 }

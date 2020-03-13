@@ -142,6 +142,7 @@ public class TemplateServiceImpl implements TemplateService {
 
     template = templateRepository.save(template);
     template = updateContentImage(template);
+    template = updateThumbnail(template);
     return template;
   }
 
