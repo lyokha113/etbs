@@ -102,4 +102,7 @@ public class Account extends Auditing {
   @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
   private Set<UserBlock> userBlocks;
 
+  @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+  private Set<Notification> notifications;
+
 }

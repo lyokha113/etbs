@@ -21,4 +21,6 @@ public interface MessagePublisherService {
   void sendPublishesAdmin(Object data);
 
   void sendPublishes(String receiver, Object data);
+
+  void sendNotification(String receiver, Object data);
 }

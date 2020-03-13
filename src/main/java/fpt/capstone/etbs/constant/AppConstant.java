@@ -41,6 +41,7 @@ public class AppConstant {
   public static final String WEB_SOCKET_USER_EMAIL_QUEUE = "/queue/useremail/";
   public static final String WEB_SOCKET_INVITATION_QUEUE = "/queue/invitation/";
   public static final String WEB_SOCKET_RAW_QUEUE = "/queue/raw/";
+  public static final String WEB_SOCKET_NOTIFICATION_QUEUE = "/queue/notification/";
   public static final String WEB_SOCKET_PUBLISH_QUEUE = "/queue/publish/";
   public static final String WEB_SOCKET_PUBLISH_TOPIC = "/topic/publish/";
 

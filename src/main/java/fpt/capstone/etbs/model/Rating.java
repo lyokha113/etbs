@@ -32,7 +32,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @JsonIgnoreProperties(
     value = {"createdDate", "lastModifiedDate"},
     allowGetters = true)
-@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Rating extends Auditing {
 
   @EmbeddedId

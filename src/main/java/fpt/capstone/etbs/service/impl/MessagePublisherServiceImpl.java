@@ -1,6 +1,7 @@
 package fpt.capstone.etbs.service.impl;
 
 import static fpt.capstone.etbs.constant.AppConstant.WEB_SOCKET_INVITATION_QUEUE;
+import static fpt.capstone.etbs.constant.AppConstant.WEB_SOCKET_NOTIFICATION_QUEUE;
 import static fpt.capstone.etbs.constant.AppConstant.WEB_SOCKET_PUBLISH_QUEUE;
 import static fpt.capstone.etbs.constant.AppConstant.WEB_SOCKET_PUBLISH_TOPIC;
 import static fpt.capstone.etbs.constant.AppConstant.WEB_SOCKET_USER_EMAIL_QUEUE;
@@ -86,5 +87,10 @@ public class MessagePublisherServiceImpl implements MessagePublisherService {
   @Override
   public void sendPublishes(String receiver, Object data) {
     messagingTemplate.convertAndSendToUser(receiver, WEB_SOCKET_PUBLISH_QUEUE, data);
+  }
+
+  @Override
+  public void sendNotification(String receiver, Object data) {
+    messagingTemplate.convertAndSendToUser(receiver, WEB_SOCKET_NOTIFICATION_QUEUE, data);
   }
 }
