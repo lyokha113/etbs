@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -138,6 +139,7 @@ public class TemplateServiceImpl implements TemplateService {
         .content(request.getContent())
         .author(author)
         .categories(categories)
+        .score(0.0)
         .build();
 
     template = templateRepository.save(template);

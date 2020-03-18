@@ -18,9 +18,11 @@ public interface MessagePublisherService {
 
   void sendDesignFiles(String receiver, String dest, Object data);
 
-  void sendPublishesAdmin(Object data);
+  void sendPublishes(Object data);
 
-  void sendPublishes(String receiver, Object data);
+  void sendPublish(String receiver, Object data);
+
+  void sendUpdatePublish(String receiver, Object data);
 
   void sendNotification(String receiver, Object data);
 }

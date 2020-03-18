@@ -6,11 +6,13 @@ import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.TemplateRequest;
 import fpt.capstone.etbs.payload.TemplateResponse;
+import fpt.capstone.etbs.service.PublishService;
 import fpt.capstone.etbs.service.TemplateService;
 import fpt.capstone.etbs.util.RoleUtils;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,9 @@ public class TemplateController {
 
   @Autowired
   private TemplateService templateService;
+
+  @Autowired
+  private PublishService publishService;
 
   @Autowired
   private AuthenticationFacade authenticationFacade;
@@ -76,6 +81,7 @@ public class TemplateController {
     try {
       Template template = templateService.createTemplate(request);
       TemplateResponse response = TemplateResponse.setResponse(template);
+      publishService.checkDuplicate();
       return ResponseEntity.ok(new ApiResponse<>(true, "Template created", response));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));

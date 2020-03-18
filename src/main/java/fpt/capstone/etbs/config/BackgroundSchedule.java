@@ -1,26 +1,14 @@
 package fpt.capstone.etbs.config;
 
-import static fpt.capstone.etbs.constant.AppConstant.PIVOT_DATE;
-import static fpt.capstone.etbs.constant.AppConstant.TIME_TO_SCORE;
-
 import fpt.capstone.etbs.constant.AppConstant;
-import fpt.capstone.etbs.model.Category;
 import fpt.capstone.etbs.model.DeletingMediaFile;
 import fpt.capstone.etbs.model.MediaFile;
-import fpt.capstone.etbs.model.Rating;
-import fpt.capstone.etbs.model.Template;
-import fpt.capstone.etbs.repository.CategoryRepository;
 import fpt.capstone.etbs.repository.DeletingMediaFileRepository;
-import fpt.capstone.etbs.repository.RatingRepository;
-import fpt.capstone.etbs.repository.TemplateRepository;
 import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.MediaFileService;
 import fpt.capstone.etbs.service.TemplateService;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -37,10 +25,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Configuration
 @EnableScheduling
-public class FileSchedule {
+public class BackgroundSchedule {
 
-  private static final int THREAD_POOL = 5;
-  private final Logger logger = LoggerFactory.getLogger(FileSchedule.class);
+  private final Logger logger = LoggerFactory.getLogger(BackgroundSchedule.class);
   @Autowired
   private FirebaseService firebaseService;
 
@@ -56,7 +43,7 @@ public class FileSchedule {
   @Bean
   public TaskScheduler taskScheduler() {
     final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-    scheduler.setPoolSize(THREAD_POOL);
+    scheduler.setPoolSize(5);
     return scheduler;
   }
 

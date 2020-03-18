@@ -80,13 +80,24 @@ public class MessagePublisherServiceImpl implements MessagePublisherService {
   }
 
   @Override
-  public void sendPublishesAdmin(Object data) {
+  public void sendPublishes(Object data) {
     messagingTemplate.convertAndSend(WEB_SOCKET_PUBLISH_TOPIC, data);
   }
 
   @Override
-  public void sendPublishes(String receiver, Object data) {
-    messagingTemplate.convertAndSendToUser(receiver, WEB_SOCKET_PUBLISH_QUEUE, data);
+  public void sendPublish(String receiver, Object data) {
+    Map<String, Object> message = new HashMap<>();
+    message.put("command", "get");
+    message.put("data", data);
+    messagingTemplate.convertAndSendToUser(receiver, WEB_SOCKET_PUBLISH_QUEUE, message);
+  }
+
+  @Override
+  public void sendUpdatePublish(String receiver, Object data) {
+    Map<String, Object> message = new HashMap<>();
+    message.put("command", "update");
+    message.put("data", data);
+    messagingTemplate.convertAndSendToUser(receiver, WEB_SOCKET_PUBLISH_QUEUE, message);
   }
 
   @Override

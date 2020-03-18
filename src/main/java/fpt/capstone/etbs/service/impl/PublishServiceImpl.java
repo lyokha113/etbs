@@ -105,7 +105,10 @@ public class PublishServiceImpl implements PublishService {
       templateService.createTemplate(request);
 
       publish.setStatus(PublishStatus.PUBLISHED);
-      return publishRepository.save(publish);
+      publish = publishRepository.save(publish);
+
+      messagePublisherService.sendUpdatePublish(publish.getAuthor().getId().toString(), PublishResponse.setResponse(publish));
+      return publish;
   }
 
   @Override
@@ -115,8 +118,11 @@ public class PublishServiceImpl implements PublishService {
       throw new BadRequestException("Publish isn't existed");
     }
 
-    publish.setStatus(PublishStatus.PUBLISHED);
-    return publishRepository.save(publish);
+    publish.setStatus(PublishStatus.DENIED);
+    publish = publishRepository.save(publish);
+    messagePublisherService.sendUpdatePublish(publish.getAuthor().getId().toString(), PublishResponse.setResponse(publish));
+
+    return publish;
   }
 
   @Override
@@ -129,7 +135,7 @@ public class PublishServiceImpl implements PublishService {
     List<PublishResponse> responses = publishes.stream().map(PublishResponse::setResponse)
         .sorted(Comparator.comparing(PublishResponse::getRequestDate).reversed())
         .collect(Collectors.toList());
-    messagePublisherService.sendPublishesAdmin(responses);
+    messagePublisherService.sendPublishes(responses);
   }
 
   @Override
@@ -138,11 +144,18 @@ public class PublishServiceImpl implements PublishService {
     List<Publish> publishes = Collections.singletonList(publish);
     checkDuplicate(publishes);
 
-    publishes = getPublishes(authorId);
+    publishes = getPublishes();
     List<PublishResponse> responses = publishes.stream().map(PublishResponse::setResponse)
         .sorted(Comparator.comparing(PublishResponse::getRequestDate).reversed())
         .collect(Collectors.toList());
-    messagePublisherService.sendPublishes(authorId.toString(), responses);
+    messagePublisherService.sendPublishes(responses);
+
+    publishes = publishes.stream().filter(p -> p.getAuthor().getId().equals(authorId))
+        .collect(Collectors.toList());
+    responses = publishes.stream().map(PublishResponse::setResponse)
+        .sorted(Comparator.comparing(PublishResponse::getRequestDate).reversed())
+        .collect(Collectors.toList());
+    messagePublisherService.sendPublish(authorId.toString(), responses);
   }
 
   private void checkDuplicate(List<Publish> publishes) {
