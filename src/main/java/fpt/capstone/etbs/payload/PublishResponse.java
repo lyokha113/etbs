@@ -16,6 +16,8 @@ import lombok.NoArgsConstructor;
 public class PublishResponse {
 
   private Integer id;
+  private String name;
+  private String description;
   private String content;
   private String authorName;
   private UUID authorId;
@@ -23,13 +25,15 @@ public class PublishResponse {
   private Double duplicateRate;
   private String duplicateName;
   private String duplicateContent;
-  private LocalDateTime requestDate;
+  private String requestDate;
 
   public static PublishResponse setResponse(Publish publish) {
     return PublishResponse.builder()
         .id(publish.getId())
         .authorId(publish.getAuthor().getId())
         .authorName(publish.getAuthor().getFullName())
+        .name(publish.getName())
+        .description(publish.getDescription())
         .content(publish.getContent())
         .status(publish.getStatus())
         .duplicateRate(publish.getDuplicateRate() == null ? 0.0 : publish.getDuplicateRate())
@@ -37,7 +41,7 @@ public class PublishResponse {
             publish.getDuplicateTemplate() == null ? "" : publish.getDuplicateTemplate().getName())
         .duplicateContent(publish.getDuplicateTemplate() == null ? ""
             : publish.getDuplicateTemplate().getContent())
-        .requestDate(publish.getCreatedDate())
+        .requestDate(publish.getCreatedDate().toString())
         .build();
   }
 }
