@@ -16,6 +16,7 @@ import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.LoginResponse;
 import fpt.capstone.etbs.payload.StringWrapperRequest;
 import fpt.capstone.etbs.service.AccountService;
+import fpt.capstone.etbs.service.RedisService;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Base64;
@@ -52,6 +53,9 @@ public class GoogleController {
 
   @Autowired
   private AuthenticationFacade authenticationFacade;
+
+  @Autowired
+  private RedisService redisService;
 
   @GetMapping("/google/authorize")
   public ResponseEntity<?> getAuthorizedURL(@RequestParam String redirectUri,
@@ -94,6 +98,7 @@ public class GoogleController {
       Account account = accountService.setGoogleAccount(email, name, avatar);
       AccountResponse response = AccountResponse.setResponse(account);
       String jwt = tokenProvider.generateToken(response);
+      redisService.setLoginToken(account.getId().toString(), jwt);
       return ResponseEntity.ok(
           new ApiResponse<>(true, "Logged successfully", new LoginResponse(jwt)));
     } catch (BadRequestException | GeneralSecurityException | IOException ex) {

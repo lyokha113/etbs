@@ -13,6 +13,7 @@ import fpt.capstone.etbs.payload.LoginRequest;
 import fpt.capstone.etbs.payload.LoginResponse;
 import fpt.capstone.etbs.service.AccountService;
 import fpt.capstone.etbs.service.EmailService;
+import fpt.capstone.etbs.service.RedisService;
 import java.io.IOException;
 import java.util.UUID;
 import javax.mail.MessagingException;
@@ -52,6 +53,9 @@ public class UserController {
 
   @Autowired
   private EmailService emailService;
+
+  @Autowired
+  private RedisService redisService;
 
   @GetMapping("/user")
   public ResponseEntity<?> getUserDetail() {
@@ -111,6 +115,7 @@ public class UserController {
       Account account = accountService.getAccountByEmail(loginRequest.getEmail());
       AccountResponse response = AccountResponse.setResponse(account);
       String jwt = tokenProvider.generateToken(response);
+      redisService.setLoginToken(account.getId().toString(), jwt);
       return ResponseEntity.ok(
           new ApiResponse<>(true, "Logged successfully", new LoginResponse(jwt)));
     } catch (BadCredentialsException ex) {

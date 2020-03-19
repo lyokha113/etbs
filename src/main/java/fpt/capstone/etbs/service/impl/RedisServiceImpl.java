@@ -1,7 +1,8 @@
 package fpt.capstone.etbs.service.impl;
 
-import static fpt.capstone.etbs.constant.AppConstant.CURRENT_ONLINE_CACHE;
+import static fpt.capstone.etbs.constant.AppConstant.*;
 
+import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.service.RedisService;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -14,6 +15,17 @@ public class RedisServiceImpl implements RedisService {
 
   @Autowired
   private RedisTemplate<String, Object> redisTemplate;
+
+  @Override
+  public boolean checkLoginToken(String accountId, String token) {
+    String currentToken = (String) redisTemplate.opsForHash().get(LOGIN_CACHE, accountId);
+    return currentToken != null && currentToken.equals(token);
+  }
+
+  @Override
+  public void setLoginToken(String accountId, String token) {
+    redisTemplate.opsForHash().put(LOGIN_CACHE, accountId, token);
+  }
 
   @Override
   public void setOnlineSession(String key, String accountId) {

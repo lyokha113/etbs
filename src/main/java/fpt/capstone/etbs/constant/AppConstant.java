@@ -36,7 +36,6 @@ public class AppConstant {
   public static final int TIME_TO_SCORE = 60 * 60 * 6;
   public static final String PIVOT_DATE = "2020-01-01T00:00:00";
 
-
   public static final String WEB_SOCKET_CONTENT_APP = "/content/";
   public static final String WEB_SOCKET_CONTRIBUTOR_APP = "/contributor/";
   public static final String WEB_SOCKET_USER_EMAIL_QUEUE = "/queue/useremail/";
@@ -47,4 +46,5 @@ public class AppConstant {
   public static final String WEB_SOCKET_PUBLISH_TOPIC = "/topic/publish/";
 
   public static final String CURRENT_ONLINE_CACHE = "CurrentOnline";
+  public static final String LOGIN_CACHE = "Login";
 }

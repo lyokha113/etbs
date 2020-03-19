@@ -5,6 +5,7 @@ import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Role;
 import fpt.capstone.etbs.payload.AccountResponse;
 import fpt.capstone.etbs.service.CustomUserDetailsService;
+import fpt.capstone.etbs.service.RedisService;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -30,6 +31,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   @Autowired
   private CustomUserDetailsService customUserDetailsService;
 
+  @Autowired
+  private RedisService redisService;
+
   @Override
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -39,12 +43,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
       if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
         AccountResponse json = tokenProvider.getTokenValue(jwt, AccountResponse.class);
-        UserDetails userDetails = customUserDetailsService.loadUserFromID(json.getId());
-        UsernamePasswordAuthenticationToken authentication =
-            new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities());
-        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (redisService.checkLoginToken(json.getId().toString(), jwt)) {
+          UserDetails userDetails = customUserDetailsService.loadUserFromID(json.getId());
+          UsernamePasswordAuthenticationToken authentication =
+              new UsernamePasswordAuthenticationToken(
+                  userDetails, null, userDetails.getAuthorities());
+          authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+          SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
       }
     } catch (Exception ex) {
       logger.error("Could not set user authentication in security context", ex);
