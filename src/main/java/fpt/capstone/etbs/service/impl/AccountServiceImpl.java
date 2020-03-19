@@ -46,6 +46,11 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
+  public List<Account> getAdminAccounts() {
+    return accountRepository.getByRole_Id(RoleEnum.ADMINISTRATOR.getId());
+  }
+
+  @Override
   public Account getAccount(UUID uuid) {
     return accountRepository.findById(uuid).orElse(null);
   }

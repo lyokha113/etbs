@@ -16,6 +16,7 @@ import fpt.capstone.etbs.repository.PublishRepository;
 import fpt.capstone.etbs.repository.TemplateRepository;
 import fpt.capstone.etbs.service.HtmlContentService;
 import fpt.capstone.etbs.service.MessagePublisherService;
+import fpt.capstone.etbs.service.NotificationService;
 import fpt.capstone.etbs.service.PublishService;
 import fpt.capstone.etbs.service.TemplateService;
 import java.math.BigDecimal;
@@ -36,7 +37,6 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PublishServiceImpl implements PublishService {
@@ -58,6 +58,9 @@ public class PublishServiceImpl implements PublishService {
 
   @Autowired
   private MessagePublisherService messagePublisherService;
+
+  @Autowired
+  private NotificationService notificationService;
 
   @Override
   public List<Publish> getPublishes() {
@@ -90,25 +93,31 @@ public class PublishServiceImpl implements PublishService {
         .status(PublishStatus.PENDING)
         .build();
 
-    return publishRepository.save(publish);
+    publish = publishRepository.save(publish);
+    notificationService.createPublishNotification();
+    return publish;
   }
 
   @Override
   public Publish approve(Integer id, ApprovePublishRequest approveRequest) throws Exception {
 
-      Publish publish = publishRepository.findById(id).orElse(null);
-      if (publish == null) {
-        throw new BadRequestException("Publish isn't existed");
-      }
+    Publish publish = publishRepository.findById(id).orElse(null);
+    if (publish == null) {
+      throw new BadRequestException("Publish isn't existed");
+    }
 
-      TemplateRequest request = new TemplateRequest(approveRequest, publish.getContent(), publish.getAuthor().getId());
-      templateService.createTemplate(request);
+    TemplateRequest request = new TemplateRequest(approveRequest, publish.getContent(),
+        publish.getAuthor().getId());
+    Template template = templateService.createTemplate(request);
 
-      publish.setStatus(PublishStatus.PUBLISHED);
-      publish = publishRepository.save(publish);
+    publish.setStatus(PublishStatus.PUBLISHED);
+    publish = publishRepository.save(publish);
 
-      messagePublisherService.sendUpdatePublish(publish.getAuthor().getId().toString(), PublishResponse.setResponse(publish));
-      return publish;
+    messagePublisherService.sendUpdatePublish(publish.getAuthor().getId().toString(),
+        PublishResponse.setResponse(publish));
+
+    notificationService.createApproveNotification(publish.getAuthor(), template.getId());
+    return publish;
   }
 
   @Override
@@ -120,8 +129,10 @@ public class PublishServiceImpl implements PublishService {
 
     publish.setStatus(PublishStatus.DENIED);
     publish = publishRepository.save(publish);
-    messagePublisherService.sendUpdatePublish(publish.getAuthor().getId().toString(), PublishResponse.setResponse(publish));
+    messagePublisherService.sendUpdatePublish(publish.getAuthor().getId().toString(),
+        PublishResponse.setResponse(publish));
 
+    notificationService.createDenyNotification(publish.getAuthor());
     return publish;
   }
 

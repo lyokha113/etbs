@@ -12,7 +12,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Integer> {
 
-  Slice<Notification> getByAccount_IdOrderByCreatedDateDesc(UUID accountId, Pageable pageable);
+  List<Notification> getByAccount_IdOrderByCreatedDateDesc(UUID accountId);
+
+  List<Notification> getByAccount_IdAndLoadedFalseOrderByCreatedDateDesc(UUID accountId);
 
   List<Notification> getByLoadedTrueAndCreatedDateBefore(LocalDateTime limit);
 

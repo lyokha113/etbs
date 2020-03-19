@@ -2,18 +2,30 @@ package fpt.capstone.etbs.service;
 
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.Notification;
-import fpt.capstone.etbs.payload.NotificationRequest;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.data.domain.Slice;
 
 public interface NotificationService {
 
-  Slice<Notification> getNotifications(UUID accountId, int currentPage);
+  List<Notification> getNotifications(UUID accountId);
 
-  List<Notification> getLoadedNotifications();
+  List<Notification> getUnloadNotifications(UUID accountId);
 
-  void createNotification(Account account, NotificationRequest request);
+  List<Notification> getNotificationsToRemove();
 
-  void loadNotification(Integer [] ids);
+  void createPublishNotification();
+
+  void createApproveNotification(Account receiver, Integer templateId);
+
+  void createDenyNotification(Account receiver);
+
+  void createEmailNotification(Account receiver);
+
+  void createInvitationNotification(Account receiver);
+
+  void createKickNotification(Account receiver);
+
+  void createLeaveNotification(Account receiver);
+
+  void loadNotification(Integer id);
 }

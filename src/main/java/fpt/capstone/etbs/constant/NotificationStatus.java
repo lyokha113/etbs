@@ -1,5 +1,5 @@
 package fpt.capstone.etbs.constant;
 
 public enum NotificationStatus {
-  SUCCESS, WARNING, DANGER, NORMAL
+  SUCCESS, WARNING, DANGER, PRIMARY
 }

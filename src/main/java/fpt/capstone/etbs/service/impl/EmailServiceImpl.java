@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import javax.mail.Flags;
 import javax.mail.Folder;
@@ -70,7 +71,7 @@ public class EmailServiceImpl implements EmailService {
   private GoogleAuthenticator googleAuthenticator;
 
   @Autowired
-  private int sendMailType;
+  private AtomicInteger sendMailType;
 
   @Value("${app.serverConfirmUri}")
   private String serverConfirmUri;
@@ -278,23 +279,23 @@ public class EmailServiceImpl implements EmailService {
 
   private void balancingSend(String email, String subject, String content)
       throws MessagingException, IOException {
-    if (sendMailType <= 0) {
+    if (sendMailType.get() <= 0) {
       javaMailSender.send(createSendMessage(email, subject, content));
-      sendMailType++;
+      sendMailType.getAndIncrement();
     } else {
       sendBySendGrid(email, subject, content);
-      sendMailType--;
+      sendMailType.getAndDecrement();
     }
   }
 
   private void balancingSend(String [] email, String subject, String content)
       throws MessagingException, IOException {
-    if (sendMailType <= 0) {
+    if (sendMailType.get() <= 0) {
       javaMailSender.send(createSendMessage(email, subject, content));
-      sendMailType++;
+      sendMailType.getAndIncrement();
     } else {
       sendBySendGrid(email, subject, content);
-      sendMailType--;
+      sendMailType.getAndDecrement();
     }
   }
 

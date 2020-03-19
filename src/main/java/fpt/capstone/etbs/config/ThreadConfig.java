@@ -70,4 +70,16 @@ public class ThreadConfig {
     return executor;
   }
 
+  @Bean("notificationAsyncExecutor")
+  public TaskExecutor notificationAsyncExecutor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setCorePoolSize(20);
+    executor.setMaxPoolSize(50);
+    executor.setQueueCapacity(50);
+    executor.setWaitForTasksToCompleteOnShutdown(true);
+    executor.setThreadNamePrefix("Notification-");
+    executor.initialize();
+    return executor;
+  }
+
 }

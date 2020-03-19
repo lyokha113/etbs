@@ -13,4 +13,5 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
   Optional<Account> getByEmail(String email);
 
   List<Account> getByRole_Id(Integer roleId);
+
 }

@@ -39,23 +39,31 @@ public class NotificationController {
 
 
   @GetMapping("/notification")
-  private ResponseEntity<?> getNotifications(@RequestParam("page") int page) {
+  private ResponseEntity<?> getUnloadNotifications() {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-    Slice<Notification> slice = notificationService.getNotifications(userPrincipal.getId(), page);
-    List<Notification> notifications = slice.getContent();
-    Map<String, Object> response = new HashMap<>();
-    response.put("next", slice.hasNext());
-    response.put("notifications", notifications.stream()
+    List<Notification> notifications = notificationService.getUnloadNotifications(userPrincipal.getId());
+    List<NotificationResponse> response = notifications.stream()
         .map(NotificationResponse::setResponse)
-        .collect(Collectors.toList()));
+        .collect(Collectors.toList());
     return ResponseEntity.ok(new ApiResponse<>(true, "", response));
   }
 
-  @PostMapping("/notification")
-  private ResponseEntity<?> loadNotification(@RequestParam("ids") Integer [] ids) {
+  @GetMapping("/notification/all")
+  private ResponseEntity<?> getAllNotifications() {
+    Authentication auth = authenticationFacade.getAuthentication();
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+    List<Notification> notifications = notificationService.getNotifications(userPrincipal.getId());
+    List<NotificationResponse> response = notifications.stream()
+        .map(NotificationResponse::setResponse)
+        .collect(Collectors.toList());
+    return ResponseEntity.ok(new ApiResponse<>(true, "", response));
+  }
+
+  @PostMapping("/notification/{id}")
+  private ResponseEntity<?> loadNotification(@PathVariable("id") Integer id) {
     try {
-      notificationService.loadNotification(ids);
+      notificationService.loadNotification(id);
       return ResponseEntity.ok(new ApiResponse<>(true, "", null));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));

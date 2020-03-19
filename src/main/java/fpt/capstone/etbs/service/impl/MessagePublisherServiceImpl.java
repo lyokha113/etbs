@@ -6,8 +6,11 @@ import static fpt.capstone.etbs.constant.AppConstant.WEB_SOCKET_PUBLISH_QUEUE;
 import static fpt.capstone.etbs.constant.AppConstant.WEB_SOCKET_PUBLISH_TOPIC;
 import static fpt.capstone.etbs.constant.AppConstant.WEB_SOCKET_USER_EMAIL_QUEUE;
 
+import fpt.capstone.etbs.model.Notification;
+import fpt.capstone.etbs.payload.NotificationResponse;
 import fpt.capstone.etbs.service.MessagePublisherService;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -103,5 +106,13 @@ public class MessagePublisherServiceImpl implements MessagePublisherService {
   @Override
   public void sendNotification(String receiver, Object data) {
     messagingTemplate.convertAndSendToUser(receiver, WEB_SOCKET_NOTIFICATION_QUEUE, data);
+  }
+
+  @Override
+  public void sendNotifications(List<Notification> data) {
+    data.forEach(notification -> {
+      messagingTemplate.convertAndSendToUser(notification.getAccount().getId().toString(),
+          WEB_SOCKET_NOTIFICATION_QUEUE, NotificationResponse.setResponse(notification));
+    });
   }
 }

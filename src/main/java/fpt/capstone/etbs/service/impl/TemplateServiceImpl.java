@@ -22,6 +22,7 @@ import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.ImageGeneratorService;
 import fpt.capstone.etbs.service.TemplateService;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -149,25 +151,29 @@ public class TemplateServiceImpl implements TemplateService {
   }
 
   @Override
-  public Template updateContentImage(Template template) throws Exception {
-    String content = template.getContent();
-    Document doc = Jsoup.parse(content, "UTF-8");
-    int count = 1;
-    for (Element element : doc.select("img")) {
-      String src = element.absUrl("src");
-      String order = template.getId() + "/" + count;
-      String replace = "";
-      if (src.startsWith("http://storage.googleapis.com/") && src.contains(AppConstant.USER_IMAGES)) {
-        src = src.substring(0, src.indexOf("?"));
-        replace = firebaseService.createTemplateImages(src, order);
-      } else {
-        replace = firebaseService.createTemplateImages(new URL(src), order);
+  public Template updateContentImage(Template template)  {
+      String content = template.getContent();
+      Document doc = Jsoup.parse(content, "UTF-8");
+      int count = 1;
+      Elements imgElements = doc.select("img");
+      for (Element element : imgElements) {
+        try {
+          String src = element.absUrl("src");
+          String order = template.getId() + "/" + count;
+          String replace = "";
+          if (src.startsWith("https://storage.googleapis.com/") && src.contains(AppConstant.USER_IMAGES)) {
+            src = src.substring(0, src.indexOf("?"));
+            replace = firebaseService.createTemplateImages(src, order);
+          } else {
+            replace = firebaseService.createTemplateImages(new URL(src), order);
+          }
+          content = content.replaceAll(src, replace);
+          count++;
+        } catch (Exception ignored) {
+        }
       }
-      content = content.replaceAll(src, replace);
-      count++;
-    }
-    template.setContent(content);
-    return templateRepository.save(template);
+      template.setContent(content);
+      return templateRepository.save(template);
   }
 
 
@@ -184,7 +190,7 @@ public class TemplateServiceImpl implements TemplateService {
     Document doc = Jsoup.parse(template.getContent(), "UTF-8");
     for (Element element : doc.select("img")) {
       String src = element.absUrl("src");
-      if (src.startsWith("http://storage.googleapis.com/") && src.contains(AppConstant.TEMPLATE_IMAGE)) {
+      if (src.startsWith("https://storage.googleapis.com/") && src.contains(AppConstant.TEMPLATE_IMAGE)) {
         String link = src.substring(src.indexOf(AppConstant.TEMPLATE_IMAGE), src.indexOf("?"));
         files.add(DeletingMediaFile.builder().link(link).build());
       }

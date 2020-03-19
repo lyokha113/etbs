@@ -8,6 +8,7 @@ import fpt.capstone.etbs.model.UserEmail;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.UserEmailRepository;
 import fpt.capstone.etbs.service.MessagePublisherService;
+import fpt.capstone.etbs.service.NotificationService;
 import fpt.capstone.etbs.service.UserEmailService;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +28,9 @@ public class UserEmailServiceImpl implements UserEmailService {
 
   @Autowired
   private MessagePublisherService messagePublisherService;
+
+  @Autowired
+  private NotificationService notificationService;
 
   @Override
   public UserEmail createUserEmail(UUID accountId, String email) {
@@ -90,6 +94,7 @@ public class UserEmailServiceImpl implements UserEmailService {
 
     messagePublisherService
         .sendUserEmailApproved(userEmail.getAccount().getId().toString(), userEmail);
+    notificationService.createEmailNotification(userEmail.getAccount());
   }
 
 

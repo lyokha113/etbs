@@ -22,6 +22,7 @@ import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.ImageGeneratorService;
 import fpt.capstone.etbs.service.MediaFileService;
 import fpt.capstone.etbs.service.MessagePublisherService;
+import fpt.capstone.etbs.service.NotificationService;
 import fpt.capstone.etbs.service.RedisService;
 import java.util.List;
 import java.util.Set;
@@ -47,13 +48,10 @@ public class DesignSessionServiceImpl implements DesignSessionService {
   private MediaFileService mediaFileService;
 
   @Autowired
-  private FirebaseService firebaseService;
-
-  @Autowired
-  private ImageGeneratorService imageGeneratorService;
-
-  @Autowired
   private MessagePublisherService messagePublisherService;
+
+  @Autowired
+  private NotificationService notificationService;
 
   @Autowired
   private RedisService redisService;
@@ -134,6 +132,7 @@ public class DesignSessionServiceImpl implements DesignSessionService {
 
     messagePublisherService.sendAddInvitation(contributor.getId().toString(),
         DesignSessionResponse.setResponse(session));
+    notificationService.createInvitationNotification(contributor);
     return session;
   }
 
@@ -199,7 +198,7 @@ public class DesignSessionServiceImpl implements DesignSessionService {
     messagePublisherService.sendLeaveSession(owner.getId().toString(),
         WEB_SOCKET_RAW_QUEUE + rawId,
         contributorId.toString());
-
+    notificationService.createLeaveNotification(owner);
   }
 
   @Override
@@ -207,15 +206,15 @@ public class DesignSessionServiceImpl implements DesignSessionService {
     List<DesignSession> sessions = designSessionRepository
         .getByRawTemplate_Workspace_Account_IdAndId_RawTemplateId(ownerId, rawId);
 
-    List<String> contributors = sessions.stream()
-        .map(s -> s.getContributor().getId().toString())
+    List<Account> contributors = sessions.stream().map(DesignSession::getContributor)
         .collect(Collectors.toList());
 
     designSessionRepository.deleteAll(sessions);
     contributors.forEach(contributor -> {
-      messagePublisherService.sendRemoveInvitation(contributor, rawId);
-      messagePublisherService.sendKickSession(contributor, WEB_SOCKET_RAW_QUEUE + rawId);
-      redisService.setOfflineSession(CURRENT_ONLINE_CACHE + rawId, contributor);
+      messagePublisherService.sendRemoveInvitation(contributor.getId().toString(), rawId);
+      messagePublisherService.sendKickSession(contributor.getId().toString(), WEB_SOCKET_RAW_QUEUE + rawId);
+      redisService.setOfflineSession(CURRENT_ONLINE_CACHE + rawId, contributor.getId().toString());
+      notificationService.createKickNotification(contributor);
     });
   }
 
@@ -237,6 +236,7 @@ public class DesignSessionServiceImpl implements DesignSessionService {
     messagePublisherService.sendRemoveInvitation(contributorId.toString(), rawId);
     messagePublisherService.sendKickSession(contributorId.toString(), WEB_SOCKET_RAW_QUEUE + rawId);
     redisService.setOfflineSession(CURRENT_ONLINE_CACHE + rawId, contributorId.toString());
+    notificationService.createKickNotification(session.getContributor());
   }
 
 }

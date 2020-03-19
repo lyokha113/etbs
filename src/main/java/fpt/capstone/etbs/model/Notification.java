@@ -26,7 +26,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Data
-@Table(name = "rating")
+@Table(name = "notification")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -45,10 +45,10 @@ public class Notification extends Auditing{
   private Integer id;
 
   @Column
-  private String content;
+  private String title;
 
   @Column
-  private String icon;
+  private String content;
 
   @Column
   private boolean loaded;
@@ -56,8 +56,7 @@ public class Notification extends Auditing{
   @Enumerated(EnumType.STRING)
   private NotificationStatus status;
 
-  @Enumerated(EnumType.STRING)
-  private NotificationCode code;
+  private String code;
 
   @ManyToOne(optional = false)
   @NonNull

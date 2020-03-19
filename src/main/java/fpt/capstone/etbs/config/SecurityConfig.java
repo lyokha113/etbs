@@ -82,11 +82,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     // User
     http.authorizeRequests()
         .antMatchers(HttpMethod.GET, "/rating", "/workspace", "/raw/*", "/user", "/useremail",
-            "/userblock", "/userblock/*", "/session/raw/*", "/session/user", "/session/user/*", "/notification", "/google/authorize")
+            "/userblock", "/userblock/*", "/session/raw/*", "/session/user", "/session/user/*", "/google/authorize")
         .hasRole(USER.getName())
         .antMatchers(HttpMethod.POST, "/rating", "/template", "/workspace", "/rate", "/raw",
             "/email/send", "/email/confirm/*", "/email/draft/*", "/publish", "/useremail",
-            "/userblock", "/userblock/sync", "/session/raw", "/notification")
+            "/userblock", "/userblock/sync", "/session/raw")
         .hasRole(USER.getName())
         .antMatchers(HttpMethod.PUT, "/rating", "/workspace/*", "/raw/*", "/user", "/user/invite", "/userblock/*",
             "/session/raw/**", "/session/user/**")
@@ -112,9 +112,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .hasRole(ADMINISTRATOR.getName());
 
     // Logged
-    http.authorizeRequests().antMatchers(HttpMethod.GET, "/user", "/file", "/publish")
+    http.authorizeRequests().antMatchers(HttpMethod.GET, "/user", "/file", "/publish", "/notification", "/notification/all")
         .authenticated()
-        .antMatchers(HttpMethod.POST, "/file")
+        .antMatchers(HttpMethod.POST, "/file", "/notification/*")
         .authenticated()
         .antMatchers(HttpMethod.PUT, "/user", "/file/*")
         .authenticated();

@@ -1,5 +1,8 @@
 package fpt.capstone.etbs.service;
 
+import fpt.capstone.etbs.model.Notification;
+import java.util.List;
+
 public interface MessagePublisherService {
 
   void sendOnlineMessage(String receiver, String dest, Object data);
@@ -25,4 +28,8 @@ public interface MessagePublisherService {
   void sendUpdatePublish(String receiver, Object data);
 
   void sendNotification(String receiver, Object data);
+
+  void sendNotifications(List<Notification> data);
+
+
 }

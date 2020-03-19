@@ -11,6 +11,8 @@ public interface AccountService {
 
   List<Account> getAccounts();
 
+  List<Account> getAdminAccounts();
+
   Account getAccount(UUID uuid);
 
   Account getAccountByEmail(String email);

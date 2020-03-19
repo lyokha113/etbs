@@ -83,14 +83,16 @@ public class MediaFileServiceImpl implements MediaFileService {
     }
     List<MediaFile> results = new LinkedList<>();
     for (URL file : files) {
-      UUID id = UUID.randomUUID();
-      String link = firebaseService.createUserImage(file, accountId.toString(), id.toString());
-      String name = StringUtils.generateRandomString(10);
-      results.add(MediaFile.builder()
-          .id(id).name(name).link(link).account(account).active(true).open(true)
-          .build());
+      try {
+        UUID id = UUID.randomUUID();
+        String link = firebaseService.createUserImage(file, accountId.toString(), id.toString());
+        String name = StringUtils.generateRandomString(10);
+        results.add(MediaFile.builder()
+            .id(id).name(name).link(link).account(account).active(true).open(true)
+            .build());
+      } catch (Exception ignored) {
+      }
     }
-
     return mediaFileRepository.saveAll(results);
   }
 
