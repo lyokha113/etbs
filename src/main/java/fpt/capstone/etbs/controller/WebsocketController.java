@@ -20,7 +20,6 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class WebsocketController {
 
-
   @Autowired
   private RedisService redisService;
 

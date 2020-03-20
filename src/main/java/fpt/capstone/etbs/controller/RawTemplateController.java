@@ -1,5 +1,8 @@
 package fpt.capstone.etbs.controller;
 
+import static fpt.capstone.etbs.constant.AppConstant.CURRENT_ONLINE_CACHE;
+import static fpt.capstone.etbs.constant.AppConstant.WEB_SOCKET_RAW_QUEUE;
+
 import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.exception.BadRequestException;
@@ -11,8 +14,11 @@ import fpt.capstone.etbs.payload.RawTemplateRequest;
 import fpt.capstone.etbs.payload.RawTemplateResponse;
 import fpt.capstone.etbs.payload.SaveContentRequest;
 import fpt.capstone.etbs.payload.StringWrapperRequest;
+import fpt.capstone.etbs.service.MessagePublisherService;
 import fpt.capstone.etbs.service.RawTemplateService;
+import fpt.capstone.etbs.service.RedisService;
 import java.util.List;
+import java.util.Set;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +41,11 @@ public class RawTemplateController {
   @Autowired
   private RawTemplateService rawTemplateService;
 
+  @Autowired
+  private RedisService redisService;
+
+  @Autowired
+  private MessagePublisherService messagePublisherService;
 
   @Autowired
   private AuthenticationFacade authenticationFacade;
@@ -88,8 +99,19 @@ public class RawTemplateController {
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       RawTemplate template = rawTemplateService.updateContent(userPrincipal.getId(), id, request.getContent());
-      if (!request.isAutoSave()) {
-        rawTemplateService.updateThumbnail(template);
+      if (request.isAutoSave()) {
+        String currentOnlineKey = CURRENT_ONLINE_CACHE + id;
+        String dest = WEB_SOCKET_RAW_QUEUE + id;
+
+        Set<Object> currentOnline = redisService.getOnlineSessions(currentOnlineKey);
+        currentOnline.forEach(user -> {
+          String receiverId = String.valueOf(user);
+          if (!userPrincipal.getId().toString().equals(receiverId)) {
+            messagePublisherService.sendDesignContent(receiverId, dest, request.getContent());
+          }
+        });
+      } else {
+          rawTemplateService.updateThumbnail(template);
       }
       RawTemplateResponse response = RawTemplateResponse.setResponseWithContent(template);
       return ResponseEntity.ok(new ApiResponse<>(true, "Raw template version changed", response));
