@@ -17,7 +17,7 @@ public interface MessagePublisherService {
 
   void sendUserEmailApproved(String receiver, Object data);
 
-  void sendDesignContent(String receiver, String dest, Object data);
+  void sendDesignContent(String receiver, String dest, String data);
 
   void sendDesignFiles(String receiver, String dest, Object data);
 

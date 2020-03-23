@@ -114,7 +114,7 @@ public class RawTemplateController {
           rawTemplateService.updateThumbnail(template);
       }
       RawTemplateResponse response = RawTemplateResponse.setResponseWithContent(template);
-      return ResponseEntity.ok(new ApiResponse<>(true, "Raw template version changed", response));
+      return ResponseEntity.ok(new ApiResponse<>(true, "Raw template content changed", response));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }

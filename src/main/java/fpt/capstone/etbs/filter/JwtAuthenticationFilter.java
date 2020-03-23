@@ -1,8 +1,6 @@
 package fpt.capstone.etbs.filter;
 
 import fpt.capstone.etbs.component.JwtTokenProvider;
-import fpt.capstone.etbs.model.Account;
-import fpt.capstone.etbs.model.Role;
 import fpt.capstone.etbs.payload.AccountResponse;
 import fpt.capstone.etbs.service.CustomUserDetailsService;
 import fpt.capstone.etbs.service.RedisService;
@@ -40,7 +38,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
     try {
       String jwt = getJwtFromRequest(request);
-
       if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
         AccountResponse json = tokenProvider.getTokenValue(jwt, AccountResponse.class);
         if (redisService.checkLoginToken(json.getId().toString(), jwt)) {

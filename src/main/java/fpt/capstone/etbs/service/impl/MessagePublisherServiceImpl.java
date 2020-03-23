@@ -67,7 +67,7 @@ public class MessagePublisherServiceImpl implements MessagePublisherService {
   }
 
   @Override
-  public void sendDesignContent(String receiver, String dest, Object data) {
+  public void sendDesignContent(String receiver, String dest, String data) {
     Map<String, Object> message = new HashMap<>();
     message.put("command", "content");
     message.put("data", data);
