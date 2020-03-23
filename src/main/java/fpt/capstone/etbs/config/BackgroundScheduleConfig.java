@@ -3,9 +3,12 @@ package fpt.capstone.etbs.config;
 import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.model.DeletingMediaFile;
 import fpt.capstone.etbs.model.MediaFile;
+import fpt.capstone.etbs.model.Notification;
 import fpt.capstone.etbs.repository.DeletingMediaFileRepository;
+import fpt.capstone.etbs.repository.NotificationRepository;
 import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.MediaFileService;
+import fpt.capstone.etbs.service.NotificationService;
 import fpt.capstone.etbs.service.TemplateService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,9 +28,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Configuration
 @EnableScheduling
-public class BackgroundSchedule {
+public class BackgroundScheduleConfig {
 
-  private final Logger logger = LoggerFactory.getLogger(BackgroundSchedule.class);
+  private final Logger logger = LoggerFactory.getLogger(BackgroundScheduleConfig.class);
   @Autowired
   private FirebaseService firebaseService;
 
@@ -38,12 +41,18 @@ public class BackgroundSchedule {
   private TemplateService templateService;
 
   @Autowired
+  private NotificationService notificationService;
+
+  @Autowired
+  private NotificationRepository notificationRepository;
+
+  @Autowired
   private DeletingMediaFileRepository deletingMediaFileRepository;
 
   @Bean
   public TaskScheduler taskScheduler() {
     final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-    scheduler.setPoolSize(5);
+    scheduler.setPoolSize(10);
     return scheduler;
   }
 
@@ -87,10 +96,18 @@ public class BackgroundSchedule {
     logger.info("Finished delete DeletingMediaFile - " + deletedFiles.size() + " files deleted");
   }
 
-  @Scheduled(initialDelay = 1000 * 60 * 3, fixedDelay = 1000 * 60 * 60)
+  @Scheduled(initialDelay = 1000 * 60 * 5, fixedDelay = 1000 * 60 * 5)
   public void calculateTemplateScore() {
     logger.info("Start to calculate template score");
     templateService.calculateScore();
+  }
+
+  @Scheduled(initialDelay = 1000 * 60 * 5, fixedDelay = 1000 * 60 * 5)
+  public void deleteNotifications() {
+    logger.info("Start to delete 3 days loaded notifications");
+    List<Notification> notifications = notificationService.getNotificationsToRemove();
+    notificationRepository.deleteAll(notifications);
+    logger.info("Finished delete 3 days loaded notificaitons - " + notifications.size() +  " notifications deleted");
   }
 
 }
