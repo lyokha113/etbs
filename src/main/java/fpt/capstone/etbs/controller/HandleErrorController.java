@@ -3,7 +3,6 @@ package fpt.capstone.etbs.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fpt.capstone.etbs.payload.ApiError;
-import io.netty.handler.codec.http.websocketx.WebSocketCloseStatus;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.RequestDispatcher;

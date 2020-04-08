@@ -2,7 +2,6 @@ package fpt.capstone.etbs.controller;
 
 import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.component.UserPrincipal;
-import fpt.capstone.etbs.constant.PublishStatus;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Publish;
 import fpt.capstone.etbs.payload.ApiResponse;
@@ -69,7 +68,7 @@ public class PublishController {
       PublishResponse response = PublishResponse.setResponse(publish);
       publishService.checkDuplicate();
       return ResponseEntity.ok(new ApiResponse<>(true, "Request sent", response));
-    } catch (BadRequestException | IllegalArgumentException ex) {
+    } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
   }
@@ -80,7 +79,7 @@ public class PublishController {
       Publish publish = publishService.deny(id);
       PublishResponse response = PublishResponse.setResponse(publish);
       return ResponseEntity.ok(new ApiResponse<>(true, "Request sent", response));
-    } catch (BadRequestException | IllegalArgumentException ex) {
+    } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
   }

@@ -18,8 +18,6 @@ import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.DesignSessionRepository;
 import fpt.capstone.etbs.repository.RawTemplateRepository;
 import fpt.capstone.etbs.service.DesignSessionService;
-import fpt.capstone.etbs.service.FirebaseService;
-import fpt.capstone.etbs.service.ImageGeneratorService;
 import fpt.capstone.etbs.service.MediaFileService;
 import fpt.capstone.etbs.service.MessagePublisherService;
 import fpt.capstone.etbs.service.NotificationService;
@@ -152,7 +150,7 @@ public class DesignSessionServiceImpl implements DesignSessionService {
   }
 
   @Override
-  public List<MediaFile>  uploadFileToOwner(UUID contributorId, Integer rawId, MultipartFile[] files)
+  public List<MediaFile> uploadFileToOwner(UUID contributorId, Integer rawId, MultipartFile[] files)
       throws Exception {
 
     DesignSession session = designSessionRepository
@@ -212,7 +210,8 @@ public class DesignSessionServiceImpl implements DesignSessionService {
     designSessionRepository.deleteAll(sessions);
     contributors.forEach(contributor -> {
       messagePublisherService.sendRemoveInvitation(contributor.getId().toString(), rawId);
-      messagePublisherService.sendKickSession(contributor.getId().toString(), WEB_SOCKET_RAW_QUEUE + rawId);
+      messagePublisherService
+          .sendKickSession(contributor.getId().toString(), WEB_SOCKET_RAW_QUEUE + rawId);
       redisService.setOfflineSession(CURRENT_ONLINE_CACHE + rawId, contributor.getId().toString());
       notificationService.createKickNotification(contributor);
     });

@@ -1,7 +1,6 @@
 package fpt.capstone.etbs.repository;
 
 import fpt.capstone.etbs.model.UserBlock;
-import fpt.capstone.etbs.model.Workspace;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

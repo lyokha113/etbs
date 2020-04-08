@@ -7,8 +7,6 @@ import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.payload.DesignSessionMessage;
 import fpt.capstone.etbs.service.MessagePublisherService;
 import fpt.capstone.etbs.service.RedisService;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;

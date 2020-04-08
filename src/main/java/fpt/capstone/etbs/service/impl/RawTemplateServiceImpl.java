@@ -7,7 +7,6 @@ import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.DeletingMediaFile;
-import fpt.capstone.etbs.model.DesignSession;
 import fpt.capstone.etbs.model.MediaFile;
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.model.Template;
@@ -18,7 +17,6 @@ import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.DeletingMediaFileRepository;
 import fpt.capstone.etbs.repository.RawTemplateRepository;
 import fpt.capstone.etbs.repository.WorkspaceRepository;
-import fpt.capstone.etbs.service.DesignSessionService;
 import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.ImageGeneratorService;
 import fpt.capstone.etbs.service.MediaFileService;
@@ -31,14 +29,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
+@Slf4j
 public class RawTemplateServiceImpl implements RawTemplateService {
 
   @Autowired
@@ -77,8 +76,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
   }
 
   @Override
-  public RawTemplate createRawTemplate(UUID accountId, RawTemplateRequest request)
-      throws Exception {
+  public RawTemplate createRawTemplate(UUID accountId, RawTemplateRequest request) {
     Account account = accountRepository.findById(accountId).orElse(null);
     if (account == null) {
       throw new BadRequestException("Account doesn't exist");
@@ -169,7 +167,8 @@ public class RawTemplateServiceImpl implements RawTemplateService {
   }
 
   @Override
-  public List<MediaFile> uploadFiles(UUID accountId, Integer rawId, MultipartFile[] files) throws Exception {
+  public List<MediaFile> uploadFiles(UUID accountId, Integer rawId, MultipartFile[] files)
+      throws Exception {
 
     Account account = accountRepository.findById(accountId).orElse(null);
     if (account == null) {
@@ -195,11 +194,16 @@ public class RawTemplateServiceImpl implements RawTemplateService {
 
   @Override
   @Async("generateImageAsyncExecutor")
-  public void updateThumbnail(RawTemplate rawTemplate) throws Exception {
-    BufferedImage file = imageGeneratorService.generateImageFromHtml(rawTemplate.getContent());
-    String thumbnail = firebaseService.createRawThumbnail(file, rawTemplate.getId().toString());
-    rawTemplate.setThumbnail(thumbnail);
-    rawTemplateRepository.save(rawTemplate);
+  public void updateThumbnail(RawTemplate rawTemplate) {
+    try {
+      BufferedImage file = imageGeneratorService.generateImageFromHtml(rawTemplate.getContent());
+      String thumbnail = firebaseService.createRawThumbnail(file, rawTemplate.getId().toString());
+      rawTemplate.setThumbnail(thumbnail);
+      rawTemplateRepository.save(rawTemplate);
+    } catch (Exception ex) {
+      log.error("Generate image from html failed", ex);
+    }
+
   }
 
   @Override
@@ -213,7 +217,7 @@ public class RawTemplateServiceImpl implements RawTemplateService {
     }
 
     DeletingMediaFile thumbnail = DeletingMediaFile
-        .builder().link(rawTemplate.getThumbnail() + rawTemplate.getId())
+        .builder().link(AppConstant.RAW_TEMPLATE_THUMBNAIL + rawTemplate.getId())
         .build();
 
     deletingMediaFileRepository.save(thumbnail);

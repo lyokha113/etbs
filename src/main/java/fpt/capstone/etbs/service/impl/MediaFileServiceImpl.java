@@ -1,14 +1,11 @@
 package fpt.capstone.etbs.service.impl;
 
-import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
-import fpt.capstone.etbs.model.DesignSession;
 import fpt.capstone.etbs.model.MediaFile;
 import fpt.capstone.etbs.repository.AccountRepository;
 import fpt.capstone.etbs.repository.MediaFileRepository;
-import fpt.capstone.etbs.service.DesignSessionService;
 import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.service.MediaFileService;
 import fpt.capstone.etbs.util.StringUtils;
@@ -18,7 +15,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -67,12 +63,13 @@ public class MediaFileServiceImpl implements MediaFileService {
       UUID id = UUID.randomUUID();
       String link = firebaseService.createUserImage(file, accountId.toString(), id.toString());
       results.add(MediaFile.builder()
-          .id(id).name(file.getOriginalFilename()).link(link).account(account).active(true).open(true)
+          .id(id).name(file.getOriginalFilename()).link(link).account(account).active(true)
+          .open(true)
           .build());
     }
 
     results = mediaFileRepository.saveAll(results);
-    return  results;
+    return results;
   }
 
   @Override
@@ -116,7 +113,7 @@ public class MediaFileServiceImpl implements MediaFileService {
 
   @Override
   public void changeSharedMediaFile(UUID accountId, UUID id, boolean open) {
-    MediaFile mediaFile =  mediaFileRepository.getByIdAndAccount_Id(id, accountId).orElse(null);
+    MediaFile mediaFile = mediaFileRepository.getByIdAndAccount_Id(id, accountId).orElse(null);
 
     if (mediaFile == null) {
       throw new BadRequestException("File doesn't exist");

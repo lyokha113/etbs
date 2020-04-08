@@ -3,7 +3,6 @@ package fpt.capstone.etbs.model;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import fpt.capstone.etbs.constant.NotificationCode;
 import fpt.capstone.etbs.constant.NotificationStatus;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -37,7 +36,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
     value = {"createdDate", "lastModifiedDate"},
     allowGetters = true)
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id")
-public class Notification extends Auditing{
+public class Notification extends Auditing {
 
   @Id
   @Column

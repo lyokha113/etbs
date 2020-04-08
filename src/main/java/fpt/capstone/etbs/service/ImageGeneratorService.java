@@ -8,5 +8,4 @@ public interface ImageGeneratorService {
 
   BufferedImage generateImageFromHtmlByChrome(String html) throws Exception;
 
-  BufferedImage generateImageFromHtmlByPDFCrowd(String html) throws Exception;
 }

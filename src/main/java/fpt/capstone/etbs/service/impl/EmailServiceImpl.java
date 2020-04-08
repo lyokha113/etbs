@@ -8,7 +8,6 @@ import com.google.api.services.gmail.model.Message;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
 import com.sendgrid.SendGrid;
-import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.objects.Personalization;
@@ -20,7 +19,6 @@ import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.payload.DraftEmailRequest;
 import fpt.capstone.etbs.payload.DynamicData;
-import fpt.capstone.etbs.payload.DynamicDataAttrs;
 import fpt.capstone.etbs.payload.SendEmailRequest;
 import fpt.capstone.etbs.service.EmailService;
 import fpt.capstone.etbs.service.HtmlContentService;
@@ -40,9 +38,7 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.internet.MimeMessage;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -51,6 +47,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class EmailServiceImpl implements EmailService {
 
   private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
@@ -78,8 +75,7 @@ public class EmailServiceImpl implements EmailService {
 
   @Override
   @Async("mailAsyncExecutor")
-  public void sendEmail(UUID accountId, SendEmailRequest request)
-      throws MessagingException, IOException {
+  public void sendEmail(UUID accountId, SendEmailRequest request) {
 
     RawTemplate template = rawTemplateService.getRawTemplate(request.getRawId(), accountId);
     if (template == null) {
@@ -134,7 +130,8 @@ public class EmailServiceImpl implements EmailService {
       rawId = Integer.parseInt(String.valueOf(mapState.get("rawId")));
       redirectUri = String.valueOf(mapState.get("redirectUri"));
     } catch (Exception e) {
-      throw new BadRequestException("Invalid state information");
+      log.trace("Invalid google state information", e);
+      throw new BadRequestException("Invalid google state information");
     }
 
     Gmail gmail = googleAuthenticator.getGMailInstance(redirectUri, code);
@@ -144,32 +141,33 @@ public class EmailServiceImpl implements EmailService {
 
   @Override
   @Async("mailAsyncExecutor")
-  public void sendConfirmUserEmail(String email, String token)
-      throws MessagingException, IOException {
-    String content = htmlContentService.setConfirmToken(serverConfirmUri + "/email", token, AppConstant.EMAIL_CONFIRM_CONTENT);
+  public void sendConfirmUserEmail(String email, String token) {
+    String content = htmlContentService
+        .setConfirmToken(serverConfirmUri + "/email", token, AppConstant.EMAIL_CONFIRM_CONTENT);
     this.balancingSend(email, AppConstant.EMAIL_CONFIRM_SUBJECT, content);
   }
 
   @Override
   @Async("mailAsyncExecutor")
-  public void sendConfirmAccount(String email, String token) throws MessagingException, IOException {
-    String content = htmlContentService.setConfirmToken(serverConfirmUri + "/account", token, AppConstant.ACCOUNT_CONFIRM_CONTENT);
+  public void sendConfirmAccount(String email, String token) {
+    String content = htmlContentService
+        .setConfirmToken(serverConfirmUri + "/account", token, AppConstant.ACCOUNT_CONFIRM_CONTENT);
     this.balancingSend(email, AppConstant.ACCOUNT_CONFIRM_SUBJECT, content);
   }
 
   @Override
   @Async("mailAsyncExecutor")
-  public void sendConfirmRecovery(String email, String token)
-      throws MessagingException, IOException {
-    String content = htmlContentService.setConfirmToken(serverConfirmUri + "/recovery", token, AppConstant.RECOVERY_CONFIRM_CONTENT);
+  public void sendConfirmRecovery(String email, String token) {
+    String content = htmlContentService.setConfirmToken(serverConfirmUri + "/recovery", token,
+        AppConstant.RECOVERY_CONFIRM_CONTENT);
     this.balancingSend(email, AppConstant.RECOVERY_CONFIRM_SUBJECT, content);
   }
 
   @Override
   @Async("mailAsyncExecutor")
-  public void sendRecovery(String email, String password) throws MessagingException, IOException {
+  public void sendRecovery(String email, String password) {
     String content = htmlContentService.setRecoveryPassword(password, AppConstant.RECOVERY_CONTENT);
-    this.balancingSend(email, AppConstant.RECOVERY_SUBJECT,  content);
+    this.balancingSend(email, AppConstant.RECOVERY_SUBJECT, content);
   }
 
   private MimeMessage createDraftMessage(Integer rawId, UUID accountId)
@@ -216,16 +214,6 @@ public class EmailServiceImpl implements EmailService {
     gmail.users().drafts().create("me", draft).execute();
   }
 
-  private MimeMessage createSendMessage(String receiver, String subject, String content)
-      throws MessagingException {
-    MimeMessage message = javaMailSender.createMimeMessage();
-    MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-    helper.setTo(receiver);
-    helper.setSubject(subject);
-    helper.setText(content, true);
-    return message;
-  }
-
   private MimeMessage createSendMessage(String[] receiver, String subject, String content)
       throws MessagingException {
     MimeMessage message = javaMailSender.createMimeMessage();
@@ -234,21 +222,6 @@ public class EmailServiceImpl implements EmailService {
     helper.setSubject(subject);
     helper.setText(content, true);
     return message;
-  }
-
-  private void sendBySendGrid(String receiver, String subject, String content)
-      throws IOException {
-
-    Email from = new Email("etbsonline@gmail.com");
-    Email to = new Email(receiver);
-    Content body = new Content("text/html", content);
-    Mail mail = new Mail(from, subject, to, body);
-
-    Request request = new Request();
-    request.setMethod(Method.POST);
-    request.setEndpoint("mail/send");
-    request.setBody(mail.build());
-    sendGrid.api(request);
   }
 
   private void sendBySendGrid(String[] receivers, String subject, String content)
@@ -277,25 +250,21 @@ public class EmailServiceImpl implements EmailService {
     sendGrid.api(re);
   }
 
-  private void balancingSend(String email, String subject, String content)
-      throws MessagingException, IOException {
-    if (sendMailType.get() <= 0) {
-      javaMailSender.send(createSendMessage(email, subject, content));
-      sendMailType.getAndIncrement();
-    } else {
-      sendBySendGrid(email, subject, content);
-      sendMailType.getAndDecrement();
-    }
+  private void balancingSend(String email, String subject, String content) {
+    this.balancingSend(new String[]{email}, subject, content);
   }
 
-  private void balancingSend(String [] email, String subject, String content)
-      throws MessagingException, IOException {
-    if (sendMailType.get() <= 0) {
-      javaMailSender.send(createSendMessage(email, subject, content));
-      sendMailType.getAndIncrement();
-    } else {
-      sendBySendGrid(email, subject, content);
-      sendMailType.getAndDecrement();
+  private void balancingSend(String[] email, String subject, String content) {
+    try {
+      if (sendMailType.get() <= 0) {
+        javaMailSender.send(createSendMessage(email, subject, content));
+        sendMailType.getAndIncrement();
+      } else {
+        sendBySendGrid(email, subject, content);
+        sendMailType.getAndDecrement();
+      }
+    } catch (Exception ex) {
+      log.error("Send mail failed", ex);
     }
   }
 

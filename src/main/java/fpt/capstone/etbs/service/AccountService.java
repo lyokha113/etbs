@@ -21,11 +21,11 @@ public interface AccountService {
 
   Account createAccount(AccountRequest request);
 
-  Account updateAccount(UUID uuid, AccountRequest request) throws IOException;
+  Account updateAccount(UUID uuid, AccountRequest request);
 
   Account updateProfile(UUID uuid, AccountRequest request) throws IOException;
 
-  Account updateInvite(UUID uuid, Boolean allow) throws IOException;
+  Account updateInvite(UUID uuid, Boolean allow);
 
   Account updateAccountStatus(UUID uuid, Boolean active);
 

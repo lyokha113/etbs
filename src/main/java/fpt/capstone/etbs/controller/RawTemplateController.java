@@ -13,7 +13,6 @@ import fpt.capstone.etbs.payload.MediaFileResponse;
 import fpt.capstone.etbs.payload.RawTemplateRequest;
 import fpt.capstone.etbs.payload.RawTemplateResponse;
 import fpt.capstone.etbs.payload.SaveContentRequest;
-import fpt.capstone.etbs.payload.StringWrapperRequest;
 import fpt.capstone.etbs.service.MessagePublisherService;
 import fpt.capstone.etbs.service.RawTemplateService;
 import fpt.capstone.etbs.service.RedisService;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -98,7 +96,8 @@ public class RawTemplateController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      RawTemplate template = rawTemplateService.updateContent(userPrincipal.getId(), id, request.getContent());
+      RawTemplate template = rawTemplateService
+          .updateContent(userPrincipal.getId(), id, request.getContent());
       if (request.isAutoSave()) {
         String currentOnlineKey = CURRENT_ONLINE_CACHE + id;
         String dest = WEB_SOCKET_RAW_QUEUE + id;
@@ -111,7 +110,7 @@ public class RawTemplateController {
           }
         });
       } else {
-          rawTemplateService.updateThumbnail(template);
+        rawTemplateService.updateThumbnail(template);
       }
       RawTemplateResponse response = RawTemplateResponse.setResponseWithContent(template);
       return ResponseEntity.ok(new ApiResponse<>(true, "Raw template content changed", response));
@@ -128,7 +127,8 @@ public class RawTemplateController {
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
       List<MediaFile> uploaded = rawTemplateService.uploadFiles(userPrincipal.getId(), id, files);
-      return ResponseEntity.ok(new ApiResponse<>(true, "Files was uploaded", MediaFileResponse.setResponse(uploaded.get(0))));
+      return ResponseEntity.ok(new ApiResponse<>(true, "Files was uploaded",
+          MediaFileResponse.setResponse(uploaded.get(0))));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }

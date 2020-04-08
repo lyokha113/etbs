@@ -1,20 +1,16 @@
 package fpt.capstone.etbs.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.component.JwtTokenProvider;
 import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.constant.AuthProvider;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
-import fpt.capstone.etbs.model.UserEmail;
-import fpt.capstone.etbs.payload.AccountResponse;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.DraftEmailRequest;
 import fpt.capstone.etbs.payload.SendEmailRequest;
 import fpt.capstone.etbs.service.AccountService;
 import fpt.capstone.etbs.service.EmailService;
-import fpt.capstone.etbs.service.UserEmailService;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import javax.mail.MessagingException;

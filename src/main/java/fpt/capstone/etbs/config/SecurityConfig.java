@@ -1,9 +1,9 @@
 package fpt.capstone.etbs.config;
 
-import static fpt.capstone.etbs.constant.RoleEnum.*;
+import static fpt.capstone.etbs.constant.RoleEnum.ADMINISTRATOR;
+import static fpt.capstone.etbs.constant.RoleEnum.USER;
 
 import fpt.capstone.etbs.component.JwtAuthenticationEntryPoint;
-import fpt.capstone.etbs.constant.RoleEnum;
 import fpt.capstone.etbs.filter.JwtAuthenticationFilter;
 import fpt.capstone.etbs.service.impl.CustomUserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +71,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     // All
     http.authorizeRequests()
-        .antMatchers(HttpMethod.GET, "/", "/category", "/template", "/template/*", "/template/author/*",
+        .antMatchers(HttpMethod.GET, "/", "/category", "/template", "/template/*",
+            "/template/author/*",
             "/tutorial", "/tutorial/*", "/confirm/*", "/ws/*", "/ws/**")
         .permitAll()
         .antMatchers(HttpMethod.POST, "/login", "/google/login", "/register", "/email/confirm")
@@ -82,13 +83,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     // User
     http.authorizeRequests()
         .antMatchers(HttpMethod.GET, "/rating", "/workspace", "/raw/*", "/user", "/useremail",
-            "/userblock", "/userblock/*", "/session/raw/*", "/session/user", "/session/user/*", "/google/authorize")
+            "/userblock", "/userblock/*", "/session/raw/*", "/session/user", "/session/user/*",
+            "/google/authorize")
         .hasRole(USER.getName())
         .antMatchers(HttpMethod.POST, "/rating", "/template", "/workspace", "/rate", "/raw",
             "/email/send", "/email/confirm/*", "/email/draft/*", "/publish", "/useremail",
             "/userblock", "/userblock/sync", "/session/raw")
         .hasRole(USER.getName())
-        .antMatchers(HttpMethod.PUT, "/rating", "/workspace/*", "/raw/*", "/user", "/user/invite", "/userblock/*",
+        .antMatchers(HttpMethod.PUT, "/rating", "/workspace/*", "/raw/*", "/user", "/user/invite",
+            "/userblock/*",
             "/session/raw/**", "/session/user/**")
         .hasRole(USER.getName())
         .antMatchers(HttpMethod.PATCH, "/raw/**", "/userblock/*", "/file/*")
@@ -112,7 +115,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .hasRole(ADMINISTRATOR.getName());
 
     // Logged
-    http.authorizeRequests().antMatchers(HttpMethod.GET, "/user", "/file", "/publish", "/notification", "/notification/all")
+    http.authorizeRequests()
+        .antMatchers(HttpMethod.GET, "/user", "/file", "/publish", "/notification",
+            "/notification/all")
         .authenticated()
         .antMatchers(HttpMethod.POST, "/file", "/notification/*")
         .authenticated()

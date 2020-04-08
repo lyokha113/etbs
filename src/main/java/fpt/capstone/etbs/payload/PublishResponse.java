@@ -2,7 +2,6 @@ package fpt.capstone.etbs.payload;
 
 import fpt.capstone.etbs.constant.PublishStatus;
 import fpt.capstone.etbs.model.Publish;
-import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

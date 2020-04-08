@@ -1,6 +1,5 @@
 package fpt.capstone.etbs.payload;
 
-import fpt.capstone.etbs.model.RawTemplate;
 import fpt.capstone.etbs.model.UserBlock;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

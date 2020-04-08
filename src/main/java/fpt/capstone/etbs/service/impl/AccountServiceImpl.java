@@ -20,12 +20,14 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.mail.MessagingException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 @Service
+@Slf4j
 public class AccountServiceImpl implements AccountService {
 
   @Autowired
@@ -91,7 +93,7 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  public Account updateAccount(UUID uuid, AccountRequest request) throws IOException {
+  public Account updateAccount(UUID uuid, AccountRequest request) {
 
     Account account = getAccount(uuid);
     if (account == null) {
@@ -132,7 +134,8 @@ public class AccountServiceImpl implements AccountService {
     return accountRepository.save(account);
   }
 
-  @Override public Account updateInvite(UUID uuid, Boolean allow) {
+  @Override
+  public Account updateInvite(UUID uuid, Boolean allow) {
     Account account = getAccount(uuid);
     if (account == null || account.getRole().getId().equals(RoleEnum.ADMINISTRATOR.getId())) {
       throw new BadRequestException("Account doesn't existed");
@@ -182,7 +185,6 @@ public class AccountServiceImpl implements AccountService {
 
     throw new BadRequestException(
         "This email was registered in system. Please use email and password to login");
-
   }
 
   @Override

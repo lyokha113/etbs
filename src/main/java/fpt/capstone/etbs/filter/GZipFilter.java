@@ -14,24 +14,29 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
 @Order(1)
+@Slf4j
 public class GZipFilter implements Filter {
 
 
   @Override
-  public void doFilter(ServletRequest req, ServletResponse res, FilterChain fc)
-      throws IOException, ServletException {
+  public void doFilter(ServletRequest req, ServletResponse res, FilterChain fc) {
     HttpServletRequest request = (HttpServletRequest) req;
     String encoding = request.getHeader("Content-Encoding");
     if (encoding != null && encoding.equalsIgnoreCase("gzip")) {
       req = new GZIPServletRequestWrapper(request);
     }
 
-    fc.doFilter(req, res);
+    try {
+      fc.doFilter(req, res);
+    } catch (IOException | ServletException e) {
+      log.error("Can't parse GZip request", e);
+    }
   }
 
   private static class GZIPServletRequestWrapper extends HttpServletRequestWrapper {
@@ -77,7 +82,6 @@ public class GZipFilter implements Filter {
 
     @Override
     public void setReadListener(ReadListener listener) {
-
     }
   }
 }

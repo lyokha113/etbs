@@ -1,9 +1,11 @@
 package fpt.capstone.etbs.config;
 
 
-import static fpt.capstone.etbs.constant.AppConstant.*;
-import static fpt.capstone.etbs.constant.RoleEnum.*;
-import static org.springframework.messaging.simp.SimpMessageType.*;
+import static fpt.capstone.etbs.constant.RoleEnum.ADMINISTRATOR;
+import static fpt.capstone.etbs.constant.RoleEnum.USER;
+import static org.springframework.messaging.simp.SimpMessageType.CONNECT;
+import static org.springframework.messaging.simp.SimpMessageType.DISCONNECT;
+import static org.springframework.messaging.simp.SimpMessageType.UNSUBSCRIBE;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;

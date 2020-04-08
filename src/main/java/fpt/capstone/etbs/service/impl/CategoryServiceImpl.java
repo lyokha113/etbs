@@ -2,7 +2,6 @@ package fpt.capstone.etbs.service.impl;
 
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Category;
-import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.CategoryRequest;
 import fpt.capstone.etbs.repository.CategoryRepository;
 import fpt.capstone.etbs.service.CategoryService;

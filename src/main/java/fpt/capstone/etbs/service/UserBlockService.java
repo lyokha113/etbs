@@ -20,7 +20,8 @@ public interface UserBlockService {
 
   UserBlock updateUserBlockContent(UUID accountId, Integer id, String content);
 
-  Map<String, List<Integer>> synchronizeContent(UUID accountId, SynchronizeContentRequest request) throws Exception;
+  Map<String, List<Integer>> synchronizeContent(UUID accountId, SynchronizeContentRequest request)
+      throws Exception;
 
   void deleteUserBlock(UUID accountId, Integer id);
 }

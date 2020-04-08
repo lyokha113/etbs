@@ -73,7 +73,8 @@ public class TutorialServiceImpl implements TutorialService {
   }
 
   @Override
-  public Tutorial updateTutorial(UUID accountId, Integer id, TutorialRequest request) throws Exception {
+  public Tutorial updateTutorial(UUID accountId, Integer id, TutorialRequest request)
+      throws Exception {
 
     Tutorial tutorial = tutorialRepository.findById(id).orElse(null);
     if (tutorial == null) {
@@ -115,17 +116,25 @@ public class TutorialServiceImpl implements TutorialService {
 
   private Tutorial updateTutorialContentImage(UUID accountId, Tutorial tutorial)
       throws Exception {
+    boolean isExternalParseError = false;
     String content = tutorial.getContent();
     Document doc = Jsoup.parse(content, "UTF-8");
     List<URL> externalLinks = new ArrayList<>();
     for (Element element : doc.select("img")) {
       String src = element.absUrl("src");
-      if (!src.startsWith("https://storage.googleapis.com/") && !src.contains(AppConstant.USER_IMAGES)) {
-        externalLinks.add(new URL(src));
+      if (!src.startsWith("https://storage.googleapis.com/") && !src
+          .contains(AppConstant.USER_IMAGES)) {
+        try {
+          externalLinks.add(new URL(src));
+        } catch (Exception ex) {
+          isExternalParseError = true;
+          element.remove();
+        }
       }
     }
 
-    if (!externalLinks.isEmpty()) {
+    if (!externalLinks.isEmpty() || isExternalParseError) {
+      content = doc.outerHtml();
       List<MediaFile> files = mediaFileService.createMediaFiles(accountId, externalLinks);
       for (int i = 0; i < files.size(); i++) {
         content = content.replace(externalLinks.get(i).toString(), files.get(i).getLink());

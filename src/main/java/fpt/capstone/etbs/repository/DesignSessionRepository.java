@@ -14,12 +14,15 @@ public interface DesignSessionRepository extends
 
   List<DesignSession> getByRawTemplate_Workspace_Account_Id(UUID ownerId);
 
-  List<DesignSession> getByRawTemplate_Workspace_Account_IdAndId_RawTemplateId(UUID ownerId, Integer rawId);
+  List<DesignSession> getByRawTemplate_Workspace_Account_IdAndId_RawTemplateId(UUID ownerId,
+      Integer rawId);
 
   List<DesignSession> getById_ContributorId(UUID contributorId);
 
-  Optional<DesignSession> getById_ContributorIdAndId_RawTemplateId(UUID contributorId, Integer rawId);
+  Optional<DesignSession> getById_ContributorIdAndId_RawTemplateId(UUID contributorId,
+      Integer rawId);
 
-  Optional<DesignSession> getByContributor_EmailAndId_RawTemplateId(String contributorEmail, Integer rawId);
+  Optional<DesignSession> getByContributor_EmailAndId_RawTemplateId(String contributorEmail,
+      Integer rawId);
 
 }
