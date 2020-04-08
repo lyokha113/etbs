@@ -1,11 +1,9 @@
 package fpt.capstone.etbs.controller;
 
 
-import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.component.JwtTokenProvider;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.service.AccountService;
-import fpt.capstone.etbs.service.EmailService;
 import fpt.capstone.etbs.service.UserEmailService;
 import java.io.IOException;
 import java.util.UUID;

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @RestControllerAdvice
+@Slf4j
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
   @Override
@@ -34,7 +36,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
       final HttpHeaders headers,
       final HttpStatus status,
       final WebRequest request) {
-    logger.info(ex.getClass().getName());
+    log.trace(ex.getClass().getName(), ex);
     final List<String> errors = new ArrayList<>();
     for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
       errors.add(error.getField() + ": " + error.getDefaultMessage());
@@ -53,7 +55,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
       final HttpHeaders headers,
       final HttpStatus status,
       final WebRequest request) {
-    logger.info(ex.getClass().getName());
+    log.trace(ex.getClass().getName(), ex);
     final List<String> errors = new ArrayList<>();
     for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
       errors.add(error.getField() + ": " + error.getDefaultMessage());
@@ -72,7 +74,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
       final HttpHeaders headers,
       final HttpStatus status,
       final WebRequest request) {
-    logger.info(ex.getClass().getName());
+    log.trace(ex.getClass().getName(), ex);
     final String error =
         ex.getValue()
             + " value for "
@@ -89,7 +91,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
       final HttpHeaders headers,
       final HttpStatus status,
       final WebRequest request) {
-    logger.info(ex.getClass().getName());
+    log.trace(ex.getClass().getName(), ex);
     final String error = ex.getRequestPartName() + " part is missing";
     final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), error);
     return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
@@ -101,7 +103,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
       final HttpHeaders headers,
       final HttpStatus status,
       final WebRequest request) {
-    logger.info(ex.getClass().getName());
+    log.trace(ex.getClass().getName(), ex);
     final String error = ex.getParameterName() + " parameter is missing";
     final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), error);
     return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
@@ -113,7 +115,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
       final HttpHeaders headers,
       final HttpStatus status,
       final WebRequest request) {
-    logger.info(ex.getClass().getName());
+    log.trace(ex.getClass().getName(), ex);
     final String error = ex.getHttpInputMessage() + " http message is missing";
     final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), error);
     return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
@@ -125,7 +127,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
       final HttpHeaders headers,
       final HttpStatus status,
       final WebRequest request) {
-    logger.info(ex.getClass().getName());
+    log.trace(ex.getClass().getName(), ex);
     final String error = "No handler found for " + ex.getHttpMethod() + " " + ex.getRequestURL();
     final ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, ex.getLocalizedMessage(), error);
     return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
@@ -137,7 +139,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
       final HttpHeaders headers,
       final HttpStatus status,
       final WebRequest request) {
-    logger.info(ex.getClass().getName());
+    log.trace(ex.getClass().getName(), ex);
     final StringBuilder builder = new StringBuilder();
     builder.append(ex.getMethod());
     builder.append(" method is not supported for this request. Supported methods are ");
@@ -153,7 +155,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
       final HttpHeaders headers,
       final HttpStatus status,
       final WebRequest request) {
-    logger.info(ex.getClass().getName());
+    log.trace(ex.getClass().getName(), ex);
     final StringBuilder builder = new StringBuilder();
     builder.append(ex.getContentType());
     builder.append(" media type is not supported. Supported media types are ");
@@ -170,7 +172,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler({MethodArgumentTypeMismatchException.class})
   public ResponseEntity<Object> handleMethodArgumentTypeMismatch(
       final MethodArgumentTypeMismatchException ex, final WebRequest request) {
-    logger.info(ex.getClass().getName());
+    log.trace(ex.getClass().getName(), ex);
     final String error = ex.getName() + " should be of type " + ex.getRequiredType().getName();
     final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), error);
     return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
@@ -196,7 +198,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler({Exception.class})
   public ResponseEntity<Object> handleAll(final Exception ex, final WebRequest request) {
-    logger.info(ex.getClass().getName());
+    log.trace(ex.getClass().getName(), ex);
     final ApiError apiError =
         new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), "Error occurred");
     return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());

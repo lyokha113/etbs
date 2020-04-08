@@ -7,7 +7,6 @@ import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.RatingRequest;
 import fpt.capstone.etbs.payload.RatingResponse;
 import fpt.capstone.etbs.service.RatingService;
-import fpt.capstone.etbs.service.TemplateService;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

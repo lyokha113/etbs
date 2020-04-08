@@ -164,8 +164,10 @@ public class DesignSessionController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      List<MediaFile> uploaded = designSessionService.uploadFileToOwner(userPrincipal.getId(), rawId, files);
-      return ResponseEntity.ok(new ApiResponse<>(true, "Files was uploaded", MediaFileResponse.setResponse(uploaded.get(0))));
+      List<MediaFile> uploaded = designSessionService
+          .uploadFileToOwner(userPrincipal.getId(), rawId, files);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Files was uploaded",
+          MediaFileResponse.setResponse(uploaded.get(0))));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }

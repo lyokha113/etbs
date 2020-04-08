@@ -42,7 +42,8 @@ public class UserBlockController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     List<UserBlock> blocks = userBlockService.getUserBlocks(userPrincipal.getId());
-    List<UserBlockResponse> responses = blocks.stream().map(UserBlockResponse::setResponseWithContent)
+    List<UserBlockResponse> responses = blocks.stream()
+        .map(UserBlockResponse::setResponseWithContent)
         .collect(Collectors.toList());
     return ResponseEntity.ok(new ApiResponse<>(true, "", responses));
 
@@ -80,7 +81,8 @@ public class UserBlockController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      Map<String, List<Integer>> response = userBlockService.synchronizeContent(userPrincipal.getId(), request);
+      Map<String, List<Integer>> response = userBlockService
+          .synchronizeContent(userPrincipal.getId(), request);
       return ResponseEntity.ok(new ApiResponse<>(true, "Content was synchronized", response));
     } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));

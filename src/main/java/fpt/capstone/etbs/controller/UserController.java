@@ -15,12 +15,9 @@ import fpt.capstone.etbs.service.AccountService;
 import fpt.capstone.etbs.service.EmailService;
 import fpt.capstone.etbs.service.RedisService;
 import java.io.IOException;
-import java.util.UUID;
 import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -92,7 +89,7 @@ public class UserController {
       Account account = accountService.updateInvite(userPrincipal.getId(), allow);
       AccountResponse response = AccountResponse.setResponse(account);
       return ResponseEntity.ok(new ApiResponse<>(true, "Account updated", response));
-    } catch (BadRequestException | IOException ex) {
+    } catch (BadRequestException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }
   }

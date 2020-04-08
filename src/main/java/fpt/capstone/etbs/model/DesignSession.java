@@ -3,12 +3,9 @@ package fpt.capstone.etbs.model;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.Table;
@@ -33,7 +30,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
     value = {"createdDate", "lastModifiedDate"},
     allowGetters = true)
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id")
-public class DesignSession extends Auditing{
+public class DesignSession extends Auditing {
 
   @EmbeddedId
   private DesignSessionIdentity id;

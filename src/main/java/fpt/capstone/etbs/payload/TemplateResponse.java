@@ -3,9 +3,6 @@ package fpt.capstone.etbs.payload;
 import fpt.capstone.etbs.model.Category;
 import fpt.capstone.etbs.model.Rating;
 import fpt.capstone.etbs.model.Template;
-import fpt.capstone.etbs.service.TemplateService;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -14,13 +11,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TemplateResponse  {
+public class TemplateResponse {
 
   private int id;
   private String name;

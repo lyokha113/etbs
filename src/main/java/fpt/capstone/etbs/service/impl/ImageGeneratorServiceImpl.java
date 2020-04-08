@@ -1,10 +1,8 @@
 package fpt.capstone.etbs.service.impl;
 
-import com.pdfcrowd.Pdfcrowd;
 import fpt.capstone.etbs.component.ChromeDriverEx;
 import fpt.capstone.etbs.service.ImageGeneratorService;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import javax.imageio.ImageIO;
 import org.apache.commons.text.StringEscapeUtils;
@@ -15,28 +13,14 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ImageGeneratorServiceImpl implements ImageGeneratorService {
 
-  @Value("${app.pdfcrowd.username}")
-  private String pdfCrowdUserName;
-
-  @Value("${app.pdfcrowd.apikey}")
-  private String pdfCrowdAPIKey;
-
-  @Value("${app.generateImageApi}")
-  private boolean generateImageApi;
-
   @Override
   public BufferedImage generateImageFromHtml(String html) throws Exception {
-    if (generateImageApi) {
-      return generateImageFromHtmlByPDFCrowd(html);
-    } else {
-      return generateImageFromHtmlByChrome(html);
-    }
+    return generateImageFromHtmlByChrome(html);
   }
 
   @Override
@@ -79,16 +63,6 @@ public class ImageGeneratorServiceImpl implements ImageGeneratorService {
     File screenshot = driver.getFullScreenshotAs(OutputType.FILE);
     driver.quit();
     return ImageIO.read(screenshot);
-  }
-
-  @Override
-  public BufferedImage generateImageFromHtmlByPDFCrowd(String html) throws Exception {
-    Pdfcrowd.HtmlToImageClient client =
-        new Pdfcrowd.HtmlToImageClient(pdfCrowdUserName, pdfCrowdAPIKey);
-    client.setOutputFormat("png");
-    byte[] image = client.convertString(html);
-    ByteArrayInputStream is = new ByteArrayInputStream(image);
-    return ImageIO.read(is);
   }
 
 }

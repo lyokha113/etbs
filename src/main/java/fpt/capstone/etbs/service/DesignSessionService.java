@@ -22,7 +22,8 @@ public interface DesignSessionService {
 
   RawTemplate updateContent(UUID contributorId, Integer rawId, String content) throws Exception;
 
-  List<MediaFile>  uploadFileToOwner(UUID contributorId, Integer rawId, MultipartFile[] files) throws Exception;
+  List<MediaFile> uploadFileToOwner(UUID contributorId, Integer rawId, MultipartFile[] files)
+      throws Exception;
 
   void leaveSession(UUID contributorId, Integer rawId) throws Exception;
 

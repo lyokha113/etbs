@@ -2,9 +2,7 @@ package fpt.capstone.etbs.service;
 
 import fpt.capstone.etbs.model.MediaFile;
 import fpt.capstone.etbs.model.RawTemplate;
-import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.payload.RawTemplateRequest;
-import fpt.capstone.etbs.payload.SaveContentRequest;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,7 +17,8 @@ public interface RawTemplateService {
 
   RawTemplate updateContent(UUID accountId, Integer id, String content) throws Exception;
 
-  List<MediaFile> uploadFiles(UUID accountId, Integer rawId, MultipartFile[] files) throws Exception;
+  List<MediaFile> uploadFiles(UUID accountId, Integer rawId, MultipartFile[] files)
+      throws Exception;
 
   void updateThumbnail(RawTemplate rawTemplate) throws Exception;
 

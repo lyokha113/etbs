@@ -15,10 +15,12 @@ import com.google.api.services.gmail.GmailScopes;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class GoogleAuthenticator {
 
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
@@ -28,7 +30,6 @@ public class GoogleAuthenticator {
 
   @Value("${spring.security.oauth2.client.registration.google.clientSecret}")
   private String clientSecret;
-
 
   public GoogleAuthorizationCodeFlow getFlow() throws GeneralSecurityException, IOException {
     Details web = new Details();

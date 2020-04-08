@@ -1,6 +1,5 @@
 package fpt.capstone.etbs.service;
 
-import fpt.capstone.etbs.constant.PublishStatus;
 import fpt.capstone.etbs.model.Publish;
 import fpt.capstone.etbs.payload.ApprovePublishRequest;
 import fpt.capstone.etbs.payload.PublishRequest;

@@ -14,8 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,9 +27,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Configuration
 @EnableScheduling
+@Slf4j
 public class BackgroundScheduleConfig {
 
-  private final Logger logger = LoggerFactory.getLogger(BackgroundScheduleConfig.class);
   @Autowired
   private FirebaseService firebaseService;
 
@@ -58,7 +57,7 @@ public class BackgroundScheduleConfig {
 
   @Scheduled(initialDelay = 1000 * 60 * 5, fixedDelay = 1000 * 60 * 5)
   public void deleteInactiveUserFile() {
-    logger.info("Start to delete inactive user file");
+    log.info("Start to delete inactive user file");
     List<MediaFile> files = mediaFileService.getInactiveMediaFiles();
     files = files.stream()
         .filter(f -> f.getLastModifiedDate().plusDays(1).isBefore(LocalDateTime.now()))
@@ -67,47 +66,46 @@ public class BackgroundScheduleConfig {
     for (MediaFile file : files) {
       try {
         String fbPath = file.getAccount().getId().toString() + "/" + file.getId().toString();
-        if (firebaseService.deleteImage(AppConstant.USER_IMAGES + fbPath)) {
-          deletedFiles.add(file);
-        }
+        firebaseService.deleteImage(AppConstant.USER_IMAGES + fbPath);
+        deletedFiles.add(file);
       } catch (Exception e) {
-        logger.error(e.getMessage());
+        log.error(e.getMessage());
       }
     }
     mediaFileService.deleteMediaFile(deletedFiles);
-    logger.info("Finished delete inactive user file - " + deletedFiles.size() + " files deleted");
+    log.info("Finished delete inactive user file - " + deletedFiles.size() + " files deleted");
   }
 
   @Scheduled(initialDelay = 1000 * 60, fixedDelay = 1000 * 60 * 5)
   public void deleteDeletingMediaFile() {
-    logger.info("Start to delete DeletingMediaFile");
+    log.info("Start to delete DeletingMediaFile");
     List<DeletingMediaFile> files = deletingMediaFileRepository.findAll();
     List<DeletingMediaFile> deletedFiles = new ArrayList<>();
     for (DeletingMediaFile file : files) {
       try {
-        if (firebaseService.deleteImage(file.getLink())) {
-          deletedFiles.add(file);
-        }
+        firebaseService.deleteImage(file.getLink());
+        deletedFiles.add(file);
       } catch (Exception e) {
-        logger.error(e.getMessage());
+        log.error(e.getMessage());
       }
     }
     deletingMediaFileRepository.deleteAll(deletedFiles);
-    logger.info("Finished delete DeletingMediaFile - " + deletedFiles.size() + " files deleted");
+    log.info("Finished delete DeletingMediaFile - " + deletedFiles.size() + " files deleted");
   }
 
   @Scheduled(initialDelay = 1000 * 60 * 5, fixedDelay = 1000 * 60 * 5)
   public void calculateTemplateScore() {
-    logger.info("Start to calculate template score");
+    log.info("Start to calculate template score");
     templateService.calculateScore();
   }
 
   @Scheduled(initialDelay = 1000 * 60 * 5, fixedDelay = 1000 * 60 * 5)
   public void deleteNotifications() {
-    logger.info("Start to delete 3 days loaded notifications");
+    log.info("Start to delete 3 days loaded notifications");
     List<Notification> notifications = notificationService.getNotificationsToRemove();
     notificationRepository.deleteAll(notifications);
-    logger.info("Finished delete 3 days loaded notificaitons - " + notifications.size() +  " notifications deleted");
+    log.info("Finished delete 3 days loaded notificaitons - " + notifications.size()
+        + " notifications deleted");
   }
 
 }

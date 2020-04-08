@@ -1,10 +1,8 @@
 package fpt.capstone.etbs.payload;
 
-import fpt.capstone.etbs.constant.NotificationCode;
 import fpt.capstone.etbs.constant.NotificationStatus;
 import fpt.capstone.etbs.model.Notification;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

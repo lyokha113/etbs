@@ -8,7 +8,6 @@ import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.UserEmail;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.StringWrapperRequest;
-import fpt.capstone.etbs.payload.TutorialResponse;
 import fpt.capstone.etbs.payload.UserEmailResponse;
 import fpt.capstone.etbs.service.EmailService;
 import fpt.capstone.etbs.service.UserEmailService;

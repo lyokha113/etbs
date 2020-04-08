@@ -10,12 +10,9 @@ import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.service.FirebaseService;
 import fpt.capstone.etbs.util.ImageUtils;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
-import javax.imageio.ImageIO;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -66,7 +63,7 @@ public class FirebaseServiceImpl implements FirebaseService {
   }
 
   @Override
-  public String createTemplateImages(String file, String name) throws Exception {
+  public String createTemplateImages(String file, String name) {
     String fbPath = AppConstant.TEMPLATE_IMAGE + name;
     return createImage(fbPath, file);
   }

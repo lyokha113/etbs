@@ -1,8 +1,7 @@
 package fpt.capstone.etbs.service.impl;
 
-import static fpt.capstone.etbs.constant.AppConstant.*;
+import static fpt.capstone.etbs.constant.AppConstant.LOGIN_CACHE;
 
-import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.service.RedisService;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
