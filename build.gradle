@@ -53,7 +53,6 @@ dependencies {
     implementation group: 'org.apache.poi', name: 'poi', version: '4.1.1'
     implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.1'
     implementation group: 'de.uni_jena.cs.fusion', name: 'similarity.jarowinkler', version: '1.0.0'
-    implementation 'com.pdfcrowd:pdfcrowd:4.11.0'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"

@@ -28,6 +28,8 @@ public class ImageGeneratorServiceImpl implements ImageGeneratorService {
 
     if (System.getProperty("os.name").toLowerCase().contains("win")) {
       System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
+    } else {
+      System.setProperty("webdriver.chrome.driver", "chromedriver");
     }
 
     ChromeOptions chromeOptions = new ChromeOptions();
@@ -53,8 +55,7 @@ public class ImageGeneratorServiceImpl implements ImageGeneratorService {
     int loaded = 0;
     while (loaded < imageToLoad) {
       for (int i = 0; i < imageToLoad; i++) {
-        loaded +=
-            (Boolean) ((JavascriptExecutor) driver)
+        loaded += (Boolean) ((JavascriptExecutor) driver)
                 .executeScript("return document.images[" + i + "].complete;") ? 1 : 0;
       }
       Thread.sleep(100);
