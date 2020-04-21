@@ -17,6 +17,8 @@ public interface RawTemplateService {
 
   RawTemplate updateContent(UUID accountId, Integer id, String content) throws Exception;
 
+  RawTemplate updateContentContributor(UUID contributorId, Integer id, String content) throws Exception;
+
   List<MediaFile> uploadFiles(UUID accountId, Integer rawId, MultipartFile[] files)
       throws Exception;
 

@@ -18,10 +18,12 @@ import fpt.capstone.etbs.service.RawTemplateService;
 import fpt.capstone.etbs.service.RedisService;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -96,8 +98,9 @@ public class RawTemplateController {
     Authentication auth = authenticationFacade.getAuthentication();
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     try {
-      RawTemplate template = rawTemplateService
-          .updateContent(userPrincipal.getId(), id, request.getContent());
+      RawTemplate template = StringUtils.isEmpty(request.getContributor()) ?
+        rawTemplateService.updateContent(userPrincipal.getId(), id, request.getContent()) :
+        rawTemplateService.updateContentContributor(UUID.fromString(request.getContributor()), id, request.getContent());
       if (request.isAutoSave()) {
         String currentOnlineKey = CURRENT_ONLINE_CACHE + id;
         String dest = WEB_SOCKET_RAW_QUEUE + id;

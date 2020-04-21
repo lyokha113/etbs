@@ -27,9 +27,9 @@ public class ImageGeneratorServiceImpl implements ImageGeneratorService {
   public BufferedImage generateImageFromHtmlByChrome(String html) throws Exception {
 
     if (System.getProperty("os.name").toLowerCase().contains("win")) {
-      System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
+      System.setProperty("webdriver.chrome.driver", "/chromedriver.exe");
     } else {
-      System.setProperty("webdriver.chrome.driver", "chromedriver");
+      System.setProperty("webdriver.chrome.driver", "/chromedriver");
     }
 
     ChromeOptions chromeOptions = new ChromeOptions();

@@ -13,4 +13,5 @@ public class SaveContentRequest {
 
   private String content;
   private boolean autoSave;
+  private String contributor;
 }

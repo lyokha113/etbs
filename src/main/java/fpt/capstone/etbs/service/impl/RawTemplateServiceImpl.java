@@ -167,6 +167,19 @@ public class RawTemplateServiceImpl implements RawTemplateService {
   }
 
   @Override
+  public RawTemplate updateContentContributor(UUID contributorId, Integer id, String content) {
+    RawTemplate rawTemplate = rawTemplateRepository.findById(id).orElse(null);
+
+    if (rawTemplate == null || rawTemplate.getDesignSessions().stream().noneMatch(s -> s.getContributor().getId().equals(contributorId))) {
+      throw new BadRequestException("Raw template doesn't exist");
+    }
+
+    rawTemplate.setContent(content);
+    rawTemplate = rawTemplateRepository.save(rawTemplate);
+    return rawTemplate;
+  }
+
+  @Override
   public List<MediaFile> uploadFiles(UUID accountId, Integer rawId, MultipartFile[] files)
       throws Exception {
 
