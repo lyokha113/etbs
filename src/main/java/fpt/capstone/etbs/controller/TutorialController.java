@@ -3,12 +3,15 @@ package fpt.capstone.etbs.controller;
 import fpt.capstone.etbs.component.AuthenticationFacade;
 import fpt.capstone.etbs.component.UserPrincipal;
 import fpt.capstone.etbs.exception.BadRequestException;
+import fpt.capstone.etbs.model.Template;
 import fpt.capstone.etbs.model.Tutorial;
 import fpt.capstone.etbs.payload.ApiResponse;
 import fpt.capstone.etbs.payload.TutorialRequest;
 import fpt.capstone.etbs.payload.TutorialResponse;
 import fpt.capstone.etbs.service.TutorialService;
 import fpt.capstone.etbs.util.RoleUtils;
+
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -39,8 +42,10 @@ public class TutorialController {
     List<Tutorial> tutorials = RoleUtils.hasAdminRole(auth)
         ? tutorialService.getTutorials()
         : tutorialService.getActiveTutorials();
-    List<TutorialResponse> response =
-        tutorials.stream().map(TutorialResponse::setResponse).collect(Collectors.toList());
+    List<TutorialResponse> response = tutorials.stream()
+                .sorted(Comparator.comparing(Tutorial::getCreatedDate).reversed())
+                .map(TutorialResponse::setResponse)
+                .collect(Collectors.toList());
     return ResponseEntity.ok(new ApiResponse<>(true, "", response));
   }
 
