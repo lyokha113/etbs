@@ -42,7 +42,7 @@ public class NotificationServiceImpl implements NotificationService {
   @Override
   public List<Notification> getNotificationsToRemove() {
     LocalDateTime limit = LocalDateTime.now().minusDays(3);
-    return notificationRepository.getByLoadedTrueAndCreatedDateBefore(limit);
+    return notificationRepository.getByLoadedTrueAndLastModifiedDateBefore(limit);
   }
 
   @Override

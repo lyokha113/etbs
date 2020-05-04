@@ -24,5 +24,4 @@ public interface MediaFileService {
 
   void changeSharedMediaFile(UUID accountId, UUID id, boolean open);
 
-  void deleteMediaFile(List<MediaFile> files);
 }

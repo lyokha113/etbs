@@ -73,6 +73,13 @@ public class PublishServiceImpl implements PublishService {
   }
 
   @Override
+  public List<Publish> getPublishesToRemove() {
+    LocalDateTime limit = LocalDateTime.now().minusDays(30);
+    List<PublishStatus> statuses = Arrays.asList(PublishStatus.DENIED, PublishStatus.PUBLISHED);
+    return publishRepository.getByStatusInAndLastModifiedDateBefore(statuses, limit);
+  }
+
+  @Override
   public Publish createPublish(UUID authorId, PublishRequest request) {
 
     Account author = accountRepository.findById(authorId).orElse(null);

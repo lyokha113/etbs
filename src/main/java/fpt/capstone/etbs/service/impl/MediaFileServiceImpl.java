@@ -94,11 +94,6 @@ public class MediaFileServiceImpl implements MediaFileService {
   }
 
   @Override
-  public void deleteMediaFile(List<MediaFile> files) {
-    mediaFileRepository.deleteAll(files);
-  }
-
-  @Override
   public void changeActiveMediaFile(UUID accountId, UUID id, boolean active, boolean isAdmin) {
     MediaFile mediaFile = isAdmin ?
         mediaFileRepository.findById(id).orElse(null) :

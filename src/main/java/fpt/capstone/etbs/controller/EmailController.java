@@ -105,16 +105,22 @@ public class EmailController {
   public ResponseEntity<?> sendConfirmAccount(@Valid @RequestParam String email) {
     try {
       Account account = accountService.getAccountByEmail(email);
-      if (account != null && account.getProvider().equals(AuthProvider.local)) {
-        String token = tokenProvider.generateToken(account.getId());
-        if (!account.isApproved()) {
-          emailService.sendConfirmAccount(email, token);
-        } else {
-          emailService.sendConfirmRecovery(email, token);
-        }
+
+      if (account == null) {
+        return ResponseEntity.badRequest().body(new ApiResponse<>(false, "Account isn't existed", null));
       }
-      return ResponseEntity.ok(
-          new ApiResponse<>(true, "Email was sent", null));
+
+      if (account.getProvider().equals(AuthProvider.google)) {
+        return ResponseEntity.badRequest().body(new ApiResponse<>(false, "This email is registered with Google", null));
+      }
+
+      String token = tokenProvider.generateToken(account.getId());
+      if (!account.isApproved()) {
+        emailService.sendConfirmAccount(email, token);
+      } else {
+        emailService.sendConfirmRecovery(email, token);
+      }
+      return ResponseEntity.ok(new ApiResponse<>(true, "Email was sent", null));
     } catch (BadRequestException | MessagingException | IOException ex) {
       return ResponseEntity.badRequest().body(new ApiResponse<>(false, ex.getMessage(), null));
     }

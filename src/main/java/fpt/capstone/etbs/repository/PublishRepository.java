@@ -17,6 +17,8 @@ public interface PublishRepository extends JpaRepository<Publish, Integer> {
 
   List<Publish> getByDuplicateTemplate_Id(Integer templateId);
 
+  List<Publish> getByStatusInAndLastModifiedDateBefore(List<PublishStatus>  statuses, LocalDateTime limit);
+
   long countByAuthor_IdAndStatusInAndCreatedDateBetween(UUID authorId, List<PublishStatus> statuses,
       LocalDateTime from, LocalDateTime to);
 }

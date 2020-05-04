@@ -14,7 +14,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
 
   List<Notification> getByAccount_IdAndLoadedFalseOrderByCreatedDateDesc(UUID accountId);
 
-  List<Notification> getByLoadedTrueAndCreatedDateBefore(LocalDateTime limit);
+  List<Notification> getByLoadedTrueAndLastModifiedDateBefore(LocalDateTime limit);
 
-  List<Notification> getByIdIn(Integer[] ids);
 }

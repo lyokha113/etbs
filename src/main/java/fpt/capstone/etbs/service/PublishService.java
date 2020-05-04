@@ -12,6 +12,8 @@ public interface PublishService {
 
   List<Publish> getPublishes(UUID authorId);
 
+  List<Publish> getPublishesToRemove();
+
   Publish createPublish(UUID authorId, PublishRequest request);
 
   Publish approve(Integer id, ApprovePublishRequest approveRequest) throws Exception;
