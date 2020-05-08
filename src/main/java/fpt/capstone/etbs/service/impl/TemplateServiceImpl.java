@@ -229,6 +229,7 @@ public class TemplateServiceImpl implements TemplateService {
       long up = ratings.stream().filter(Rating::isVote).count();
       long down = ratings.stream().filter(r -> !r.isVote()).count();
       long sign = up - down;
+      // Log b of a = Log 10 a / Log 10 b = Log e a / Log e b => Log 2 sign
       double voteScore = Math.log((Math.max(Math.abs(sign), 1))) / Math.log(2);
       sign = Long.compare(sign, 0);
 

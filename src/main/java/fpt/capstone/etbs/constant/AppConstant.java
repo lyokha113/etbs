@@ -18,7 +18,7 @@ public class AppConstant {
   public static final String TEMPLATE_THUMBNAIL = "thumbnail/template/";
   public static final String TUTORIAL_THUMBNAIL = "thumbnail/tutorial/";
 
-  public static final String BLANK_CONTENT = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\"><html xmlns=\"http://www.w3.org/1999/xhtml\"> <head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"> <meta name=\"format-detection\" content=\"telephone=no\"> <meta name=\"viewport\" content=\"width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no;\"> <meta http-equiv=\"X-UA-Compatible\" content=\"IE=9; IE=8; IE=7; IE=EDGE\"/> <title>ETBS</title> </head> <body style=\"margin: 0; padding: 0; min-width: 100%!important;\"> </body></html>";
+  public static final String BLANK_CONTENT = "<table width=\"100%\" height=\"500\" style=\"box-sizing: border-box; height: auto; margin: 0 auto 10px auto; padding: 0 0 0 0; width: 100%; max-width: auto;\"> <tbody style=\"box-sizing: border-box;\"></tbody></table>";
   public static final String ACCOUNT_CONFIRM_SUBJECT = "Welcome to ETBS";
   public static final String EMAIL_CONFIRM_SUBJECT = "Confirmation for approving your email";
   public static final String RECOVERY_CONFIRM_SUBJECT = "Recovery your password confirmation";

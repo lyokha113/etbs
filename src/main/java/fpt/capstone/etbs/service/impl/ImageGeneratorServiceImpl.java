@@ -4,6 +4,8 @@ import fpt.capstone.etbs.component.ChromeDriverEx;
 import fpt.capstone.etbs.service.ImageGeneratorService;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import org.apache.commons.text.StringEscapeUtils;
 import org.openqa.selenium.By;
@@ -25,6 +27,9 @@ public class ImageGeneratorServiceImpl implements ImageGeneratorService {
 
   @Override
   public BufferedImage generateImageFromHtmlByChrome(String html) throws Exception {
+
+    System.setProperty("webdriver.chrome.silentOutput", "true");
+    Logger.getLogger("org.openqa.selenium").setLevel(Level.OFF);
 
     ChromeOptions chromeOptions = new ChromeOptions();
     chromeOptions.setHeadless(true);
@@ -54,7 +59,9 @@ public class ImageGeneratorServiceImpl implements ImageGeneratorService {
       }
       Thread.sleep(100);
     }
+    Thread.sleep(100);
 
+    driver.executeScript("document.body.style.overflow = 'hidden'");
     File screenshot = driver.getFullScreenshotAs(OutputType.FILE);
     driver.quit();
     return ImageIO.read(screenshot);
