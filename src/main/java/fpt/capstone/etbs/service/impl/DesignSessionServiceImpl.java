@@ -28,6 +28,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -142,6 +143,10 @@ public class DesignSessionServiceImpl implements DesignSessionService {
 
     if (session == null) {
       throw new BadRequestException("Session doesn't exist");
+    }
+
+    if (StringUtils.isEmpty(content)) {
+      throw new BadRequestException("Content is empty");
     }
 
     RawTemplate rawTemplate = session.getRawTemplate();

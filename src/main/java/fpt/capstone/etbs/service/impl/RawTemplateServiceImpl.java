@@ -161,6 +161,10 @@ public class RawTemplateServiceImpl implements RawTemplateService {
       throw new BadRequestException("Raw template doesn't exist");
     }
 
+    if (StringUtils.isEmpty(content)) {
+      throw new BadRequestException("Content is empty");
+    }
+
     rawTemplate.setContent(content);
     rawTemplate = rawTemplateRepository.save(rawTemplate);
     return rawTemplate;

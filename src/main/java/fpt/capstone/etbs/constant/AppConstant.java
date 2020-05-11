@@ -8,9 +8,9 @@ public class AppConstant {
   public static final String DEFAULT_AVATAR_ADMIN_URL =
       "https://firebasestorage.googleapis.com/v0/b/etbs-441a1.appspot.com/o/default%2Fdefault_avatar_admin.png?alt=media&token=aa1a4bad-4d74-4edc-b7c7-c2017697afc7";
   public static final String DEFAULT_TUTORIAL_THUMBNAIL =
-      "https://firebasestorage.googleapis.com/v0/b/etbs-441a1.appspot.com/o/default%2Fdefault_template.png?alt=media&token=b5126bf4-d80e-470a-8931-a0b09a98badd";
+      "https://firebasestorage.googleapis.com/v0/b/etbs-441a1.appspot.com/o/default%2Fdefault_tutorial.png?alt=media&token=0c3095af-d0b2-48b6-a2a1-78126cf95dd8";
   public static final String DEFAULT_RAW_TEMPLATE_THUMBNAIL =
-      "https://firebasestorage.googleapis.com/v0/b/etbs-441a1.appspot.com/o/default%2Fdefault_template.png?alt=media&token=b5126bf4-d80e-470a-8931-a0b09a98badd";
+      "https://firebasestorage.googleapis.com/v0/b/etbs-441a1.appspot.com/o/default%2Fdefault_template.png?alt=media&token=9f1b5725-2df8-4898-b396-a09556521283";
 
   public static final String USER_IMAGES = "userImages/";
   public static final String TEMPLATE_IMAGE = "template/";
@@ -18,7 +18,7 @@ public class AppConstant {
   public static final String TEMPLATE_THUMBNAIL = "thumbnail/template/";
   public static final String TUTORIAL_THUMBNAIL = "thumbnail/tutorial/";
 
-  public static final String BLANK_CONTENT = "<table width=\"100%\" height=\"500\" style=\"box-sizing: border-box; height: auto; margin: 0 auto 10px auto; padding: 0 0 0 0; width: 100%; max-width: auto;\"> <tbody style=\"box-sizing: border-box;\"></tbody></table>";
+  public static final String BLANK_CONTENT = "<table id=\"iz6h\" style=\"box-sizing: border-box; height: 150px; margin: 0 auto 10px auto; padding: 5px 5px 5px 5px; width: 100%;\" width=\"100%\" height=\"150\"> <tbody style=\"box-sizing: border-box;\"> <tr style=\"box-sizing: border-box;\"> <td id=\"idg9i\" style=\"box-sizing: border-box; padding: 0; margin: 0; vertical-align: top;\" valign=\"top\"> </td></tr></tbody></table>";
   public static final String ACCOUNT_CONFIRM_SUBJECT = "Welcome to ETBS";
   public static final String EMAIL_CONFIRM_SUBJECT = "Confirmation for approving your email";
   public static final String RECOVERY_CONFIRM_SUBJECT = "Recovery your password confirmation";

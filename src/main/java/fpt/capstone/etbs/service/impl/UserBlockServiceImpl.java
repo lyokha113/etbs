@@ -2,6 +2,7 @@ package fpt.capstone.etbs.service.impl;
 
 import static fpt.capstone.etbs.constant.AppConstant.CURRENT_ONLINE_CACHE;
 
+import fpt.capstone.etbs.constant.AppConstant;
 import fpt.capstone.etbs.exception.BadRequestException;
 import fpt.capstone.etbs.model.Account;
 import fpt.capstone.etbs.model.RawTemplate;
@@ -24,6 +25,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class UserBlockServiceImpl implements UserBlockService {
@@ -72,7 +74,7 @@ public class UserBlockServiceImpl implements UserBlockService {
 
     userBlock = UserBlock.builder()
         .name(request.getName()).icon(request.getIcon())
-        .content("").account(account)
+        .content(AppConstant.BLANK_CONTENT).account(account)
         .build();
 
     return userBlockRepository.save(userBlock);
@@ -100,6 +102,10 @@ public class UserBlockServiceImpl implements UserBlockService {
     UserBlock userBlock = userBlockRepository.getByAccount_IdAndId(accountId, id).orElse(null);
     if (userBlock == null) {
       throw new BadRequestException("Block doesn't exist");
+    }
+
+    if (StringUtils.isEmpty(content)) {
+      throw new BadRequestException("Content is empty");
     }
 
     userBlock.setContent(content);
