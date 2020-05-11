@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class PublishServiceImpl implements PublishService {
@@ -91,6 +92,10 @@ public class PublishServiceImpl implements PublishService {
     if (!checkPublishPolicy(authorId)) {
       throw new BadRequestException(
           "Publish request was reached limitation. Please wait for processing and request later.");
+    }
+
+    if (StringUtils.isEmpty(request.getContent())) {
+      throw new BadRequestException("Request content is empty");
     }
 
     Publish publish = Publish.builder().content(request.getContent()).name(request.getName())

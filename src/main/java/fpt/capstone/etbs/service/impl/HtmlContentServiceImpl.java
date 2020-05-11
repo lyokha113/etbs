@@ -41,8 +41,8 @@ public class HtmlContentServiceImpl implements HtmlContentService {
       String cssQuery =
           "[datatype=" + attr.getDatatype() + "]"
               + "[name=" + attr.getName() + "]";
-      Element ele = doc.select(cssQuery).first();
-      if (ele != null) {
+      Elements elements = doc.select(cssQuery);
+      for (Element ele : elements) {
         String value = attr.getValue();
         if (attr.getDatatype().equalsIgnoreCase("dynamic text")) {
           ele.text(value);

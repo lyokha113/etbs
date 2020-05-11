@@ -52,7 +52,6 @@ public class RawTemplate extends Auditing {
   private String description;
 
   @Column(columnDefinition = "longtext")
-  @NotBlank
   private String content;
 
   @Column(columnDefinition = "text")
