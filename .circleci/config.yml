@@ -19,16 +19,18 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "build.gradle" }}
+      - run: gradle build
       - run: |
-          gradle build
           cp ~/repo/Procfile ~/repo/build/libs/
-          zip -r etbs.zip *.jar Procfile
+          cd ~/repo/build/libs/
+          zip etbs.zip *
+          rm ~/repo/build/libs/*.jar
       - persist_to_workspace:
           root: .
           paths: build/libs/
   deploy:
     docker:
-      - image: circleci/python:2.7
+      - image: circleci/python:3.6.8
     steps:
       - attach_workspace:
           at: ~/repo
