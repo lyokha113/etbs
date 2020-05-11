@@ -28,8 +28,8 @@ public class ImageGeneratorServiceImpl implements ImageGeneratorService {
   @Override
   public BufferedImage generateImageFromHtmlByChrome(String html) throws Exception {
 
-    System.setProperty("webdriver.chrome.silentOutput", "true");
-    Logger.getLogger("org.openqa.selenium").setLevel(Level.OFF);
+//    System.setProperty("webdriver.chrome.silentOutput", "true");
+//    Logger.getLogger("org.openqa.selenium").setLevel(Level.OFF);
 
     ChromeOptions chromeOptions = new ChromeOptions();
     chromeOptions.setHeadless(true);
