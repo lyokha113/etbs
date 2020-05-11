@@ -1,5 +1,7 @@
 package fpt.capstone.etbs.service;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface RedisService {
@@ -8,10 +10,16 @@ public interface RedisService {
 
   void setLoginToken(String accountId, String token);
 
-  void setOnlineSession(String key, String accountId);
+  void setOnlineSession(String rawId, String accountId);
 
-  void setOfflineSession(String key, String accountId);
+  void setOfflineSession(String rawId, String accountId);
 
-  Set<Object> getOnlineSessions(String key);
+  void setContentToCheckDuplicate(String templateId, String contentId);
+
+  void initContentToCheckDuplicate();
+
+  Set<Object> getOnlineSessions(String rawId);
+
+  Map<Object, Object> getContentToCheckDuplicate();
 
 }

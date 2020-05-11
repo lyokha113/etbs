@@ -1,1 +1,1 @@
-web: java -jar etbs-1.0.0.jar -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5003
+web: java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5003 -jar etbs-1.0.0.jar

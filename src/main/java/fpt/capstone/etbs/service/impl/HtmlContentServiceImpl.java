@@ -17,7 +17,7 @@ public class HtmlContentServiceImpl implements HtmlContentService {
   @Override
   public String setSynchronizeContent(UserBlock block, String content) {
     Document doc = Jsoup.parse(content, "UTF-8");
-    String cssQuery = "[datatype=user block][name=" + block.getId() + "-" + block.getName() + "]";
+    String cssQuery = "[datatype=user block][name=" + block.getId() + "]";
     Elements ele = doc.select(cssQuery);
 
     if (ele.isEmpty()) {

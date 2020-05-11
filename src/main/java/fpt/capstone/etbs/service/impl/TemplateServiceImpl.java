@@ -19,7 +19,9 @@ import fpt.capstone.etbs.repository.PublishRepository;
 import fpt.capstone.etbs.repository.RatingRepository;
 import fpt.capstone.etbs.repository.TemplateRepository;
 import fpt.capstone.etbs.service.FirebaseService;
+import fpt.capstone.etbs.service.HtmlContentService;
 import fpt.capstone.etbs.service.ImageGeneratorService;
+import fpt.capstone.etbs.service.RedisService;
 import fpt.capstone.etbs.service.TemplateService;
 import java.awt.image.BufferedImage;
 import java.math.BigDecimal;
@@ -68,6 +70,12 @@ public class TemplateServiceImpl implements TemplateService {
 
   @Autowired
   private ImageGeneratorService imageGeneratorService;
+
+  @Autowired
+  private RedisService redisService;
+
+  @Autowired
+  private HtmlContentService htmlContentService;
 
   @Override
   public List<Template> getTemplates() {
@@ -145,6 +153,10 @@ public class TemplateServiceImpl implements TemplateService {
     template = templateRepository.save(template);
     template = updateContentImage(template);
     template = updateThumbnail(template);
+
+    redisService.setContentToCheckDuplicate(String.valueOf(template.getId()),
+        htmlContentService.removeAllText(template.getContent()));
+
     return template;
   }
 

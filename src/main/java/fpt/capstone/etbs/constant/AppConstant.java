@@ -47,4 +47,5 @@ public class AppConstant {
 
   public static final String CURRENT_ONLINE_CACHE = "CurrentOnline";
   public static final String LOGIN_CACHE = "Login";
+  public static final String CONTENT_TO_CHECK_DUPLICATE_CACHE = "TemplateContent";
 }
