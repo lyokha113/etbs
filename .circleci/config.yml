@@ -32,6 +32,7 @@ jobs:
           at: ~/repo
       - run: sudo pip install awscli
       - run: |
+          ls ~/repo
           cp ~/repo/Procfile ~/repo/build/libs/
           zip -r etbs.zip *.jar Procfile
           aws s3 cp ~/repo/build/libs/etbs.zip s3://elasticbeanstalk-ap-southeast-1-453030339737/etbs.zip --region ap-southeast-1
