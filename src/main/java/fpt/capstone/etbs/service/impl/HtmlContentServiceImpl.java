@@ -18,14 +18,14 @@ public class HtmlContentServiceImpl implements HtmlContentService {
   public String setSynchronizeContent(UserBlock block, String content) {
     Document doc = Jsoup.parse(content, "UTF-8");
     String cssQuery = "[datatype=user block][name=" + block.getId() + "]";
-    Elements ele = doc.select(cssQuery);
+    Elements elements = doc.select(cssQuery);
 
-    if (ele.isEmpty()) {
+    if (elements.isEmpty()) {
       return null;
     }
 
-    ele.empty();
-    ele.append(block.getContent());
+    elements.empty();
+    elements.append(block.getContent());
     return doc.outerHtml();
   }
 
@@ -42,16 +42,15 @@ public class HtmlContentServiceImpl implements HtmlContentService {
           "[datatype=" + attr.getDatatype() + "]"
               + "[name=" + attr.getName() + "]";
       Elements elements = doc.select(cssQuery);
-      for (Element ele : elements) {
         String value = attr.getValue();
         if (attr.getDatatype().equalsIgnoreCase("dynamic text")) {
-          ele.text(value);
+          elements.empty();
+          elements.append(value);
         } else if (attr.getDatatype().equalsIgnoreCase("dynamic link")) {
-          ele.attr("href", value);
+          elements.attr("href", value);
         } else if (attr.getDatatype().equalsIgnoreCase("dynamic image")) {
-          ele.attr("src", value);
+          elements.attr("src", value);
         }
-      }
     });
     return doc.outerHtml();
   }
