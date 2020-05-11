@@ -1,0 +1,1 @@
+web: java -jar etbs-1.0.0.jar -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=4443
