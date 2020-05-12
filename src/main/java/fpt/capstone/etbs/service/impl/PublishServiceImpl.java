@@ -186,25 +186,28 @@ public class PublishServiceImpl implements PublishService {
 
     Jaccard jaccard = new Jaccard();
     for (Publish publish : publishes) {
+      double maxRate = AppConstant.MIN_DUPLICATION_RATE;
       for (Entry<Object, Object> entry : templates.entrySet()) {
         String publishContent = htmlContentService.removeAllText(publish.getContent());
         String templateContent = (String) entry.getValue();
         double dupRate = jaccard.distance(publishContent, templateContent);
-        if (dupRate > AppConstant.MIN_DUPLICATION_RATE) {
+        if (dupRate > maxRate) {
           Template duplicateTemplate =
               Template.builder().id(Integer.parseInt((String) entry.getKey())).name("").content(templateContent).build();
           BigDecimal rate = BigDecimal.valueOf(dupRate * 100).setScale(3, RoundingMode.DOWN);
           publish.setDuplicateTemplate(duplicateTemplate);
           publish.setDuplicateRate(rate.doubleValue());
-
           if (dupRate >= AppConstant.MAX_DUPLICATION_RATE) {
             publish.setStatus(PublishStatus.DENIED);
           }
-
-        } else {
+          maxRate = dupRate;
+        }
+      }
+      if (maxRate >= AppConstant.MAX_DUPLICATION_RATE) {
+          publish.setStatus(PublishStatus.DENIED);
+      } else if (maxRate <= AppConstant.MIN_DUPLICATION_RATE) {
           publish.setDuplicateTemplate(null);
           publish.setDuplicateRate(0.0);
-        }
       }
     }
 
