@@ -103,15 +103,15 @@ public class RawTemplateServiceImpl implements RawTemplateService {
 
     rawTemplate = rawTemplateRepository.save(rawTemplate);
 
-    if (request.getRawId() != null) {
-      RawTemplate raw = getRawTemplate(request.getRawId(), accountId);
-      if (raw != null) {
-        updateContent(accountId, rawTemplate.getId(), raw.getContent());
-      }
-    } else if (request.getTemplateId() != null) {
+    if (request.getTemplateId() != null) {
       Template template = templateService.getTemplate(request.getTemplateId());
       if (template != null) {
         updateContent(accountId, rawTemplate.getId(), template.getContent());
+      }
+    } else if (request.getRawId() != null) {
+      RawTemplate raw = getRawTemplate(request.getRawId(), accountId);
+      if (raw != null) {
+        updateContent(accountId, rawTemplate.getId(), raw.getContent());
       }
     }
 
