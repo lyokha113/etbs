@@ -1,11 +1,12 @@
 package fpt.capstone.etbs.service.impl;
 
+
+
 import fpt.capstone.etbs.component.ChromeDriverEx;
 import fpt.capstone.etbs.service.ImageGeneratorService;
+import fpt.capstone.etbs.util.ImageUtils;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import org.apache.commons.text.StringEscapeUtils;
 import org.openqa.selenium.By;
@@ -64,7 +65,7 @@ public class ImageGeneratorServiceImpl implements ImageGeneratorService {
     driver.executeScript("document.body.style.overflow = 'hidden'");
     File screenshot = driver.getFullScreenshotAs(OutputType.FILE);
     driver.quit();
-    return ImageIO.read(screenshot);
+    return ImageUtils.resizeThumbnail(ImageIO.read(screenshot));
   }
 
 }
