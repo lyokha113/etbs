@@ -14,5 +14,6 @@ public class RawTemplateRequest {
   private String name;
   private String description;
   private Integer templateId;
+  private Integer rawId;
   private Integer workspaceId;
 }
