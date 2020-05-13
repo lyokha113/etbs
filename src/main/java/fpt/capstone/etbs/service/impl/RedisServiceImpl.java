@@ -56,6 +56,11 @@ public class RedisServiceImpl implements RedisService {
   }
 
   @Override
+  public void removeTemplateToCheckDuplicate(String templateId) {
+    redisTemplate.opsForHash().delete(CONTENT_TO_CHECK_DUPLICATE_CACHE, templateId);
+  }
+
+  @Override
   public void initContentToCheckDuplicate() {
     if (redisTemplate.opsForHash().size(CONTENT_TO_CHECK_DUPLICATE_CACHE) == 0) {
       List<Template> templates = templateRepository.findAll();

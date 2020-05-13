@@ -30,7 +30,7 @@ public class AppConstant {
 
   public static final double MAX_WIDTH_TEMPLATE_THUMBNAIL = 350;
   public static final double MAX_DUPLICATION_RATE = 0.9;
-  public static final double MIN_DUPLICATION_RATE = 0.5;
+  public static final double MIN_DUPLICATION_RATE = 0.4;
   public static final int MAX_PENDING_PUBLISH = 3;
   public static final int MAX_DESIGN_SESSION = 4;
   public static final int MAX_TEST_EMAIL = 5;

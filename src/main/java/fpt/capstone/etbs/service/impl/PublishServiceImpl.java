@@ -32,9 +32,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.apache.commons.text.similarity.JaroWinklerSimilarity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @Service
@@ -125,8 +127,6 @@ public class PublishServiceImpl implements PublishService {
         PublishResponse.setResponse(publish));
 
     notificationService.createApproveNotification(publish.getAuthor(), template.getId());
-    redisService.setContentToCheckDuplicate(String.valueOf(template.getId()),
-        htmlContentService.removeAllText(template.getContent()));
     return publish;
   }
 
@@ -180,36 +180,28 @@ public class PublishServiceImpl implements PublishService {
   }
 
   private void checkDuplicate(List<Publish> publishes) {
-    redisService.initContentToCheckDuplicate();
-
-    Map<Object, Object> templates = redisService.getContentToCheckDuplicate();
-
-    Jaccard jaccard = new Jaccard();
+    List<Template> templates = templateRepository.findAll();
+    JaroWinklerSimilarity jws = new JaroWinklerSimilarity();
     for (Publish publish : publishes) {
       double maxRate = AppConstant.MIN_DUPLICATION_RATE;
-      for (Entry<Object, Object> entry : templates.entrySet()) {
+      for (Template template : templates) {
         String publishContent = htmlContentService.removeAllText(publish.getContent());
-        String templateContent = (String) entry.getValue();
-        double dupRate = jaccard.distance(publishContent, templateContent);
+        String templateContent = htmlContentService.removeAllText(template.getContent());
+        double dupRate = jws.apply(publishContent, templateContent);
         if (dupRate > maxRate) {
-          Template duplicateTemplate =
-              Template.builder().id(Integer.parseInt((String) entry.getKey())).name("").content(templateContent).build();
           BigDecimal rate = BigDecimal.valueOf(dupRate * 100).setScale(3, RoundingMode.DOWN);
-          publish.setDuplicateTemplate(duplicateTemplate);
+          publish.setDuplicateTemplate(template);
           publish.setDuplicateRate(rate.doubleValue());
-          if (dupRate >= AppConstant.MAX_DUPLICATION_RATE) {
-            publish.setStatus(PublishStatus.DENIED);
-          }
           maxRate = dupRate;
         }
       }
-      if (maxRate >= AppConstant.MAX_DUPLICATION_RATE) {
+      if (maxRate <= AppConstant.MIN_DUPLICATION_RATE) {
+        publish.setDuplicateTemplate(null);
+        publish.setDuplicateRate(0.0);
+      } else if (maxRate >= AppConstant.MAX_DUPLICATION_RATE) {
           publish.setStatus(PublishStatus.DENIED);
-      } else if (maxRate <= AppConstant.MIN_DUPLICATION_RATE) {
-          publish.setDuplicateTemplate(null);
-          publish.setDuplicateRate(0.0);
+        }
       }
-    }
 
     publishRepository.saveAll(publishes);
   }

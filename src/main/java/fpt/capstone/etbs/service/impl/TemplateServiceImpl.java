@@ -153,10 +153,6 @@ public class TemplateServiceImpl implements TemplateService {
     template = templateRepository.save(template);
     template = updateContentImage(template);
     template = updateThumbnail(template);
-
-    redisService.setContentToCheckDuplicate(String.valueOf(template.getId()),
-        htmlContentService.removeAllText(template.getContent()));
-
     return template;
   }
 

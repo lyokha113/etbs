@@ -16,6 +16,8 @@ public interface RedisService {
 
   void setContentToCheckDuplicate(String templateId, String contentId);
 
+  void removeTemplateToCheckDuplicate(String templateId);
+
   void initContentToCheckDuplicate();
 
   Set<Object> getOnlineSessions(String rawId);
