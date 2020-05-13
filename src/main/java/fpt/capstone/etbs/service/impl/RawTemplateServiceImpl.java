@@ -28,6 +28,7 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,8 +90,8 @@ public class RawTemplateServiceImpl implements RawTemplateService {
       throw new BadRequestException("Workspace doesn't exist");
     }
 
-    if (isDuplicateNameEachWorkspace(request.getName(), workspace)) {
-      throw new BadRequestException("Template name is existed in this workspace");
+    if (isDuplicateTemplateName(request.getName(), accountId)) {
+      throw new BadRequestException("Template name is existed");
     }
 
     RawTemplate rawTemplate = RawTemplate.builder()
@@ -129,9 +130,8 @@ public class RawTemplateServiceImpl implements RawTemplateService {
       throw new BadRequestException("Template doesn't exist");
     }
 
-    if (isDuplicateNameEachWorkspace(request.getName(), rawTemplate.getWorkspace().getId(),
-        rawTemplate.getId())) {
-      throw new BadRequestException("Template name is existed in this workspace");
+    if (isDuplicateTemplateName(request.getName(), rawTemplate.getId(), accountId)) {
+      throw new BadRequestException("Template name is existed");
     }
 
     if (!StringUtils.isEmpty(request.getName())) {
@@ -246,13 +246,25 @@ public class RawTemplateServiceImpl implements RawTemplateService {
     rawTemplateRepository.delete(rawTemplate);
   }
 
-  private boolean isDuplicateNameEachWorkspace(String name, Workspace workspace) {
-    return workspace.getRawTemplates().stream().anyMatch(rt -> rt.getName().equals(name));
+  private boolean isDuplicateTemplateName(String name, UUID accountId) {
+    List<Workspace> workspaces = workspaceRepository.getByAccount_Id(accountId);
+    for (Workspace workspace: workspaces) {
+      if (workspace.getRawTemplates().stream().anyMatch(rt -> rt.getName().equals(name))) {
+        return true;
+      }
+    }
+    return false;
   }
 
-  private boolean isDuplicateNameEachWorkspace(String name, Integer workspaceId, Integer id) {
-    return rawTemplateRepository.getByNameAndWorkspace_IdAndIdNot(name, workspaceId, id)
-        .isPresent();
+  private boolean isDuplicateTemplateName(String name, Integer rawId, UUID accountId) {
+    List<Workspace> workspaces = workspaceRepository.getByAccount_Id(accountId);
+    for (Workspace workspace: workspaces) {
+      if (workspace.getRawTemplates().stream()
+          .anyMatch(rt -> rt.getName().equals(name) && !rt.getId().equals(rawId))) {
+        return true;
+      }
+    }
+    return false;
   }
 
 }
